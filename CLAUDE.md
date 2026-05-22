@@ -1,5 +1,7 @@
 # Bloomprint — Project Rules
 
+> New here? Read [AGENTS.md](./AGENTS.md) for the repo map, commands, and conventions.
+
 **North Star:** Bloomprint turns yard inspiration into a buildable plan.
 
 Bloomprint must feel like *a smart outdoor transformation assistant*, **not a landscaping intake

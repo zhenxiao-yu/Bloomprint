@@ -79,6 +79,9 @@ export function ShoppingTable({ items }: { items: ShoppingItem[] }) {
     [t, priorityLabel],
   );
 
+  // TanStack Table manages its own memoization; the React Compiler can't analyze
+  // its hook and warns spuriously. Safe to ignore here.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data: items,
     columns,
