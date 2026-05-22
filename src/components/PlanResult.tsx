@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import type { BloomprintPlan, ShoppingPriority } from "@/domain/models";
+import type { BloomprintPlan, RefinementAdjustment, ShoppingPriority } from "@/domain/models";
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
 import { Chip, MetricPill, Money, Section, SeverityTag } from "@/components/ui";
 import { ConceptBoard } from "@/components/ConceptBoard";
+import { CommandBar } from "@/components/CommandBar";
 import { PlanCharts } from "@/components/PlanCharts";
 import { ShoppingTable } from "@/components/ShoppingTable";
 import { ImaginedView } from "@/components/ImaginedView";
@@ -49,13 +50,14 @@ export function PlanResult({
 }: {
   result: BloomprintPlan;
   view: ViewMode;
-  adjustments: string[];
+  adjustments: RefinementAdjustment[];
   busy: boolean;
-  onRefine: (adjustment: (typeof REFINEMENTS)[number]["value"]) => void;
+  onRefine: (adjustment: RefinementAdjustment) => void;
   onAccuracy: (field: "sun" | "soil" | "drainage", value: string) => void;
   photoUrl?: string | null;
 }) {
   const t = useTranslations("Result");
+  const tr = useTranslations("Refinements");
   const { plan, enhancement } = result;
   const showNumbers = view !== "simple";
   const [boardView, setBoardView] = useState<"now" | "planned">("planned");
@@ -246,6 +248,9 @@ export function PlanResult({
         </div>
       </section>
 
+      {/* Natural-language command bar — maps plain language onto the refinements below */}
+      <CommandBar adjustments={adjustments} busy={busy} onRefine={onRefine} />
+
       {/* Refinement chips — first plan is Draft 1 */}
       <section className="card p-5">
         <p className="text-sm font-semibold text-foreground">{t("firstDraft")}</p>
@@ -262,7 +267,7 @@ export function PlanResult({
                   active ? "bg-brand text-on-strong" : "border border-border text-foreground hover:border-brand"
                 }`}
               >
-                {r.label}
+                {tr(r.value)}
               </button>
             );
           })}

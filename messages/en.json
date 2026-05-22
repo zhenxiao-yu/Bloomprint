@@ -123,6 +123,32 @@
     "noPhotoNote": "No photo needed — you'll get a layout you can build. Add details after to sharpen it.",
     "buildButton": "Build my plan"
   },
+  "Command": {
+    "title": "Tell Bloomprint what to change",
+    "placeholder": "e.g. cheaper but still premium, more privacy, safer for dogs",
+    "apply": "Apply",
+    "willApply": "I'll apply:",
+    "noMatch": "I can adjust things like: cheaper, easier, more privacy, less watering, salt-tolerant. Try one of those.",
+    "hint": "Plain language becomes real plan changes — I only adjust the plan, never freeform chat."
+  },
+  "Refinements": {
+    "cheaper": "Lower the budget",
+    "easier": "Make it easier",
+    "less-trimming": "Less trimming",
+    "more-flowers": "More flowers",
+    "more-colorful": "More colorful",
+    "more-privacy": "More privacy",
+    "more-shade": "More shade-friendly",
+    "more-modern": "More modern",
+    "premium-look": "More premium look",
+    "better-resale": "Better for resale",
+    "better-winter": "Better in winter",
+    "wildlife-friendly": "More wildlife friendly",
+    "dog-safe": "Safer for dogs & kids",
+    "salt-safe": "Salt-tolerant",
+    "less-watering": "Less watering",
+    "stone-to-mulch": "Stone → mulch"
+  },
   "About": {
     "metaTitle": "About — Bloomprint",
     "metaDescription": "How Bloomprint turns yard inspiration into a buildable plan — and the principles behind it.",

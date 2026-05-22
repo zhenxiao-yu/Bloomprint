@@ -123,6 +123,32 @@
     "noPhotoNote": "不用照片也行 —— 你会得到一份能动手做的布置方案。之后再补细节会更准。",
     "buildButton": "生成我的方案"
   },
+  "Command": {
+    "title": "告诉 Bloomprint 想改什么",
+    "placeholder": "例如：更便宜但保持质感、更私密、对狗更安全",
+    "apply": "应用",
+    "willApply": "我会应用：",
+    "noMatch": "我可以调整这些方面：更便宜、更省事、更私密、更省水、耐融雪盐。可以试试其中之一。",
+    "hint": "用大白话说，就能变成真实的方案调整 —— 我只调整方案，不做闲聊。"
+  },
+  "Refinements": {
+    "cheaper": "降低预算",
+    "easier": "做起来更省事",
+    "less-trimming": "少修剪",
+    "more-flowers": "多点花",
+    "more-colorful": "更鲜艳多彩",
+    "more-privacy": "更私密遮挡",
+    "more-shade": "更耐阴",
+    "more-modern": "更现代简约",
+    "premium-look": "更高级的质感",
+    "better-resale": "更利于转售",
+    "better-winter": "冬天更耐看",
+    "wildlife-friendly": "更吸引鸟与传粉昆虫",
+    "dog-safe": "对狗和孩子更安全",
+    "salt-safe": "耐融雪盐",
+    "less-watering": "更省水",
+    "stone-to-mulch": "石头换成木屑"
+  },
   "About": {
     "metaTitle": "关于 —— Bloomprint",
     "metaDescription": "Bloomprint 如何把院子灵感变成一份能动手做的方案，以及背后的理念。",

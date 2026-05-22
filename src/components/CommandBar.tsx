@@ -1,0 +1,92 @@
+"use client";
+
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { Sparkles, ArrowRight } from "lucide-react";
+import type { RefinementAdjustment } from "@/domain/models";
+import { parseCommand } from "@/lib/command/parseCommand";
+
+/**
+ * Constrained natural-language command bar. Plain text is parsed (deterministically)
+ * into the app's existing refinement vocabulary and applied through the SAME onRefine
+ * path as the chips. It is NOT a chatbot: it produces structured plan changes, never
+ * freeform conversation (CLAUDE.md guardrail).
+ */
+export function CommandBar({
+  adjustments,
+  busy,
+  onRefine,
+}: {
+  adjustments: RefinementAdjustment[];
+  busy: boolean;
+  onRefine: (adjustment: RefinementAdjustment) => void;
+}) {
+  const t = useTranslations("Command");
+  const tr = useTranslations("Refinements");
+  const [text, setText] = useState("");
+  const [applied, setApplied] = useState<RefinementAdjustment[] | null>(null);
+  const [noMatch, setNoMatch] = useState(false);
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (busy) return;
+    const { matched, unmatched } = parseCommand(text);
+    if (unmatched || matched.length === 0) {
+      setNoMatch(text.trim().length > 0);
+      setApplied(null);
+      return;
+    }
+    // Additive only — never toggle an already-active refinement off.
+    const toApply = matched.filter((m) => !adjustments.includes(m));
+    toApply.forEach((m) => onRefine(m));
+    setApplied(matched);
+    setNoMatch(false);
+    setText("");
+  }
+
+  return (
+    <div className="card p-4">
+      <div className="flex items-center gap-2">
+        <Sparkles className="size-4 text-accent" aria-hidden />
+        <h3 className="text-sm font-semibold text-foreground">{t("title")}</h3>
+      </div>
+
+      <form onSubmit={submit} className="mt-3 flex gap-2">
+        <input
+          value={text}
+          onChange={(e) => {
+            setText(e.target.value);
+            setNoMatch(false);
+          }}
+          placeholder={t("placeholder")}
+          aria-label={t("title")}
+          disabled={busy}
+          className="card min-h-11 w-full p-2.5 text-sm"
+        />
+        <button
+          type="submit"
+          disabled={busy || text.trim().length === 0}
+          className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full bg-brand px-4 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
+        >
+          {t("apply")} <ArrowRight className="size-4" aria-hidden />
+        </button>
+      </form>
+
+      {applied && applied.length > 0 ? (
+        <div className="mt-3 flex flex-wrap items-center gap-1.5 text-sm">
+          <span className="text-muted">{t("willApply")}</span>
+          {applied.map((a) => (
+            <span
+              key={a}
+              className="inline-flex items-center rounded-full bg-brand-soft px-2.5 py-0.5 text-xs font-medium text-brand-strong"
+            >
+              {tr(a)}
+            </span>
+          ))}
+        </div>
+      ) : null}
+
+      {noMatch ? <p className="mt-3 text-sm text-muted">{t("noMatch")}</p> : <p className="mt-2 text-xs text-muted">{t("hint")}</p>}
+    </div>
+  );
+}
