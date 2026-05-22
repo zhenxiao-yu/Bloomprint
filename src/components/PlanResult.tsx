@@ -58,6 +58,7 @@ export function PlanResult({
 }) {
   const t = useTranslations("Result");
   const tr = useTranslations("Refinements");
+  const to = useTranslations("Options");
   const { plan, enhancement } = result;
   const showNumbers = view !== "simple";
   const [boardView, setBoardView] = useState<"now" | "planned">("planned");
@@ -295,7 +296,7 @@ export function PlanResult({
                   </option>
                   {ACCURACY_CONTROLS[u.field].map((o) => (
                     <option key={o.value} value={o.value}>
-                      {o.label}
+                      {to(`${u.field}.${o.value}`)}
                     </option>
                   ))}
                 </select>

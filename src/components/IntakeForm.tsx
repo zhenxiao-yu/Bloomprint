@@ -47,6 +47,7 @@ export function IntakeForm({
 }) {
   const t = useTranslations("Intake");
   const tc = useTranslations("Common");
+  const to = useTranslations("Options");
 
   const { register, handleSubmit, control } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -93,8 +94,8 @@ export function IntakeForm({
                     field.value === g.value ? "ring-2 ring-brand" : "hover:border-brand"
                   }`}
                 >
-                  <span className="block text-sm font-medium text-foreground">{g.label}</span>
-                  <span className="block text-xs text-muted">{g.blurb}</span>
+                  <span className="block text-sm font-medium text-foreground">{to(`goals.${g.value}`)}</span>
+                  <span className="block text-xs text-muted">{to(`goalBlurbs.${g.value}`)}</span>
                 </button>
               ))}
             </div>
@@ -135,7 +136,7 @@ export function IntakeForm({
             <option value="">{tc("notSure")}</option>
             {AREAS.map((a) => (
               <option key={a.value} value={a.value}>
-                {a.label}
+                {to(`areas.${a.value}`)}
               </option>
             ))}
           </select>
@@ -159,7 +160,7 @@ export function IntakeForm({
                     field.value === i ? "bg-brand text-on-strong" : "card text-foreground hover:border-brand"
                   }`}
                 >
-                  {b.label}
+                  {to(`budgets.${i}`)}
                 </button>
               ))}
             </div>
@@ -184,7 +185,7 @@ export function IntakeForm({
                     field.value === ef.value ? "bg-brand text-on-strong" : "card text-foreground hover:border-brand"
                   }`}
                 >
-                  {ef.label}
+                  {to(`efforts.${ef.value}`)}
                 </button>
               ))}
             </div>

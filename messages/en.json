@@ -110,6 +110,86 @@
     "nameRequired": "Please enter your name.",
     "emailInvalid": "Enter a valid email, or leave it blank."
   },
+  "PhotoPanel": {
+    "title": "Your photo",
+    "changePhoto": "Change photo",
+    "addPhoto": "Add a photo",
+    "remove": "Remove",
+    "privacyCloud": "Uploaded privately to your account when you save this plan.",
+    "privacyLocal": "Stays in your browser — never uploaded or saved.",
+    "alt": "Your yard",
+    "reading": "Reading photo…",
+    "readPhoto": "Read my photo for sun & layout hints",
+    "readError": "Couldn't read that photo — try another.",
+    "looksLike": "Looks like",
+    "useThis": "Use this",
+    "estimateNote": "An estimate from your photo — confirm on site.",
+    "noVisionNote": "Your photo now shows as the “Now” in the before/after above.",
+    "analysisUnavailable": "Photo analysis is temporarily unavailable.",
+    "couldntRead": "Couldn't read that photo — try a clearer one.",
+    "sun": {
+      "full-sun": "Full sun",
+      "part-sun": "Part sun",
+      "shade": "Shade",
+      "unknown": "Unsure"
+    }
+  },
+  "Options": {
+    "goals": {
+      "privacy": "Block the view from neighbors",
+      "curb-appeal": "Make the front of my home look better",
+      "low-maintenance": "Something easy to maintain",
+      "pollinator": "Attract bees and butterflies",
+      "shade-tolerant": "Fill a shady spot",
+      "general": "Just give me a good plan"
+    },
+    "goalBlurbs": {
+      "privacy": "Add a green screen for privacy.",
+      "curb-appeal": "Lift your curb appeal.",
+      "low-maintenance": "Looks cared-for, low upkeep.",
+      "pollinator": "A garden alive with pollinators.",
+      "shade-tolerant": "Plants that thrive out of the sun.",
+      "general": "A solid all-round refresh."
+    },
+    "budgets": {
+      "0": "Under $500",
+      "1": "$500–$1,000",
+      "2": "$1,000–$2,000",
+      "3": "$2,000+"
+    },
+    "efforts": {
+      "light": "Light weekend work",
+      "moderate": "Moderate DIY",
+      "heavy": "Heavy work is okay",
+      "hire-help": "I may hire help"
+    },
+    "areas": {
+      "foundation-bed": "Along the house foundation",
+      "driveway-edge": "Along the driveway",
+      "front-walkway": "Front walkway",
+      "fence-line": "Fence line / side yard",
+      "patio-edge": "Patio edge",
+      "lawn-corner": "Open lawn corner"
+    },
+    "sun": {
+      "full-sun": "Lots of sun (6+ hrs)",
+      "part-sun": "Some sun (3–6 hrs)",
+      "shade": "Mostly shade",
+      "unknown": "I'm not sure"
+    },
+    "soil": {
+      "clay": "Heavy / clay",
+      "loam": "Rich / loamy",
+      "sandy": "Sandy / fast-draining",
+      "unknown": "I'm not sure"
+    },
+    "drainage": {
+      "well-drained": "Drains quickly",
+      "average": "Average",
+      "poor": "Water sits after rain",
+      "unknown": "I'm not sure"
+    }
+  },
   "Intake": {
     "goalQuestion": "What do you want to do?",
     "regionQuestion": "Where is the yard?",

@@ -110,6 +110,86 @@
     "nameRequired": "请填写你的名字。",
     "emailInvalid": "请填写有效的邮箱，或者留空。"
   },
+  "PhotoPanel": {
+    "title": "你的照片",
+    "changePhoto": "换张照片",
+    "addPhoto": "添加照片",
+    "remove": "移除",
+    "privacyCloud": "保存这份方案时，照片会私密上传到你的账户。",
+    "privacyLocal": "只留在你的浏览器里 —— 绝不会上传或保存。",
+    "alt": "你的院子",
+    "reading": "正在识别照片……",
+    "readPhoto": "识别照片，获取日照和布局提示",
+    "readError": "没能识别这张照片 —— 换一张试试。",
+    "looksLike": "看起来像",
+    "useThis": "用这个",
+    "estimateNote": "这是根据照片的估算 —— 请到现场再确认。",
+    "noVisionNote": "你的照片现在会作为上方对比图里的“现状”显示。",
+    "analysisUnavailable": "照片识别暂时不可用。",
+    "couldntRead": "没能识别这张照片 —— 换张更清晰的试试。",
+    "sun": {
+      "full-sun": "全日照",
+      "part-sun": "半日照",
+      "shade": "遮阴",
+      "unknown": "不确定"
+    }
+  },
+  "Options": {
+    "goals": {
+      "privacy": "挡住邻居的视线",
+      "curb-appeal": "让自家门面更好看",
+      "low-maintenance": "好打理、省心的",
+      "pollinator": "吸引蜜蜂和蝴蝶",
+      "shade-tolerant": "填满一处背阴的角落",
+      "general": "给我一份靠谱的方案就好"
+    },
+    "goalBlurbs": {
+      "privacy": "用一道绿色屏障增加私密性。",
+      "curb-appeal": "提升门面的颜值。",
+      "low-maintenance": "看着精致，又不费心打理。",
+      "pollinator": "打造一个传粉昆虫云集的花园。",
+      "shade-tolerant": "选择在背阴处也能长好的植物。",
+      "general": "一次全面又稳妥的焕新。"
+    },
+    "budgets": {
+      "0": "$500 以下",
+      "1": "$500–$1,000",
+      "2": "$1,000–$2,000",
+      "3": "$2,000 以上"
+    },
+    "efforts": {
+      "light": "周末轻松干点",
+      "moderate": "适度自己动手",
+      "heavy": "重活儿也没问题",
+      "hire-help": "可能会请人帮忙"
+    },
+    "areas": {
+      "foundation-bed": "沿着房屋墙根",
+      "driveway-edge": "沿着车道边",
+      "front-walkway": "前门步道",
+      "fence-line": "围栏边 / 侧院",
+      "patio-edge": "露台边缘",
+      "lawn-corner": "草坪空角落"
+    },
+    "sun": {
+      "full-sun": "日照充足（6 小时以上）",
+      "part-sun": "有些日照（3–6 小时）",
+      "shade": "大部分时间背阴",
+      "unknown": "我不确定"
+    },
+    "soil": {
+      "clay": "黏重 / 黏土",
+      "loam": "肥沃 / 壤土",
+      "sandy": "沙质 / 排水快",
+      "unknown": "我不确定"
+    },
+    "drainage": {
+      "well-drained": "排水很快",
+      "average": "一般",
+      "poor": "雨后会积水",
+      "unknown": "我不确定"
+    }
+  },
   "Intake": {
     "goalQuestion": "你想做点什么？",
     "regionQuestion": "院子在哪儿？",
