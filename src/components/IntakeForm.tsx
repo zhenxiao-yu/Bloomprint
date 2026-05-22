@@ -135,7 +135,7 @@ export function IntakeForm({
               aria-pressed={budgetIndex === i}
               className={`rounded-full px-4 py-2 text-sm transition ${
                 budgetIndex === i
-                  ? "bg-brand text-white"
+                  ? "bg-brand text-on-strong"
                   : "card text-foreground hover:border-brand"
               }`}
             >
@@ -158,7 +158,7 @@ export function IntakeForm({
               aria-pressed={effortLevel === ef.value}
               className={`rounded-full px-4 py-2 text-sm transition ${
                 effortLevel === ef.value
-                  ? "bg-brand text-white"
+                  ? "bg-brand text-on-strong"
                   : "card text-foreground hover:border-brand"
               }`}
             >
@@ -174,7 +174,7 @@ export function IntakeForm({
         </p>
         <button
           type="submit"
-          className="rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-strong"
+          className="rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
         >
           Build my plan
         </button>

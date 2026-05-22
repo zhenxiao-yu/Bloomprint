@@ -60,7 +60,7 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={!name.trim()}
-            className="w-full rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-strong disabled:opacity-50"
+            className="w-full rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
           >
             Create account
           </button>

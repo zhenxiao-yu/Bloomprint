@@ -182,7 +182,7 @@ export function PlanResult({
                 }}
                 aria-pressed={boardView === v}
                 className={`rounded-full px-3 py-1 capitalize transition ${
-                  boardView === v ? "bg-brand text-white" : "text-muted hover:text-foreground"
+                  boardView === v ? "bg-brand text-on-strong" : "text-muted hover:text-foreground"
                 }`}
               >
                 {v}
@@ -243,7 +243,7 @@ export function PlanResult({
                 onClick={() => onRefine(r.value)}
                 aria-pressed={active}
                 className={`rounded-full px-4 py-2 text-sm transition disabled:opacity-50 ${
-                  active ? "bg-brand text-white" : "border border-border text-foreground hover:border-brand"
+                  active ? "bg-brand text-on-strong" : "border border-border text-foreground hover:border-brand"
                 }`}
               >
                 {r.label}
@@ -289,7 +289,7 @@ export function PlanResult({
         <ol className="space-y-2">
           {plan.topActions.map((a, i) => (
             <li key={i} className="flex gap-3 text-sm text-foreground">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-semibold text-white">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-semibold text-on-strong">
                 {i + 1}
               </span>
               {a}

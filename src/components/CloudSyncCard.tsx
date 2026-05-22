@@ -89,7 +89,7 @@ export function CloudSyncCard() {
         <button
           type="submit"
           disabled={busy}
-          className="w-full rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-strong disabled:opacity-50"
+          className="w-full rounded-full bg-brand px-4 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
         >
           {busy ? "Working…" : mode === "signin" ? "Sign in" : "Create account"}
         </button>

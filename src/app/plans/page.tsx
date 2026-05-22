@@ -92,7 +92,7 @@ export default function PlansPage() {
           <button
             onClick={compare}
             disabled={selected.length !== 2 || busy}
-            className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-strong disabled:opacity-50"
+            className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
           >
             {busy ? "Comparing…" : `Compare selected (${selected.length}/2)`}
           </button>

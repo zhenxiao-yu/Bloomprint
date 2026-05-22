@@ -47,7 +47,7 @@ export default function GuidePage() {
           <Card key={step.title}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <span className="flex size-7 items-center justify-center rounded-full bg-brand text-xs text-white">
+                <span className="flex size-7 items-center justify-center rounded-full bg-brand text-xs text-on-strong">
                   {index + 1}
                 </span>
                 {step.title}
@@ -87,7 +87,7 @@ export default function GuidePage() {
       </section>
 
       <div className="flex flex-wrap gap-3">
-        <Link href="/plan" className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-white">
+        <Link href="/plan" className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong">
           Start a plan
         </Link>
         <Link href="/plan?mode=staff" className="rounded-full border border-border px-5 py-2 text-sm font-semibold">

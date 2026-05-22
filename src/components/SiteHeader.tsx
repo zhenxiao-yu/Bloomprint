@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { initials, signOut, useAccount } from "@/lib/accountStore";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const NAV = [
   { href: "/plan", label: "Plan" },
@@ -43,11 +44,12 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle />
           {account ? (
             <details className="group relative">
               <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-border py-1 pl-1 pr-3 transition hover:border-brand">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-semibold text-white">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-semibold text-on-strong">
                   {initials(account.name) || "🌱"}
                 </span>
                 <span className="hidden max-w-[8rem] truncate text-sm text-foreground sm:inline">{account.name}</span>
@@ -70,7 +72,7 @@ export function SiteHeader() {
           ) : (
             <Link
               href="/signup"
-              className="rounded-full bg-brand px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-brand-strong sm:px-4"
+              className="rounded-full bg-brand px-3 py-1.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong sm:px-4"
             >
               <span className="sm:hidden">Me</span>
               <span className="hidden sm:inline">Create account</span>

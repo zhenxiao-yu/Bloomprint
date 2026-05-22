@@ -56,7 +56,7 @@ export default function AboutPage() {
         </section>
 
         <div className="flex flex-wrap gap-2 pt-2">
-          <Link href="/plan" className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-white">
+          <Link href="/plan" className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong">
             Start a plan
           </Link>
           <Link

@@ -320,7 +320,7 @@ export function PlanExperience() {
                 onClick={() => setView(v.value)}
                 aria-pressed={view === v.value}
                 className={`rounded-full px-3 py-1 transition ${
-                  view === v.value ? "bg-brand text-white" : "text-muted hover:text-foreground"
+                  view === v.value ? "bg-brand text-on-strong" : "text-muted hover:text-foreground"
                 } ${v.value === "staff" && !staffParam ? "opacity-70" : ""}`}
               >
                 {v.label}
@@ -375,7 +375,7 @@ export function PlanExperience() {
           <p className="text-sm text-muted">{error}</p>
           <button
             onClick={() => setStep("intake")}
-            className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-white"
+            className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong"
           >
             Start over
           </button>
@@ -407,7 +407,7 @@ export function PlanExperience() {
             <button
               onClick={handleSave}
               disabled={busy}
-              className="rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-brand-strong disabled:opacity-50"
+              className="rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
             >
               Save plan
             </button>
@@ -461,7 +461,7 @@ export function PlanExperience() {
                     (document.getElementById("care-start") as HTMLInputElement | null)?.value ?? today,
                   )
                 }
-                className="rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-white hover:bg-brand-strong"
+                className="rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-on-strong hover:bg-brand-strong"
               >
                 Download .ics
               </button>

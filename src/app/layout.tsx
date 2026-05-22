@@ -1,19 +1,31 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Sora, Inter, IBM_Plex_Sans, Noto_Sans_SC } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Headings — modern, calm, product-like
+const sora = Sora({ variable: "--font-sora", subsets: ["latin"], display: "swap" });
+// Body — highly readable
+const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
+// Data / evidence labels
+const plex = IBM_Plex_Sans({
+  variable: "--font-plex",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  display: "swap",
+});
+// Simplified Chinese fallback
+const notoSC = Noto_Sans_SC({
+  variable: "--font-noto-sc",
+  weight: ["400", "500", "700"],
+  display: "swap",
+  preload: false,
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const fontVars = `${sora.variable} ${inter.variable} ${plex.variable} ${notoSC.variable}`;
 
 export const metadata: Metadata = {
   title: "Bloomprint — buildable yard plans",
@@ -26,15 +38,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${fontVars} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col">
-        <SiteHeader />
-        <div className="flex flex-1 flex-col">{children}</div>
-        <SiteFooter />
-        <Analytics />
+        <ThemeProvider>
+          <SiteHeader />
+          <div className="flex flex-1 flex-col">{children}</div>
+          <SiteFooter />
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   );

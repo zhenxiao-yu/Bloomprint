@@ -56,7 +56,7 @@ export default function SettingsPage() {
         <div className="flex items-center gap-3">
           <button
             type="submit"
-            className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-strong"
+            className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
           >
             Save changes
           </button>

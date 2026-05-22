@@ -20,7 +20,7 @@ export function StoreRealityCheck({ searches }: { searches: StoreSearch[] }) {
         href={nearbyGardenCentersUrl()}
         target="_blank"
         rel="noreferrer"
-        className="inline-block rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-white"
+        className="inline-block rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-on-strong"
       >
         📍 Find garden centers near me
       </a>

@@ -25,7 +25,7 @@ export function Section({
   const variantClass = {
     default: "card",
     decision: "rounded-xl border border-brand/30 bg-brand-soft/70",
-    action: "rounded-xl border border-accent/30 bg-white",
+    action: "rounded-xl border border-accent/30 bg-surface",
     trust: "rounded-xl border border-border bg-surface",
     quiet: "rounded-xl border border-border/70 bg-surface/75",
   }[variant];

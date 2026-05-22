@@ -31,7 +31,7 @@ export function SavedPlans({
         </p>
         <Link
           href="/plan"
-          className="mt-4 inline-block rounded-full bg-brand px-5 py-2 text-sm font-semibold text-white"
+          className="mt-4 inline-block rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong"
         >
           Start a plan
         </Link>
@@ -52,7 +52,7 @@ export function SavedPlans({
                 aria-pressed={isSelected}
                 aria-label={`Select ${plan.label} to compare`}
                 className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border text-sm font-semibold transition ${
-                  isSelected ? "border-brand bg-brand text-white" : "border-border text-muted hover:border-brand"
+                  isSelected ? "border-brand bg-brand text-on-strong" : "border-border text-muted hover:border-brand"
                 }`}
               >
                 {isSelected ? "✓" : "+"}
@@ -79,7 +79,7 @@ export function SavedPlans({
             <div className="mt-3 flex flex-wrap gap-2 text-sm">
               <Link
                 href={openHref(plan)}
-                className="rounded-full bg-brand px-4 py-1 font-medium text-white"
+                className="rounded-full bg-brand px-4 py-1 font-medium text-on-strong"
               >
                 Open
               </Link>

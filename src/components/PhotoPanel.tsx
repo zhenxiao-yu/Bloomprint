@@ -148,7 +148,7 @@ export function PhotoPanel({
                 <button
                   onClick={analyze}
                   disabled={status === "loading"}
-                  className="rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-white hover:bg-brand-strong disabled:opacity-50"
+                  className="rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-on-strong hover:bg-brand-strong disabled:opacity-50"
                 >
                   {status === "loading" ? "Reading photo…" : "Read my photo for sun & layout hints"}
                 </button>
