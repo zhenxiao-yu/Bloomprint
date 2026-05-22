@@ -98,6 +98,33 @@ export default function Home() {
         ))}
       </section>
 
+      {/* Why trust Bloomprint — the README says it; the product page should too. */}
+      <section className="grid gap-3 sm:grid-cols-3">
+        {[
+          {
+            icon: ClipboardList,
+            title: "Not just AI images",
+            body: "Bloomprint produces materials, tools, labor, install order, and risks — a plan you can build, not a render.",
+          },
+          {
+            icon: ShieldCheck,
+            title: "Facts before AI",
+            body: "Plants and prices come from the Bloomprint Core Library and rules. AI only explains — it never decides what to plant.",
+          },
+          {
+            icon: CheckCircle2,
+            title: "Honest uncertainty",
+            body: "Approximate regions, price ranges, and local availability are clearly labeled — never faked.",
+          },
+        ].map(({ icon: Icon, title, body }) => (
+          <div key={title} className="card p-5">
+            <Icon className="mb-2 text-brand" aria-hidden="true" />
+            <p className="text-sm font-semibold text-foreground">{title}</p>
+            <p className="mt-1 text-sm text-muted">{body}</p>
+          </div>
+        ))}
+      </section>
+
       <p className="text-xs text-muted">
         Plans use the Bloomprint Core Library and approximate regional rules. Prices are ranges,
         not quotes — confirm local availability before buying.

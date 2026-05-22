@@ -45,6 +45,8 @@ interface SavedProfile {
   goal: IntakeValues["goal"];
   effortLevel: IntakeValues["effortLevel"];
   budget: number;
+  /** Tweaks the user last leaned on — so the next plan feels remembered. */
+  rememberedTweaks?: RefinementAdjustment[];
 }
 
 function parseSavedProfile(raw: string | null): SavedProfile | null {
@@ -224,6 +226,10 @@ export function PlanExperience() {
         versionLabel: versionLabel(adjustments),
       },
     });
+    // Remember the tweaks the user committed to, so the profile feels like it knows them.
+    if (profile && adjustments.length > 0) {
+      saveProfile({ ...profile, rememberedTweaks: adjustments.slice(0, 5) });
+    }
     trackEvent("plan_saved", { goal: p.intake.goal });
     setSavedNote(true);
   }
@@ -355,6 +361,22 @@ export function PlanExperience() {
         <div className="animate-fade-up">
           {profile ? <MemoryBanner profile={profile} className="mb-4" /> : null}
 
+          {(() => {
+            const missing = result.plan.accuracyUpgrades.filter(
+              (u) => u.field === "sun" || u.field === "soil" || u.field === "drainage",
+            );
+            if (missing.length === 0) return null;
+            return (
+              <div className="mb-4 rounded-lg border border-[var(--warn)]/30 bg-[var(--warn)]/10 px-4 py-2.5 text-xs text-[var(--warn)]">
+                <span className="font-semibold">
+                  This plan is missing {missing.length} detail{missing.length > 1 ? "s" : ""} that affect accuracy:
+                </span>{" "}
+                {missing.map((m) => m.field).join(", ")}. You can still save, share, and shop —
+                answering them (in the plan below) tightens the estimate.
+              </div>
+            );
+          })()}
+
           {/* Action bar — save, share, history (the engagement loop) */}
           <div className="card mb-4 flex flex-wrap items-center gap-2 p-3 shadow-sm">
             <button
@@ -482,10 +504,14 @@ function MemoryBanner({ profile, className = "" }: { profile: SavedProfile; clas
     `around $${profile.budget.toLocaleString()} budget`,
     region,
   ];
+  const tweaks = (profile.rememberedTweaks ?? []).map((t) => t.replace(/-/g, " "));
   return (
     <div className={`rounded-lg bg-brand-soft px-4 py-3 text-xs text-brand-strong ${className}`}>
       <span className="font-semibold">Using your saved preferences:</span>
       <span className="ml-1">{prefs.map((p) => `✓ ${p}`).join("  ·  ")}</span>
+      {tweaks.length > 0 ? (
+        <span className="mt-1 block opacity-80">Remembers your tweaks: {tweaks.join(", ")}</span>
+      ) : null}
     </div>
   );
 }
