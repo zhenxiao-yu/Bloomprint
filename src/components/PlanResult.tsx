@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { BloomprintPlan, ShoppingPriority } from "@/domain/models";
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
@@ -70,25 +70,34 @@ export function PlanResult({
     { id: "buy", label: t("navBuy") },
     { id: "install", label: t("navInstall") },
     { id: "plants", label: t("navPlants") },
-    { id: "risks", label: t("navRisks") },
+    ...(plan.risks.length > 0 ? [{ id: "risks", label: t("navRisks") }] : []),
     { id: "store", label: t("navStore") },
     { id: "evidence", label: t("navEvidence") },
     ...(view === "staff" ? [{ id: "staff", label: t("navStaff") }] : []),
   ];
+  const activeSection = useActiveSection(navItems.map((n) => n.id));
 
   return (
     <div className="space-y-5">
       <nav className="sticky top-2 z-20 -mx-1 overflow-x-auto rounded-full border border-border bg-surface/95 p-1 shadow-sm backdrop-blur sm:top-4">
         <div className="flex min-w-max gap-1">
-          {navItems.map((item) => (
-            <a
-              key={item.id}
-              href={`#${item.id}`}
-              className="rounded-full px-3 py-1.5 text-xs font-medium text-muted transition hover:bg-brand-soft hover:text-brand-strong"
-            >
-              {item.label}
-            </a>
-          ))}
+          {navItems.map((item) => {
+            const active = activeSection === item.id;
+            return (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                aria-current={active ? "true" : undefined}
+                className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                  active
+                    ? "bg-brand text-on-strong"
+                    : "text-muted hover:bg-brand-soft hover:text-brand-strong"
+                }`}
+              >
+                {item.label}
+              </a>
+            );
+          })}
         </div>
       </nav>
 
@@ -478,6 +487,40 @@ export function PlanResult({
       ) : null}
     </div>
   );
+}
+
+/**
+ * Scroll-spy: returns the id of the section currently nearest the top of the
+ * viewport so the sticky jump-nav can highlight where the reader is.
+ */
+function useActiveSection(ids: string[]): string | null {
+  const [active, setActive] = useState<string | null>(ids[0] ?? null);
+  // Stable key so the effect re-subscribes only when the section set changes.
+  const key = ids.join("|");
+
+  useEffect(() => {
+    const sectionIds = key.split("|").filter(Boolean);
+    const elements = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+    if (elements.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]?.target.id) setActive(visible[0].target.id);
+      },
+      // Trigger when a section sits in the upper band, below the sticky nav.
+      { rootMargin: "-25% 0px -65% 0px", threshold: 0 },
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [key]);
+
+  return active;
 }
 
 function StaffList({ title, items }: { title: string; items: string[] }) {

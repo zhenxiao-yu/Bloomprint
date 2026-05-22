@@ -153,6 +153,7 @@ h4 {
 
 html {
   -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 
 button {
