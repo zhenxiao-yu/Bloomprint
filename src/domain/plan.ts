@@ -84,7 +84,7 @@ export function generateDeterministicPlan(intake: YardIntake, options: PlanOptio
   const installPhases = generateInstallPhases(labor.totalHours, materialCategories);
   const risks = generateRiskWarnings(site, intake, placements);
 
-  const confidence = scoreConfidence(intake, recognized, region.confidence);
+  const confidence = scoreConfidence(intake, recognized, region.confidence, site.zoneMatch?.precision ?? null);
   const scores = {
     planFit: scorePlanFit(placements),
     feasibility: scoreFeasibility(budget, labor, intake),

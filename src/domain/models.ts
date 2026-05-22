@@ -235,6 +235,8 @@ export type PropertyProfile = z.infer<typeof PropertyProfile>;
 /** Minimal first-plan input. Everything beyond goal/region is optional ("unknown" tolerant). */
 export const YardIntake = z.object({
   regionId: z.string(),
+  /** Optional ZIP / postal code to refine the hardiness zone (see domain/data/zones.ts). */
+  locationQuery: z.string().optional(),
   goal: ProjectGoal,
   budget: z.number().positive().optional(),
   budgetStyle: BudgetStyle.optional(),
@@ -265,6 +267,11 @@ export const SiteCondition = z.object({
   deerPressure: Pressure,
   areaType: AreaType,
   areaSqft: z.number().positive(),
+  /** Set when a ZIP/postal lookup narrowed the hardiness zone (raises confidence). */
+  zoneMatch: z
+    .object({ label: z.string(), precision: z.enum(["good", "medium"]) })
+    .nullable()
+    .default(null),
   /** Fields we had to assume because the user didn't supply them. */
   assumptions: z.array(z.string()).default([]),
 });

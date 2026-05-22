@@ -5,6 +5,7 @@
  */
 import type { RegionPreset, SiteCondition, Tri, YardIntake } from "@/domain/models";
 import { getRegion, REGIONS } from "@/domain/data";
+import { lookupZone } from "@/domain/data/zones";
 
 /** A safe fallback when an unknown region id slips through. */
 const FALLBACK_REGION: RegionPreset = REGIONS[0];
@@ -49,10 +50,27 @@ export function resolveSite(intake: YardIntake): SiteCondition {
     assumptions.push(`Bed size not given — assumed about ${DEFAULT_AREA_SQFT} sq ft.`);
   }
 
+  // A recognized ZIP/postal code narrows the coarse preset to a real (but still "likely") zone.
+  let hardinessMin = region.hardinessMin;
+  let hardinessMax = region.hardinessMax;
+  let zoneMatch: SiteCondition["zoneMatch"] = null;
+  if (intake.locationQuery) {
+    const zone = lookupZone(intake.locationQuery);
+    if (zone) {
+      hardinessMin = zone.min;
+      hardinessMax = zone.max;
+      zoneMatch = { label: zone.label, precision: zone.precision };
+      const range = zone.min === zone.max ? `zone ${zone.min}` : `zones ${zone.min}–${zone.max}`;
+      assumptions.push(`Hardiness ${range} from ${zone.label} (microclimates still vary).`);
+    } else {
+      assumptions.push("That location isn't in our zone library yet — used the region preset instead.");
+    }
+  }
+
   return {
     regionId: region.id,
-    hardinessMin: region.hardinessMin,
-    hardinessMax: region.hardinessMax,
+    hardinessMin,
+    hardinessMax,
     sun,
     soil,
     drainage,
@@ -60,6 +78,7 @@ export function resolveSite(intake: YardIntake): SiteCondition {
     deerPressure: region.deerPressure,
     areaType: intake.areaType ?? "foundation-bed",
     areaSqft,
+    zoneMatch,
     assumptions,
   };
 }

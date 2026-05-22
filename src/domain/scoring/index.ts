@@ -182,6 +182,7 @@ export function scoreConfidence(
   intake: YardIntake,
   regionRecognized: boolean,
   regionConfidence: ConfidenceLevel,
+  zonePrecision: "good" | "medium" | null = null,
 ): ConfidenceResult {
   let v = 0.5;
   if (intake.sun !== "unknown") v += 0.15;
@@ -191,6 +192,9 @@ export function scoreConfidence(
   if (regionRecognized) {
     v += regionConfidence === "high" ? 0.15 : regionConfidence === "good" ? 0.12 : regionConfidence === "medium" ? 0.1 : 0;
   }
+  // A real hardiness zone from a ZIP/postal match is a meaningful accuracy gain.
+  if (zonePrecision === "good") v += 0.2;
+  else if (zonePrecision === "medium") v += 0.1;
   v = Math.max(0, Math.min(1, v));
 
   const level: ConfidenceLevel = v >= 0.85 ? "high" : v >= 0.7 ? "good" : v >= 0.5 ? "medium" : "low";

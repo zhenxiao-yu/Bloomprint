@@ -544,9 +544,11 @@ export function buildConfidenceReasons(
   regionRecognized: boolean,
 ): ConfidenceReason[] {
   const reasons: ConfidenceReason[] = [];
+  if (site.zoneMatch) reasons.push({ kind: "good", text: `Hardiness zone from ${site.zoneMatch.label}` });
   if (intake.budget !== undefined) reasons.push({ kind: "good", text: "Fits the budget you gave" });
   if (intake.goal === "low-maintenance") reasons.push({ kind: "good", text: "Built around low-maintenance plants" });
-  if (regionRecognized) reasons.push({ kind: "good", text: `Matched to ${site.regionId.replace(/-/g, " ")}` });
+  if (regionRecognized && !site.zoneMatch)
+    reasons.push({ kind: "good", text: `Matched to ${site.regionId.replace(/-/g, " ")}` });
 
   if (intake.sun === "unknown") reasons.push({ kind: "caveat", text: "Sun exposure was assumed" });
   if (intake.soil === "unknown") reasons.push({ kind: "caveat", text: "Soil type was assumed" });

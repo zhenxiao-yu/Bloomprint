@@ -43,6 +43,14 @@ and portable. UI and API depend on the domain, not the reverse.
 Visual Yard Preview (Phase 4) and AR (Phase 5) are deferred until the core flow earns "this actually
 understands my yard." Emotional resonance before platform expansion.
 
+## D11 — Optional capabilities degrade to off, never block
+Location accuracy uses a *curated* ZIP/postal→zone lookup (no fabricated nationwide data); a miss
+falls back to the approximate preset. AI image render is **off unless `IMAGE_API_KEY` is set** and
+is decorative only (clearly labeled "imagined illustration, not a photo"; never feeds the plan).
+Both follow the same rule as D2: optional capabilities improve the experience when configured and
+silently disable otherwise — the deterministic core always works. *Why:* honest precision + never
+block on keys.
+
 ## D10 — Engagement loop is backend-free
 Save/history is `localStorage`; sharing encodes `{intake, adjustments}` into the URL and the
 recipient regenerates the plan deterministically. No database, no accounts, no stored user data —

@@ -59,11 +59,18 @@ feeds this decision.
 - [x] `.ics` care reminders: `src/lib/ics.ts` (planting/watering/establishment/spring, user-anchored date)
 - [x] Analytics: `plan_visualized`, `store_opened`, `calendar_added`
 
-## Deferred (researched, not yet built — with reasons)
-- **AI photorealistic render** of the design: needs an external image-gen key; must be opt-in and
-  clearly labeled "imagined illustration, not a photo." Defer until a key is configured.
-- **Real hardiness accuracy** (ZIP/postal → USDA/NRCan zone): bundle a static dataset (~100–200 KB);
-  biggest honest accuracy gain. Defer until the dataset is sourced/licensed in-repo.
+## Phase 3.5 (post-V1) — Accuracy + opt-in AI render ✅
+- [x] **Location accuracy**: `src/domain/data/zones.ts` — curated US ZIP3 + Canada FSA → likely
+      USDA/NRCan zone. A recognized ZIP/postal narrows the preset to a real zone and raises
+      confidence (`scoreConfidence` boost); uncovered → approximate preset fallback. Optional ZIP
+      field in the intake form. Still labeled "likely / microclimates vary."
+- [x] **Opt-in AI render**: `src/lib/imageProvider.ts` + `/api/render` (GET enabled / POST render),
+      provider-agnostic (OpenAI-images-compatible), OFF unless `IMAGE_API_KEY` is set.
+      `ImaginedView` shows only when enabled and labels output "imagined illustration, not a photo."
+
+## Still deferred (with reasons)
+- **Nationwide ZIP→zone dataset** (~100–200 KB): would replace the curated metro lookup with full
+  coverage. Needs the dataset sourced + licensed in-repo (we won't fabricate climate facts).
 - **Photo-vision** (Claude analyzing the yard photo): opt-in *estimates only*, Zod-validated.
 
 ## Phase 4 — Yard Preview, photo edition (deferred)

@@ -6,6 +6,7 @@ import { AREAS, BUDGETS, EFFORTS, GOALS, REGION_OPTIONS } from "@/lib/uiOptions"
 
 export interface IntakeValues {
   regionId: string;
+  locationQuery?: string;
   goal: ProjectGoal;
   budget: number;
   budgetStyle: "budget" | "balanced" | "premium";
@@ -33,12 +34,14 @@ export function IntakeForm({
   const [budgetIndex, setBudgetIndex] = useState(defaults?.budgetIndex ?? 1);
   const [effortLevel, setEffortLevel] = useState<EffortLevel>(defaults?.effortLevel ?? "moderate");
   const [areaType, setAreaType] = useState<string>("");
+  const [locationQuery, setLocationQuery] = useState<string>("");
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const b = BUDGETS[budgetIndex];
     onSubmit({
       regionId,
+      locationQuery: locationQuery.trim() || undefined,
       goal,
       budget: b.budget,
       budgetStyle: b.budgetStyle,
@@ -86,6 +89,20 @@ export function IntakeForm({
               </option>
             ))}
           </select>
+        </label>
+
+        <label className="block">
+          <span className="mb-1 block text-sm font-semibold text-foreground">
+            ZIP / postal code <span className="font-normal text-muted">(optional, sharpens the zone)</span>
+          </span>
+          <input
+            type="text"
+            value={locationQuery}
+            onChange={(e) => setLocationQuery(e.target.value)}
+            placeholder="e.g. 60601 or M5V"
+            autoComplete="postal-code"
+            className="card w-full p-2.5 text-sm"
+          />
         </label>
 
         <label className="block">

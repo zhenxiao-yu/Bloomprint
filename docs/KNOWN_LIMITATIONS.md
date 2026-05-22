@@ -37,6 +37,18 @@ the plan's spacing notes, not the visual board.
 ## AR (Phase 5, deferred)
 Not in V1. Planned only as progressive enhancement via `model-viewer`; not a blocker.
 
+## Hardiness from ZIP/postal (Phase 3.5)
+The ZIP/postal lookup is a **curated set of major North-American metros (US ZIP3) and Canadian
+postal regions (FSA letter)** — not full national coverage. A recognized code gives a real, but
+still "likely", zone (microclimates vary) and raises confidence; an unrecognized code falls back to
+the approximate region preset. Soil, salt, deer, and drainage are still region-typical assumptions,
+not location-precise.
+
+## AI "imagined view" (Phase 3.5, optional)
+Image rendering is **off unless the deployment sets `IMAGE_API_KEY`**. When on, the image is an
+**illustration of the design's mood, not a photo of the user's yard** and not a source of truth —
+plant choices, counts, and spacing always come from the deterministic plan. The UI labels it as such.
+
 ## Concept board & care reminders (Phase 3)
 The concept board is an **approximate, illustrative** top-down layout (plants banded by role) — not
 a scale drawing. Blob size and position are for communication; real spacing comes from each plant's

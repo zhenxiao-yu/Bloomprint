@@ -5,6 +5,7 @@ import type { BloomprintPlan, ShoppingPriority } from "@/domain/models";
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
 import { Chip, Money, Section, SeverityTag } from "@/components/ui";
 import { ConceptBoard } from "@/components/ConceptBoard";
+import { ImaginedView } from "@/components/ImaginedView";
 import { trackEvent } from "@/lib/analytics";
 
 export type ViewMode = "simple" | "details" | "staff";
@@ -159,6 +160,7 @@ export function PlanResult({
         <p className="mt-2 text-sm font-medium text-brand-strong">
           {plan.visualSummary.transformation.feeling}
         </p>
+        <ImaginedView prompt={enhancement?.imagePrompt} />
       </section>
 
       {/* Refinement chips — first plan is Draft 1 */}
