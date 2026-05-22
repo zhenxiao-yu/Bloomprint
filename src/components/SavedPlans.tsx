@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo, useState } from "react";
+import Fuse from "fuse.js";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { SavedPlan } from "@/lib/plansStore";
@@ -24,6 +26,24 @@ export function SavedPlans({
 }) {
   const t = useTranslations("SavedPlans");
   const tc = useTranslations("Common");
+  const [query, setQuery] = useState("");
+
+  const fuse = useMemo(
+    () =>
+      new Fuse(plans, {
+        keys: ["label", "summary.styleLabel", "summary.goal", "summary.versionLabel"],
+        threshold: 0.4,
+        ignoreLocation: true,
+      }),
+    [plans],
+  );
+
+  const filtered = useMemo(() => {
+    const q = query.trim();
+    if (!q) return plans;
+    return fuse.search(q).map((r) => r.item);
+  }, [query, plans, fuse]);
+
   if (plans.length === 0) {
     return (
       <div className="card p-8 text-center">
@@ -43,8 +63,20 @@ export function SavedPlans({
   }
 
   return (
+    <div>
+      <input
+        type="search"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={t("searchPlaceholder")}
+        aria-label={t("searchPlaceholder")}
+        className="card mb-3 w-full px-4 py-2 text-sm text-foreground placeholder:text-muted"
+      />
+      {filtered.length === 0 ? (
+        <p className="card p-6 text-center text-sm text-muted">{t("noMatches")}</p>
+      ) : (
     <ul className="space-y-3">
-      {plans.map((plan) => {
+      {filtered.map((plan) => {
         const isSelected = selected.includes(plan.id);
         return (
           <li key={plan.id} className={`card p-4 ${isSelected ? "ring-2 ring-brand" : ""}`}>
@@ -109,5 +141,7 @@ export function SavedPlans({
         );
       })}
     </ul>
+      )}
+    </div>
   );
 }

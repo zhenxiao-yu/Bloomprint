@@ -34,6 +34,20 @@
     "details": "详细模式",
     "staff": "店员助手"
   },
+  "ConceptBoard": {
+    "boardAria": "你种植花坛的概念布局，俯视视角",
+    "houseSide": "房屋 / 围栏一侧",
+    "lawnEdge": "草坪边缘",
+    "resetLayout": "重置布局",
+    "caption": "大致的概念布局 —— 数字是数量，可拖动重新排布。比例仅供示意；种植前请参考每种植物的间距说明。"
+  },
+  "Charts": {
+    "budgetTitle": "各类别花费",
+    "budgetTooltip": "预计区间",
+    "laborTitle": "各阶段施工工时",
+    "laborTooltip": "预计工作量",
+    "laborHours": "{hours} 小时"
+  },
   "Home": {
     "eyebrow": "Bloomprint",
     "heroTitle": "为真实住宅打造可落地的庭院方案。",
@@ -204,6 +218,8 @@
     "emptySaveLabel": "保存方案",
     "emptyBodyAfter": "—— 它会出现在这里，方便你回看和对比不同版本。",
     "selectAria": "选择 {label} 来对比",
+    "searchPlaceholder": "搜索已保存的方案……",
+    "noMatches": "没有符合搜索的已保存方案。",
     "draftDefault": "初稿",
     "confidenceSuffix": "适配度 {confidence}",
     "plantTypes": "{count} 种植物",
@@ -274,6 +290,11 @@
     "expectedDiyTotal": "自己动手的预计总花费：",
     "shoppingList": "购物清单",
     "buyFirst": "先买",
+    "colItem": "物品",
+    "colQuantity": "数量",
+    "colPriority": "优先级",
+    "colPrice": "价格",
+    "sortBy": "按{column}排序",
     "buyFirstNote": "种植当天需要的所有东西。",
     "canWait": "可缓",
     "canWaitNote": "之后再让成品看起来更好。",

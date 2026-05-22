@@ -6,6 +6,8 @@ import type { BloomprintPlan, ShoppingPriority } from "@/domain/models";
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
 import { Chip, MetricPill, Money, Section, SeverityTag } from "@/components/ui";
 import { ConceptBoard } from "@/components/ConceptBoard";
+import { PlanCharts } from "@/components/PlanCharts";
+import { ShoppingTable } from "@/components/ShoppingTable";
 import { ImaginedView } from "@/components/ImaginedView";
 import { ArView } from "@/components/ArView";
 import { ReadinessMeter } from "@/components/ReadinessMeter";
@@ -325,10 +327,16 @@ export function PlanResult({
             </li>
           ))}
         </ul>
+        {view !== "simple" ? (
+          <PlanCharts budget={plan.budget} installPhases={plan.installPhases} />
+        ) : null}
       </Section>
 
-      {/* Shopping list grouped by priority */}
+      {/* Shopping list — sortable table in Details, grouped by priority in Simple */}
       <Section title={t("shoppingList")} variant="action">
+        {view !== "simple" ? (
+          <ShoppingTable items={plan.shoppingList} />
+        ) : (
         <div className="space-y-4">
           {PRIORITY_GROUPS.map((group) => {
             const items = plan.shoppingList.filter((i) => i.priority === group.key);
@@ -354,6 +362,7 @@ export function PlanResult({
             );
           })}
         </div>
+        )}
       </Section>
 
       {/* Install timeline — framed as achievable weekends with a planting window */}

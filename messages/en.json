@@ -34,6 +34,20 @@
     "details": "Details",
     "staff": "Staff Helper"
   },
+  "ConceptBoard": {
+    "boardAria": "Concept layout of your planting bed, top-down view",
+    "houseSide": "House / fence side",
+    "lawnEdge": "Lawn edge",
+    "resetLayout": "Reset layout",
+    "caption": "Approximate concept layout — numbers are quantities; drag to rearrange. Scale is illustrative; use each plant's spacing note before planting."
+  },
+  "Charts": {
+    "budgetTitle": "Cost by category",
+    "budgetTooltip": "Estimated range",
+    "laborTitle": "Install hours by phase",
+    "laborTooltip": "Estimated effort",
+    "laborHours": "{hours}h"
+  },
   "Home": {
     "eyebrow": "Bloomprint",
     "heroTitle": "Buildable yard plans for real homes.",
@@ -204,6 +218,8 @@
     "emptySaveLabel": "Save plan",
     "emptyBodyAfter": "— it'll show up here so you can revisit and compare versions.",
     "selectAria": "Select {label} to compare",
+    "searchPlaceholder": "Search saved plans…",
+    "noMatches": "No saved plans match your search.",
     "draftDefault": "Draft 1",
     "confidenceSuffix": "{confidence} confidence",
     "plantTypes": "{count} plant types",
@@ -274,6 +290,11 @@
     "expectedDiyTotal": "Expected DIY total:",
     "shoppingList": "Shopping list",
     "buyFirst": "Buy First",
+    "colItem": "Item",
+    "colQuantity": "Qty",
+    "colPriority": "Priority",
+    "colPrice": "Price",
+    "sortBy": "Sort by {column}",
     "buyFirstNote": "Everything you need for planting day.",
     "canWait": "Can Wait",
     "canWaitNote": "Improves the finished look later.",
