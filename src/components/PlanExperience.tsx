@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { BloomprintPlan, RefinementAdjustment } from "@/domain/models";
 import { IntakeForm, type IntakeDefaults, type IntakeValues } from "@/components/IntakeForm";
 import { PlanResult, type ViewMode } from "@/components/PlanResult";
+import { PhotoPanel } from "@/components/PhotoPanel";
 import { BUDGETS, REGION_OPTIONS } from "@/lib/uiOptions";
 import { saveProfile, useSavedProfileRaw } from "@/lib/profileStore";
 import { savePlan } from "@/lib/plansStore";
@@ -80,6 +81,7 @@ export function PlanExperience() {
   const [savedNote, setSavedNote] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const profileRaw = useSavedProfileRaw();
   const profile = useMemo<SavedProfile | null>(
     () => (profileRaw ? (JSON.parse(profileRaw) as SavedProfile) : null),
@@ -360,6 +362,14 @@ export function PlanExperience() {
             />
           ) : null}
 
+          <div className="mb-4">
+            <PhotoPanel
+              photoUrl={photoUrl}
+              onPhoto={setPhotoUrl}
+              onApplySun={(sun) => handleAccuracy("sun", sun)}
+            />
+          </div>
+
           <PlanResult
             result={result}
             view={view}
@@ -367,6 +377,7 @@ export function PlanExperience() {
             busy={busy}
             onRefine={handleRefine}
             onAccuracy={handleAccuracy}
+            photoUrl={photoUrl}
           />
           <div className="mt-6">
             <Link href="/plan" className="text-sm font-semibold text-brand">

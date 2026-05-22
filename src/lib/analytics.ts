@@ -18,7 +18,9 @@ export type LoopEvent =
   | "plan_visualized"
   | "store_opened"
   | "calendar_added"
-  | "image_rendered";
+  | "image_rendered"
+  | "photo_added"
+  | "photo_analyzed";
 
 type Primitive = string | number | boolean | null;
 

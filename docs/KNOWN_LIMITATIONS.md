@@ -49,6 +49,13 @@ Image rendering is **off unless the deployment sets `IMAGE_API_KEY`**. When on, 
 **illustration of the design's mood, not a photo of the user's yard** and not a source of truth —
 plant choices, counts, and spacing always come from the deterministic plan. The UI labels it as such.
 
+## Yard photo & vision (Phase 4)
+The uploaded photo is held **in the browser only** — it is never uploaded, saved, or included in
+share links. It improves the before/after "Now" view for everyone. Photo *analysis* (Claude vision)
+is **off unless AI_PROVIDER=claude with a key**; when on, the photo is sent transiently for that one
+request and not stored. Vision returns **estimates** (sun exposure, visible features), never
+measurements; the user confirms before anything is applied, and it never changes the plan silently.
+
 ## Concept board & care reminders (Phase 3)
 The concept board is an **approximate, illustrative** top-down layout (plants banded by role) — not
 a scale drawing. Blob size and position are for communication; real spacing comes from each plant's

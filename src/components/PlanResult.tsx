@@ -36,6 +36,7 @@ export function PlanResult({
   busy,
   onRefine,
   onAccuracy,
+  photoUrl = null,
 }: {
   result: BloomprintPlan;
   view: ViewMode;
@@ -43,6 +44,7 @@ export function PlanResult({
   busy: boolean;
   onRefine: (adjustment: (typeof REFINEMENTS)[number]["value"]) => void;
   onAccuracy: (field: "sun" | "soil" | "drainage", value: string) => void;
+  photoUrl?: string | null;
 }) {
   const { plan, enhancement } = result;
   const showNumbers = view !== "simple";
@@ -148,6 +150,11 @@ export function PlanResult({
         <div className="mt-3">
           {boardView === "planned" ? (
             <ConceptBoard plants={plan.plants} />
+          ) : photoUrl ? (
+            <div className="overflow-hidden rounded-xl border border-border" style={{ aspectRatio: "5 / 3" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={photoUrl} alt="Your yard now" className="h-full w-full object-cover" />
+            </div>
           ) : (
             <div
               className="flex w-full items-center justify-center rounded-xl border border-dashed border-border p-6 text-center"

@@ -68,10 +68,19 @@ feeds this decision.
       provider-agnostic (OpenAI-images-compatible), OFF unless `IMAGE_API_KEY` is set.
       `ImaginedView` shows only when enabled and labels output "imagined illustration, not a photo."
 
+## Phase 4 (post-V1) — Use your photo ✅
+- [x] **Photo upload** (no key): the uploaded photo becomes the "Now" in the before/after.
+      `src/components/PhotoPanel.tsx` (client-side downscale to ≤1024px). Photo stays in the
+      browser — never uploaded, saved, or put in share links.
+- [x] **Opt-in photo vision** (key-gated): `src/lib/visionProvider.ts` + `/api/vision`
+      (GET enabled / POST analyze). Returns Zod-validated *confirmable estimates* (sun + observations);
+      user taps "Use this" to apply (via the existing accuracy flow). Off unless AI_PROVIDER=claude
+      with a key. Never feeds the plan silently.
+
 ## Still deferred (with reasons)
 - **Nationwide ZIP→zone dataset** (~100–200 KB): would replace the curated metro lookup with full
   coverage. Needs the dataset sourced + licensed in-repo (we won't fabricate climate facts).
-- **Photo-vision** (Claude analyzing the yard photo): opt-in *estimates only*, Zod-validated.
+- **Accounts / cloud sync**: still premature (backend-free model holds until retention warrants it).
 
 ## Phase 4 — Yard Preview, photo edition (deferred)
 Photo upload + overlaying the concept board / AI render on a real photo.
