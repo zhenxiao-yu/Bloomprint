@@ -406,6 +406,84 @@ export type VisualPlacement = z.infer<typeof VisualPlacement>;
 /* ------------------------------------------------------------------ */
 /* The deterministic plan (source of truth)                            */
 /* ------------------------------------------------------------------ */
+/* Trust moat: evidence, alternatives, failure points, store, readiness */
+/* ------------------------------------------------------------------ */
+
+/** A source on the Source Quality Ladder (1 = user input … 6 = AI-only). */
+export const SourceRef = z.object({
+  name: z.string(),
+  level: z.number().int().min(1).max(6),
+  url: z.string().optional(),
+});
+export type SourceRef = z.infer<typeof SourceRef>;
+
+export const ConfidenceDimension = z.object({ dimension: z.string(), level: z.string() });
+export type ConfidenceDimension = z.infer<typeof ConfidenceDimension>;
+
+/** "Why should I trust this?" — the evidence drawer payload. */
+export const PlanEvidence = z.object({
+  inputs: z.array(z.string()),
+  assumptions: z.array(z.string()),
+  sources: z.array(SourceRef),
+  confidenceByDimension: z.array(ConfidenceDimension),
+});
+export type PlanEvidence = z.infer<typeof PlanEvidence>;
+
+export const AlternativeKind = z.enum([
+  "substitute",
+  "cheaper",
+  "lower-maintenance",
+  "pet-safer",
+  "premium",
+  "avoid",
+]);
+export type AlternativeKind = z.infer<typeof AlternativeKind>;
+
+export const Alternative = z.object({
+  kind: AlternativeKind,
+  label: z.string(),
+  note: z.string().optional(),
+});
+export type Alternative = z.infer<typeof Alternative>;
+
+export const PlantAlternatives = z.object({
+  plantId: z.string(),
+  commonName: z.string(),
+  options: z.array(Alternative),
+});
+export type PlantAlternatives = z.infer<typeof PlantAlternatives>;
+
+export const FailurePoint = z.object({ risk: z.string(), fix: z.string() });
+export type FailurePoint = z.infer<typeof FailurePoint>;
+
+export const AvailabilityState = z.enum([
+  "likely-common",
+  "needs-local-check",
+  "specialty-order",
+  "verify-online",
+]);
+export type AvailabilityState = z.infer<typeof AvailabilityState>;
+
+/** A "search at the store" entry — honest: no live inventory, just a query + state. */
+export const StoreSearch = z.object({
+  name: z.string(),
+  query: z.string(),
+  availability: AvailabilityState,
+});
+export type StoreSearch = z.infer<typeof StoreSearch>;
+
+export const ReadinessFactor = z.object({ label: z.string(), done: z.boolean() });
+export type ReadinessFactor = z.infer<typeof ReadinessFactor>;
+
+/** Gamified completeness meter — answering accuracy questions fills it up. */
+export const Readiness = z.object({
+  score: z.number().int().min(0).max(100),
+  label: z.string(),
+  factors: z.array(ReadinessFactor),
+});
+export type Readiness = z.infer<typeof Readiness>;
+
+/* ------------------------------------------------------------------ */
 
 export const DeterministicPlan = z.object({
   intake: YardIntake,
@@ -434,6 +512,12 @@ export const DeterministicPlan = z.object({
   confidenceReasons: z.array(ConfidenceReason),
   accuracyUpgrades: z.array(AccuracyUpgrade),
   planLabel: PlanLabel,
+  // Trust moat:
+  evidence: PlanEvidence,
+  alternatives: z.array(PlantAlternatives),
+  failurePoints: z.array(FailurePoint),
+  storeSearches: z.array(StoreSearch),
+  readiness: Readiness,
 });
 export type DeterministicPlan = z.infer<typeof DeterministicPlan>;
 
@@ -485,5 +569,6 @@ export const RefinementAdjustment = z.enum([
   "premium-look",
   "less-trimming",
   "better-resale",
+  "stone-to-mulch",
 ]);
 export type RefinementAdjustment = z.infer<typeof RefinementAdjustment>;

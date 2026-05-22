@@ -43,6 +43,16 @@ and portable. UI and API depend on the domain, not the reverse.
 Visual Yard Preview (Phase 4) and AR (Phase 5) are deferred until the core flow earns "this actually
 understands my yard." Emotional resonance before platform expansion.
 
+## D14 — Trust moat is deterministic and sourced
+Every plan ships its own evidence: inputs used, assumptions, confidence-by-dimension, and ranked
+sources (Source Quality Ladder, levels 1–6; AI is level 6 and may shape wording only). Each plant
+carries deterministic alternatives (substitute / cheaper / lower-maintenance / pet-safer / premium /
+avoid) so users are never stuck. Plans list honest failure points and a Store Reality Check that
+**never claims live inventory** — only search links + an availability *state* + a "near me" map.
+Live distances (Google Places), live inventory, and ML reranking are deferred; preference/refinement
+weights come first. *Why:* trust comes from showing what we know, what we don't, and the backups —
+not from saying "AI".
+
 ## D12 — Accounts are device-local first (cloud-ready seam)
 Account creation/management is implemented as a **device account** in localStorage
 (`src/lib/accountStore.ts`) — no password, no backend — because we can ship and verify it today and

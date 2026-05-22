@@ -6,6 +6,7 @@
 import type {
   AccuracyUpgrade,
   ConfidenceReason,
+  FailurePoint,
   InstallPhase,
   MaterialCategory,
   MoneyRange,
@@ -13,6 +14,8 @@ import type {
   PlantPlacement,
   PlantRole,
   ProjectGoal,
+  Readiness,
+  ReadinessFactor,
   RiskWarning,
   ShoppingItem,
   SiteCondition,
@@ -583,4 +586,69 @@ export function choosePlanLabel(
 ): PlanLabel {
   if (!regionRecognized || confidenceValue < 0.5) return "needs-local-verification";
   return "buildable-estimate";
+}
+
+/* ----------------------------- failure points & readiness ----------------- */
+
+/** "This plan may fail if…" + how to reduce the risk — a concrete trust builder. */
+export function generateFailurePoints(
+  site: SiteCondition,
+  intake: YardIntake,
+  placements: PlantPlacement[],
+): FailurePoint[] {
+  const out: FailurePoint[] = [];
+
+  if (intake.sun === "unknown") {
+    out.push({
+      risk: "The area gets less sun than assumed.",
+      fix: "Answer the sun question above, or switch to a shade-friendlier version with the chips.",
+    });
+  }
+  if (site.drainage === "poor" || intake.drainage === "unknown") {
+    out.push({
+      risk: "Soil stays wet after rain and roots sit in water.",
+      fix: "Work compost in, build the bed up slightly, and avoid drought-loving plants in low spots.",
+    });
+  }
+  if (placements.some((p) => p.role === "screen")) {
+    out.push({
+      risk: "Screen plants are planted too close and thin out as they mature.",
+      fix: "Follow each plant's spacing note — fewer, well-spaced plants fill in better.",
+    });
+  }
+  out.push({
+    risk: "First-year watering is skipped and new plants don't establish.",
+    fix: "Water deeply for the first weeks (the calendar reminders help); consider watering bags.",
+  });
+  if (site.saltExposure === "yes") {
+    out.push({
+      risk: "Snow and road salt pile against evergreens over winter.",
+      fix: "Keep salt-sensitive plants back from the curb, or use the salt-tolerant chip.",
+    });
+  }
+  return out;
+}
+
+const READINESS_LABELS: { min: number; label: string }[] = [
+  { min: 85, label: "Ready to build" },
+  { min: 65, label: "Almost there" },
+  { min: 40, label: "Getting there" },
+  { min: 0, label: "Just getting started" },
+];
+
+/** Gamified completeness meter — known details fill it up; unknowns are the quest. */
+export function computeReadiness(intake: YardIntake): Readiness {
+  const factors: ReadinessFactor[] = [
+    { label: "Location set", done: true },
+    { label: "Goal chosen", done: true },
+    { label: "Budget given", done: intake.budget !== undefined },
+    { label: "ZIP / postal added", done: Boolean(intake.locationQuery) },
+    { label: "Sun confirmed", done: intake.sun !== "unknown" },
+    { label: "Soil confirmed", done: intake.soil !== "unknown" },
+    { label: "Drainage confirmed", done: intake.drainage !== "unknown" },
+  ];
+  const done = factors.filter((f) => f.done).length;
+  const score = Math.round((done / factors.length) * 100);
+  const label = READINESS_LABELS.find((l) => score >= l.min)?.label ?? "Getting there";
+  return { score, label, factors };
 }

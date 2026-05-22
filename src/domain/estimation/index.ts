@@ -60,8 +60,12 @@ export function estimateMaterials(
   const edging = requireMaterial(cheap && !tuning.premium ? "plastic-edging" : "steel-edging");
   picks.push({ material: edging, quantity: linearFt, priority: "buy-first" });
 
-  // Decorative stone accent — adds work, so skip when cheaper/easier. Premium always includes it.
-  if (tuning.premium || (!cheap && !tuning.easier && (STONE_STYLES.includes(style) || intake.goal === "low-maintenance"))) {
+  // Decorative stone accent — adds work, so skip when cheaper/easier or "stone → mulch".
+  // Premium still includes it (unless the user explicitly chose mulch over stone).
+  if (
+    !tuning.noStone &&
+    (tuning.premium || (!cheap && !tuning.easier && (STONE_STYLES.includes(style) || intake.goal === "low-maintenance")))
+  ) {
     const stone = requireMaterial("river-rock");
     picks.push({ material: stone, quantity: bagsFor(area * 0.15, stone.coveragePerUnitSqft ?? 4), priority: "can-wait" });
   }

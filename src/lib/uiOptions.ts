@@ -85,4 +85,5 @@ export const REFINEMENTS: { value: RefinementAdjustment; label: string }[] = [
   { value: "dog-safe", label: "Safer for dogs" },
   { value: "salt-safe", label: "Salt-tolerant" },
   { value: "less-watering", label: "Less watering" },
+  { value: "stone-to-mulch", label: "Stone → mulch" },
 ];

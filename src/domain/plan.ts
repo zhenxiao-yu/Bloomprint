@@ -29,7 +29,9 @@ import {
   buildVisualSummary,
   choosePlanLabel,
   composePalette,
+  computeReadiness,
   deriveInsight,
+  generateFailurePoints,
   matureSize,
   sunLabel,
   generateInstallPhases,
@@ -37,6 +39,9 @@ import {
   generateRiskWarnings,
   generateShoppingList,
 } from "@/domain/generators";
+import { buildPlanEvidence } from "@/domain/evidence/sourceQuality";
+import { generateAllAlternatives } from "@/domain/alternatives";
+import { buildStoreSearches } from "@/domain/store";
 import { deriveTuning } from "@/domain/tuning";
 
 export interface PlanOptions {
@@ -116,6 +121,11 @@ export function generateDeterministicPlan(intake: YardIntake, options: PlanOptio
     confidenceReasons: buildConfidenceReasons(site, intake, recognized),
     accuracyUpgrades: buildAccuracyUpgrades(intake),
     planLabel: choosePlanLabel(confidence.value, recognized),
+    evidence: buildPlanEvidence(site, intake),
+    alternatives: generateAllAlternatives(placements, site, intake),
+    failurePoints: generateFailurePoints(site, intake, placements),
+    storeSearches: buildStoreSearches(shoppingList),
+    readiness: computeReadiness(intake),
   };
 }
 

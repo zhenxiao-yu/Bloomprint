@@ -7,6 +7,11 @@ import { Chip, Money, Section, SeverityTag } from "@/components/ui";
 import { ConceptBoard } from "@/components/ConceptBoard";
 import { ImaginedView } from "@/components/ImaginedView";
 import { ArView } from "@/components/ArView";
+import { ReadinessMeter } from "@/components/ReadinessMeter";
+import { EvidenceDrawer } from "@/components/EvidenceDrawer";
+import { AlternativeOptions } from "@/components/AlternativeOptions";
+import { FailurePointsCard } from "@/components/FailurePointsCard";
+import { StoreRealityCheck } from "@/components/StoreRealityCheck";
 import { trackEvent } from "@/lib/analytics";
 
 export type ViewMode = "simple" | "details" | "staff";
@@ -125,6 +130,9 @@ export function PlanResult({
           </span>
         </div>
       </section>
+
+      <ReadinessMeter readiness={plan.readiness} />
+      <EvidenceDrawer evidence={plan.evidence} view={view} />
 
       {/* See your yard — deterministic concept board with a Now / Planned toggle */}
       <section className="card p-5">
@@ -342,6 +350,10 @@ export function PlanResult({
               ) : null}
               {p.fit.reasons[0] ? <p className="mt-1 text-xs text-brand-strong">✓ {p.fit.reasons[0]}</p> : null}
               {p.fit.warnings[0] ? <p className="mt-0.5 text-xs text-[var(--warn)]">⚠ {p.fit.warnings[0]}</p> : null}
+              {(() => {
+                const alt = plan.alternatives.find((a) => a.plantId === p.plantId);
+                return alt ? <AlternativeOptions alt={alt} /> : null;
+              })()}
             </div>
           ))}
         </div>
@@ -363,6 +375,10 @@ export function PlanResult({
           </ul>
         </Section>
       ) : null}
+
+      {/* Trust moat: what-if failures + honest store reality */}
+      <FailurePointsCard points={plan.failurePoints} />
+      <StoreRealityCheck searches={plan.storeSearches} />
 
       {/* Tools & equipment (details) */}
       {view !== "simple" ? (

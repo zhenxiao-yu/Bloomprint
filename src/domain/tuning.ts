@@ -33,6 +33,8 @@ export interface Tuning {
   premium: boolean;
   /** Emphasize a tall green screen even when privacy isn't the primary goal. */
   privacyBoost: boolean;
+  /** Skip decorative stone in favor of mulch (cheaper + easier to haul). */
+  noStone: boolean;
   /** Force a specific style family (e.g. "More modern"). */
   forceStyle: StyleFamily | null;
 }
@@ -49,6 +51,7 @@ export const NO_TUNING: Tuning = {
   lowTrim: false,
   premium: false,
   privacyBoost: false,
+  noStone: false,
   forceStyle: null,
 };
 
@@ -95,6 +98,9 @@ export function deriveTuning(adjustments: RefinementAdjustment[] = []): Tuning {
         break;
       case "more-privacy":
         t.privacyBoost = true;
+        break;
+      case "stone-to-mulch":
+        t.noStone = true;
         break;
       case "more-modern":
         t.forceStyle = "modern-minimal";
