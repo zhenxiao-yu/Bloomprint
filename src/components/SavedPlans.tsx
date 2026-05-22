@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import type { SavedPlan } from "@/lib/plansStore";
 import { encodeShare } from "@/lib/shareLink";
 

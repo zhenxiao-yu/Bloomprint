@@ -5,7 +5,7 @@
  * server-side (no AI needed), and render a clean checklist. So this page is itself a shareable,
  * printable URL. No client plan state required.
  */
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import type { ShoppingPriority } from "@/domain/models";
 import { generateDeterministicPlan } from "@/domain";
 import { decodeShare, SHARE_PARAM } from "@/lib/shareLink";

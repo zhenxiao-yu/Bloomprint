@@ -1,21 +1,23 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { initials, signOut, useAccount } from "@/lib/accountStore";
+import { Link, usePathname } from "@/i18n/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSwitch } from "@/components/LanguageSwitch";
 
 const NAV = [
-  { href: "/plan", label: "Plan" },
-  { href: "/plans", label: "Saved" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/guide", label: "Guide" },
-  { href: "/about", label: "About" },
-];
+  { href: "/plan", key: "plan" },
+  { href: "/plans", key: "saved" },
+  { href: "/pricing", key: "pricing" },
+  { href: "/guide", key: "guide" },
+  { href: "/about", key: "about" },
+] as const;
 
 export function SiteHeader() {
   const pathname = usePathname();
   const account = useAccount();
+  const t = useTranslations("Nav");
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-surface/85 backdrop-blur">
@@ -29,7 +31,8 @@ export function SiteHeader() {
 
         <nav className="ml-1 flex items-center gap-1 overflow-x-auto text-sm sm:ml-2">
           {NAV.map((n) => {
-            const active = pathname === n.href || (n.href !== "/" && pathname.startsWith(n.href));
+            const href = n.href as string;
+            const active = pathname === href || pathname.startsWith(`${href}/`);
             return (
               <Link
                 key={n.href}
@@ -38,13 +41,14 @@ export function SiteHeader() {
                   active ? "bg-brand-soft text-brand-strong" : "text-muted hover:text-foreground"
                 }`}
               >
-                {n.label}
+                {t(n.key)}
               </Link>
             );
           })}
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <LanguageSwitch />
           <ThemeToggle />
           {account ? (
             <details className="group relative">
@@ -56,16 +60,16 @@ export function SiteHeader() {
               </summary>
               <div className="absolute right-0 mt-2 w-44 overflow-hidden rounded-xl border border-border bg-surface shadow-lg">
                 <Link href="/account" className="block px-4 py-2 text-sm text-foreground hover:bg-brand-soft">
-                  Account
+                  {t("account")}
                 </Link>
                 <Link href="/account/settings" className="block px-4 py-2 text-sm text-foreground hover:bg-brand-soft">
-                  Settings
+                  {t("settings")}
                 </Link>
                 <button
                   onClick={() => signOut()}
                   className="block w-full px-4 py-2 text-left text-sm text-[var(--danger)] hover:bg-brand-soft"
                 >
-                  Sign out
+                  {t("signOut")}
                 </button>
               </div>
             </details>
@@ -74,8 +78,8 @@ export function SiteHeader() {
               href="/signup"
               className="rounded-full bg-brand px-3 py-1.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong sm:px-4"
             >
-              <span className="sm:hidden">Me</span>
-              <span className="hidden sm:inline">Create account</span>
+              <span className="sm:hidden">{t("me")}</span>
+              <span className="hidden sm:inline">{t("createAccount")}</span>
             </Link>
           )}
         </div>

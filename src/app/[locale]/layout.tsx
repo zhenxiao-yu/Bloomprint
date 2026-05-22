@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { NextIntlClientProvider, hasLocale } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
 import { Sora, Inter, IBM_Plex_Sans, Noto_Sans_SC } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import "./globals.css";
+import { routing } from "@/i18n/routing";
+import "../globals.css";
 
 // Headings — modern, calm, product-like
 const sora = Sora({ variable: "--font-sora", subsets: ["latin"], display: "swap" });
@@ -32,20 +36,35 @@ export const metadata: Metadata = {
   description: "Bloomprint turns yard inspiration into a buildable plan.",
 };
 
-export default function RootLayout({
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export default async function LocaleLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }>) {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+  // Enable static rendering for this locale
+  setRequestLocale(locale);
+
   return (
-    <html lang="en" className={`${fontVars} h-full antialiased`} suppressHydrationWarning>
+    <html lang={locale} className={`${fontVars} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col">
-        <ThemeProvider>
-          <SiteHeader />
-          <div className="flex flex-1 flex-col">{children}</div>
-          <SiteFooter />
-          <Analytics />
-        </ThemeProvider>
+        <NextIntlClientProvider>
+          <ThemeProvider>
+            <SiteHeader />
+            <div className="flex flex-1 flex-col">{children}</div>
+            <SiteFooter />
+            <Analytics />
+          </ThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import type { BloomprintPlan } from "@/domain/models";
 import { deletePlan, renamePlan, useSavedPlans, type SavedPlan } from "@/lib/plansStore";
 import { SavedPlans } from "@/components/SavedPlans";

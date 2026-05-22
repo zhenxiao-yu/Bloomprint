@@ -1,0 +1,77 @@
+{
+  "Nav": {
+    "plan": "做方案",
+    "saved": "已保存",
+    "pricing": "价格",
+    "guide": "指南",
+    "about": "关于",
+    "account": "账户",
+    "settings": "设置",
+    "signOut": "退出登录",
+    "createAccount": "注册账户",
+    "me": "我"
+  },
+  "Footer": {
+    "tagline": "🌿 Bloomprint —— 为真实住宅打造可落地的庭院方案。",
+    "github": "GitHub",
+    "disclaimer": "方案基于 Bloomprint 核心植物库和大致的区域规则生成。价格是参考区间，不是正式报价。账户和已保存的方案都存在你自己的设备上。"
+  },
+  "Theme": {
+    "light": "浅色",
+    "dark": "深色",
+    "system": "跟随系统",
+    "label": "当前主题：{current}，点击切换到{next}。",
+    "title": "主题：{current}"
+  },
+  "Language": {
+    "label": "语言",
+    "en": "English",
+    "zh": "中文"
+  },
+  "Modes": {
+    "simple": "简明模式",
+    "details": "详细模式",
+    "staff": "店员助手"
+  },
+  "Home": {
+    "eyebrow": "Bloomprint",
+    "heroTitle": "为真实住宅打造可落地的庭院方案。",
+    "heroSubtitle": "简单说说你家的院子，Bloomprint 会把它变成真正能动手做的方案：买什么、买多少、用什么工具、按什么顺序施工。",
+    "startPlan": "开始做院子方案",
+    "tryDemo": "看看示例",
+    "trustLine": "先看事实，再用 AI。每个方案都会标出假设、风险和替代选择。",
+    "snapshot": {
+      "confidence": "适配度",
+      "confidenceValue": "比较合适，会专门提醒土壤和库存方面要注意的地方",
+      "total": "自己动手的预计花费",
+      "totalValue": "大约 $640–$1,120，是参考区间，不是假报价",
+      "order": "施工顺序",
+      "orderValue": "放线、整地、种植、装边界条、铺覆盖物",
+      "store": "门店实际情况",
+      "storeValue": "提供搜索链接和替代选项，不会假装知道库存"
+    },
+    "ctas": {
+      "startTitle": "开始做我的院子方案",
+      "startDesc": "回答几个简单问题，就能得到一份能动手做的方案。",
+      "staffTitle": "帮顾客出方案",
+      "staffDesc": "店员视角：讲解要点、好 / 更好 / 最好三档选择、替代搭配。",
+      "demoTitle": "看示例方案",
+      "demoDesc": "马上看看一份做好的 Oakville 前院方案。"
+    },
+    "chips": {
+      "shoppingList": "购物清单",
+      "installOrder": "施工顺序",
+      "risksEvidence": "风险与依据",
+      "storeChecklist": "门店清单"
+    },
+    "trust": {
+      "notAiTitle": "不只是 AI 效果图",
+      "notAiBody": "Bloomprint 给的是材料、工具、人力、施工顺序和风险 —— 一份能动手做的方案，而不是一张渲染图。",
+      "factsTitle": "事实优先，AI 在后",
+      "factsBody": "植物和价格都来自 Bloomprint 核心库和规则。AI 只负责解释，绝不替你决定种什么。",
+      "honestTitle": "如实说明不确定的地方",
+      "honestBody": "大致的区域、价格区间和本地库存都会清楚标出来 —— 绝不糊弄。"
+    },
+    "disclaimer": "方案基于 Bloomprint 核心植物库和大致的区域规则。价格是参考区间，不是报价 —— 购买前请先确认本地是否有货。"
+  }
+}

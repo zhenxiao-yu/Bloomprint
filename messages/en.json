@@ -1,0 +1,77 @@
+{
+  "Nav": {
+    "plan": "Plan",
+    "saved": "Saved",
+    "pricing": "Pricing",
+    "guide": "Guide",
+    "about": "About",
+    "account": "Account",
+    "settings": "Settings",
+    "signOut": "Sign out",
+    "createAccount": "Create account",
+    "me": "Me"
+  },
+  "Footer": {
+    "tagline": "🌿 Bloomprint — buildable yard plans for real homes.",
+    "github": "GitHub",
+    "disclaimer": "Plans use the Bloomprint Core Library and approximate regional rules. Prices are ranges, not quotes. Accounts and saved plans are stored on your device."
+  },
+  "Theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "label": "Theme: {current}. Switch to {next}.",
+    "title": "Theme: {current}"
+  },
+  "Language": {
+    "label": "Language",
+    "en": "English",
+    "zh": "中文"
+  },
+  "Modes": {
+    "simple": "Simple",
+    "details": "Details",
+    "staff": "Staff Helper"
+  },
+  "Home": {
+    "eyebrow": "Bloomprint",
+    "heroTitle": "Buildable yard plans for real homes.",
+    "heroSubtitle": "Tell us a little about your yard and Bloomprint turns it into a plan you can actually build — what to buy, how much, what tools, and in what order.",
+    "startPlan": "Start a yard plan",
+    "tryDemo": "Try the demo",
+    "trustLine": "Facts first. AI second. Every plan shows assumptions, risks, and alternatives.",
+    "snapshot": {
+      "confidence": "Confidence",
+      "confidenceValue": "Good fit, with soil and stock checks called out",
+      "total": "Expected DIY total",
+      "totalValue": "$640–$1,120 range, not a fake quote",
+      "order": "Install order",
+      "orderValue": "Mark, prep, plant, edge, mulch",
+      "store": "Store reality",
+      "storeValue": "Search links, substitutions, no inventory claims"
+    },
+    "ctas": {
+      "startTitle": "Start My Yard Plan",
+      "startDesc": "Answer a few quick questions and get a buildable plan.",
+      "staffTitle": "Help a Customer",
+      "staffDesc": "Garden-staff view: talking points, Good/Better/Best, substitutions.",
+      "demoTitle": "Try the Demo",
+      "demoDesc": "See a finished Oakville front-yard plan instantly."
+    },
+    "chips": {
+      "shoppingList": "Shopping list",
+      "installOrder": "Install order",
+      "risksEvidence": "Risks & evidence",
+      "storeChecklist": "Store checklist"
+    },
+    "trust": {
+      "notAiTitle": "Not just AI images",
+      "notAiBody": "Bloomprint produces materials, tools, labor, install order, and risks — a plan you can build, not a render.",
+      "factsTitle": "Facts before AI",
+      "factsBody": "Plants and prices come from the Bloomprint Core Library and rules. AI only explains — it never decides what to plant.",
+      "honestTitle": "Honest uncertainty",
+      "honestBody": "Approximate regions, price ranges, and local availability are clearly labeled — never faked."
+    },
+    "disclaimer": "Plans use the Bloomprint Core Library and approximate regional rules. Prices are ranges, not quotes — confirm local availability before buying."
+  }
+}

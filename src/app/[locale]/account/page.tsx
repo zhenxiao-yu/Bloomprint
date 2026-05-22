@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { initials, useAccount } from "@/lib/accountStore";
 import { useSavedPlans } from "@/lib/plansStore";
 import { CloudSyncCard } from "@/components/CloudSyncCard";

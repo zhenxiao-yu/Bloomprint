@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import type { BloomprintPlan, RefinementAdjustment } from "@/domain/models";
 import { IntakeForm, type IntakeDefaults, type IntakeValues } from "@/components/IntakeForm";
 import { PlanResult, type ViewMode } from "@/components/PlanResult";
