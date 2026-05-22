@@ -42,3 +42,9 @@ and portable. UI and API depend on the domain, not the reverse.
 ## D9 — Delight gate before platform expansion
 Visual Yard Preview (Phase 4) and AR (Phase 5) are deferred until the core flow earns "this actually
 understands my yard." Emotional resonance before platform expansion.
+
+## D10 — Engagement loop is backend-free
+Save/history is `localStorage`; sharing encodes `{intake, adjustments}` into the URL and the
+recipient regenerates the plan deterministically. No database, no accounts, no stored user data —
+consistent with D5. Analytics is cookieless Vercel Web Analytics with custom events; if disabled,
+events are harmless no-ops. *Why:* validate whether users iterate before investing in any backend.

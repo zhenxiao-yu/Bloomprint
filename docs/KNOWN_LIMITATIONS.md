@@ -36,3 +36,9 @@ the plan's spacing notes, not the visual board.
 
 ## AR (Phase 5, deferred)
 Not in V1. Planned only as progressive enhancement via `model-viewer`; not a blocker.
+
+## Saved plans & sharing (Phase 2)
+Saved plans live in **this browser only** (localStorage) — they aren't synced across devices and are
+lost if the user clears site data. Share links encode the plan's **inputs**, not a stored record, so
+a very long/edited link may not decode (it falls back to a fresh plan). If the Core Library or engine
+changes between versions, an old share link regenerates with the *current* engine, not the original.

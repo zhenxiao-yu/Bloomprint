@@ -39,8 +39,18 @@ Execution order. Each phase must pass validation before the next. Mirrors the ap
 - [ ] Zod-validate all AI output; reject/repair; fall back to deterministic narrative
 - [ ] `POST /api/plan` (deterministic → optional enhance → validate → BloomprintPlan)
 
+## Phase 2 (post-V1) — Engagement loop ✅
+Validate the core loop (generate → refine → **save → compare → share**). Backend-free.
+- [x] Share links: `src/lib/shareLink.ts` — encode `{intake, adjustments}` into `/plan?p=…`, Zod-validated on decode
+- [x] Saved plans: `src/lib/plansStore.ts` — localStorage history (useSyncExternalStore)
+- [x] Compare: `src/lib/planDiff.ts` (pure) + `src/components/CompareView.tsx`
+- [x] `/plans` page (history, open, rename, delete, select-two-to-compare)
+- [x] Save/Share action bar + shared-link load in `src/components/PlanExperience.tsx`
+- [x] Cookieless analytics: `src/lib/analytics.ts` + `<Analytics/>` (events: generated/refined/saved/shared/compared/accuracy)
+
 ## Delight gate
-Validate "this actually understands my yard" before Phases 4–5.
+Validate "this actually understands my yard" before Phases 4–5. Engagement-loop telemetry now
+feeds this decision.
 
 ## Phase 4 — Yard Preview (deferred)
 Photo upload, 2D placement board, before/planned, approximate-scale disclaimer.
