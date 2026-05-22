@@ -7,6 +7,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { MobileNav } from "@/components/MobileNav";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
@@ -56,12 +57,13 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className={`${fontVars} h-full antialiased`} suppressHydrationWarning>
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col pb-16 sm:pb-0">
         <NextIntlClientProvider>
           <ThemeProvider>
             <SiteHeader />
             <div className="flex flex-1 flex-col">{children}</div>
             <SiteFooter />
+            <MobileNav />
             <Analytics />
           </ThemeProvider>
         </NextIntlClientProvider>

@@ -5,6 +5,7 @@ import { initials, signOut, useAccount } from "@/lib/accountStore";
 import { Link, usePathname } from "@/i18n/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
+import { SyncStatusBadge } from "@/components/SyncStatusBadge";
 
 const NAV = [
   { href: "/plan", key: "plan" },
@@ -48,6 +49,9 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <span className="hidden md:inline-flex">
+            <SyncStatusBadge />
+          </span>
           <LanguageSwitch />
           <ThemeToggle />
           {account ? (
