@@ -38,6 +38,7 @@ export function SiteHeader() {
               <Link
                 key={n.href}
                 href={n.href}
+                aria-current={active ? "page" : undefined}
                 className={`shrink-0 rounded-full px-2.5 py-1.5 transition sm:px-3 ${
                   active ? "bg-brand-soft text-brand-strong" : "text-muted hover:text-foreground"
                 }`}

@@ -39,7 +39,16 @@
     "houseSide": "House / fence side",
     "lawnEdge": "Lawn edge",
     "resetLayout": "Reset layout",
-    "caption": "Approximate concept layout — numbers are quantities; drag to rearrange. Scale is illustrative; use each plant's spacing note before planting."
+    "caption": "Approximate concept layout — numbers are quantities; drag to rearrange. Scale is illustrative; use each plant's spacing note before planting.",
+    "chipAria": "{quantity}× {name}, {type} — drag to reposition",
+    "types": {
+      "evergreen": "Evergreen",
+      "tree": "Tree",
+      "shrub": "Shrub",
+      "grass": "Grass",
+      "perennial": "Perennial",
+      "groundcover": "Groundcover"
+    }
   },
   "Charts": {
     "budgetTitle": "Cost by category",

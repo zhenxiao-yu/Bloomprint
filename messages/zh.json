@@ -39,7 +39,16 @@
     "houseSide": "房屋 / 围栏一侧",
     "lawnEdge": "草坪边缘",
     "resetLayout": "重置布局",
-    "caption": "大致的概念布局 —— 数字是数量，可拖动重新排布。比例仅供示意；种植前请参考每种植物的间距说明。"
+    "caption": "大致的概念布局 —— 数字是数量，可拖动重新排布。比例仅供示意；种植前请参考每种植物的间距说明。",
+    "chipAria": "{quantity} 株 {name}，{type} —— 可拖动重新摆放",
+    "types": {
+      "evergreen": "常绿植物",
+      "tree": "乔木",
+      "shrub": "灌木",
+      "grass": "草本",
+      "perennial": "多年生植物",
+      "groundcover": "地被植物"
+    }
   },
   "Charts": {
     "budgetTitle": "各类别花费",

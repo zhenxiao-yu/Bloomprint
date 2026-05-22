@@ -24,15 +24,6 @@ const TYPE_COLOR: Record<PlantType, string> = {
   groundcover: "#8aa86a",
 };
 
-const TYPE_LABEL: Record<PlantType, string> = {
-  evergreen: "Evergreen",
-  tree: "Tree",
-  shrub: "Shrub",
-  grass: "Grass",
-  perennial: "Perennial",
-  groundcover: "Groundcover",
-};
-
 // Bounds (in % of board) the original raw-pointer version clamped to.
 const X_MIN = 3;
 const X_MAX = 97;
@@ -51,10 +42,12 @@ function Chip({
   plant,
   pos,
   isActive,
+  label,
 }: {
   plant: PlantPlacement;
   pos: Pos;
   isActive: boolean;
+  label: string;
 }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: plant.plantId });
   const size = Math.round(34 * pos.scale);
@@ -68,7 +61,8 @@ function Chip({
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      title={`${plant.quantity}× ${plant.commonName} — ${TYPE_LABEL[plant.type]}`}
+      aria-label={label}
+      title={label}
       className="absolute flex cursor-grab touch-none select-none items-center justify-center rounded-full text-[9px] font-semibold text-white outline-2 outline-white/70 hover:z-10 hover:brightness-110 active:cursor-grabbing"
       style={{
         left: `${pos.x}%`,
@@ -161,6 +155,11 @@ export function ConceptBoard({ plants }: { plants: PlantPlacement[] }) {
               plant={p}
               pos={posOf(p.plantId)}
               isActive={activeId === p.plantId}
+              label={t("chipAria", {
+                quantity: p.quantity,
+                name: p.commonName,
+                type: t(`types.${p.type}`),
+              })}
             />
           ))}
         </div>
@@ -170,7 +169,7 @@ export function ConceptBoard({ plants }: { plants: PlantPlacement[] }) {
         {typesUsed.map((tp) => (
           <span key={tp} className="inline-flex items-center gap-1">
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: TYPE_COLOR[tp] }} />
-            {TYPE_LABEL[tp]}
+            {t(`types.${tp}`)}
           </span>
         ))}
         {overrides.size > 0 ? (
