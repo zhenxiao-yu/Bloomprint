@@ -80,7 +80,25 @@
     "createAccount": "Create account",
     "createAccountAlt": "Create an account",
     "dontKnow": "I don't know",
+    "notSure": "Not sure yet",
     "optional": "(optional)"
+  },
+  "Form": {
+    "nameRequired": "Please enter your name.",
+    "emailInvalid": "Enter a valid email, or leave it blank."
+  },
+  "Intake": {
+    "goalQuestion": "What do you want to do?",
+    "regionQuestion": "Where is the yard?",
+    "zipLabel": "ZIP / postal code",
+    "zipHint": "(optional, sharpens the zone)",
+    "zipPlaceholder": "e.g. 60601 or M5V",
+    "areaQuestion": "Where in the yard?",
+    "areaOptional": "(optional)",
+    "budgetQuestion": "Rough budget?",
+    "effortQuestion": "How much work do you want to do?",
+    "noPhotoNote": "No photo needed — you'll get a layout you can build. Add details after to sharpen it.",
+    "buildButton": "Build my plan"
   },
   "About": {
     "metaTitle": "About — Bloomprint",

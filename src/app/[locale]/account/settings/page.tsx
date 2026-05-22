@@ -1,19 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { signOut, updateAccount, useAccount } from "@/lib/accountStore";
+import { accountSchema, type AccountFormValues } from "@/lib/accountForm";
 import { clearPlans, useSavedPlans } from "@/lib/plansStore";
 
 export default function SettingsPage() {
   const t = useTranslations("Settings");
   const tc = useTranslations("Common");
+  const tf = useTranslations("Form");
   const router = useRouter();
   const account = useAccount();
   const plans = useSavedPlans();
   const [saved, setSaved] = useState(false);
+
+  const schema = useMemo(
+    () => accountSchema({ nameRequired: tf("nameRequired"), emailInvalid: tf("emailInvalid") }),
+    [tf],
+  );
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<AccountFormValues>({
+    resolver: zodResolver(schema),
+    values: { name: account?.name ?? "", email: account?.email ?? "" },
+    mode: "onTouched",
+  });
 
   // Redirect when there's no account (navigation only — no setState in this effect).
   useEffect(() => {
@@ -22,13 +40,8 @@ export default function SettingsPage() {
 
   if (!account) return null;
 
-  function save(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = new FormData(e.currentTarget);
-    const name = String(form.get("name") ?? "").trim();
-    const email = String(form.get("email") ?? "");
-    if (!name) return;
-    updateAccount({ name, email });
+  function save(values: AccountFormValues) {
+    updateAccount({ name: values.name, email: values.email });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
@@ -40,21 +53,27 @@ export default function SettingsPage() {
       </Link>
       <h1 className="mt-2 text-2xl font-semibold text-foreground">{t("title")}</h1>
 
-      <form onSubmit={save} className="card mt-5 space-y-4 p-5">
+      <form onSubmit={handleSubmit(save)} className="card mt-5 space-y-4 p-5" noValidate>
         <label className="block">
           <span className="mb-1 block text-sm font-semibold text-foreground">{t("nameLabel")}</span>
-          <input name="name" defaultValue={account.name} required className="card w-full p-2.5 text-sm" />
+          <input
+            {...register("name")}
+            aria-invalid={errors.name ? "true" : undefined}
+            className="card w-full p-2.5 text-sm"
+          />
+          {errors.name ? <span className="mt-1 block text-xs text-danger">{errors.name.message}</span> : null}
         </label>
         <label className="block">
           <span className="mb-1 block text-sm font-semibold text-foreground">
             {t("emailLabel")} <span className="font-normal text-muted">{tc("optional")}</span>
           </span>
           <input
-            name="email"
+            {...register("email")}
             type="email"
-            defaultValue={account.email ?? ""}
+            aria-invalid={errors.email ? "true" : undefined}
             className="card w-full p-2.5 text-sm"
           />
+          {errors.email ? <span className="mt-1 block text-xs text-danger">{errors.email.message}</span> : null}
         </label>
         <div className="flex items-center gap-3">
           <button

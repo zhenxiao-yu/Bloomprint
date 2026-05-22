@@ -80,7 +80,25 @@
     "createAccount": "注册账户",
     "createAccountAlt": "注册一个账户",
     "dontKnow": "我不确定",
+    "notSure": "还不确定",
     "optional": "（选填）"
+  },
+  "Form": {
+    "nameRequired": "请填写你的名字。",
+    "emailInvalid": "请填写有效的邮箱，或者留空。"
+  },
+  "Intake": {
+    "goalQuestion": "你想做点什么？",
+    "regionQuestion": "院子在哪儿？",
+    "zipLabel": "邮编",
+    "zipHint": "（选填，能让耐寒区更准）",
+    "zipPlaceholder": "例如 60601 或 M5V",
+    "areaQuestion": "院子的哪个位置？",
+    "areaOptional": "（选填）",
+    "budgetQuestion": "大概预算？",
+    "effortQuestion": "你想自己动手做多少？",
+    "noPhotoNote": "不用照片也行 —— 你会得到一份能动手做的布置方案。之后再补细节会更准。",
+    "buildButton": "生成我的方案"
   },
   "About": {
     "metaTitle": "关于 —— Bloomprint",
