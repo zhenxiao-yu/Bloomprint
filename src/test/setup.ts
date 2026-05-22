@@ -2,8 +2,25 @@
 // Importing jest-dom matchers is harmless in the default node environment;
 // the jsdom-only bits below are guarded so node tests are unaffected.
 import "@testing-library/jest-dom/vitest";
-import { afterEach } from "vitest";
+import { afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
+
+// next-intl's navigation helpers import `next/navigation`, which does not
+// resolve under Vitest's ESM loader (next 16 has no exports entry for it). Any
+// component using `@/i18n/navigation` (e.g. its locale-aware <Link>) would fail
+// to load. Stub the module with plain DOM equivalents so component tests run.
+// Node-env tests that never import it are unaffected.
+vi.mock("@/i18n/navigation", async () => {
+  const { createElement } = await import("react");
+  return {
+    Link: ({ href, children, ...props }: { href: string; children?: unknown } & Record<string, unknown>) =>
+      createElement("a", { href, ...props }, children as never),
+    redirect: () => undefined,
+    usePathname: () => "/",
+    useRouter: () => ({ push: () => {}, replace: () => {}, back: () => {}, refresh: () => {} }),
+    getPathname: ({ href }: { href: string }) => href,
+  };
+});
 
 afterEach(() => {
   cleanup();

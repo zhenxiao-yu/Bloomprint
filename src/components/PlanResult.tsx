@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import type { BloomprintPlan, RefinementAdjustment, ShoppingPriority } from "@/domain/models";
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
 import { Chip, MetricPill, Money, Section, SeverityTag } from "@/components/ui";
@@ -191,6 +192,12 @@ export function PlanResult({
       <section className="card p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-base font-semibold text-foreground">{t("seeYard")}</h3>
+          <Link
+            href="/plan/map"
+            className="rounded-full border border-border px-3 py-1 text-xs font-medium text-foreground transition hover:border-brand"
+          >
+            {t("openYardMap")}
+          </Link>
           <div className="flex gap-1 rounded-full border border-border p-0.5 text-xs">
             {(["now", "planned"] as const).map((v) => (
               <button
