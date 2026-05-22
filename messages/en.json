@@ -12,6 +12,10 @@
     "createAccount": "Create account",
     "me": "Me"
   },
+  "Meta": {
+    "title": "Bloomprint — buildable yard plans for real homes",
+    "description": "Turn your yard goal into a realistic plan: plants, materials, budget, labor, risks, and a shopping list. Works without a photo."
+  },
   "Footer": {
     "tagline": "🌿 Bloomprint — buildable yard plans for real homes.",
     "github": "GitHub",
@@ -109,6 +113,15 @@
   "Form": {
     "nameRequired": "Please enter your name.",
     "emailInvalid": "Enter a valid email, or leave it blank."
+  },
+  "Errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "That page doesn't exist or has moved. Let's get you back to planning.",
+    "goHome": "Go home",
+    "errorTitle": "Something went wrong",
+    "errorBody": "Bloomprint hit an unexpected issue. Your saved plans live on this device, and you can try again without losing the whole app.",
+    "tryAgain": "Try again",
+    "freshPlan": "Start a fresh plan"
   },
   "PhotoPanel": {
     "title": "Your photo",
@@ -394,6 +407,8 @@
     "openYardMap": "Open Yard Map (beta)",
     "viewNow": "now",
     "viewPlanned": "planned",
+    "viewOverlay": "overlay",
+    "overlayCaption": "Concept overlay — labeled plants and spacing circles dropped onto your photo. Not exact placement or scale; use each plant's spacing note before planting.",
     "yourYardNow": "Your yard now",
     "viewInSpace": "📱 View in your space (3D / AR)",
     "firstDraft": "This is your first draft. Adjust it:",

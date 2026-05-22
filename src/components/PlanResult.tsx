@@ -7,6 +7,7 @@ import type { BloomprintPlan, RefinementAdjustment, ShoppingPriority } from "@/d
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
 import { Chip, MetricPill, Money, Section, SeverityTag } from "@/components/ui";
 import { ConceptBoard } from "@/components/ConceptBoard";
+import { YardPreviewOverlay } from "@/components/yard-map/YardPreviewOverlay";
 import { CommandBar } from "@/components/CommandBar";
 import { PlanCharts } from "@/components/PlanCharts";
 import { ShoppingTable } from "@/components/ShoppingTable";
@@ -62,7 +63,7 @@ export function PlanResult({
   const to = useTranslations("Options");
   const { plan, enhancement } = result;
   const showNumbers = view !== "simple";
-  const [boardView, setBoardView] = useState<"now" | "planned">("planned");
+  const [boardView, setBoardView] = useState<"now" | "planned" | "overlay">("planned");
   const [arOpen, setArOpen] = useState(false);
 
   const heroDescription =
@@ -199,7 +200,7 @@ export function PlanResult({
             {t("openYardMap")}
           </Link>
           <div className="flex gap-1 rounded-full border border-border p-0.5 text-xs">
-            {(["now", "planned"] as const).map((v) => (
+            {(["now", "planned", ...(photoUrl ? (["overlay"] as const) : [])] as const).map((v) => (
               <button
                 key={v}
                 onClick={() => {
@@ -211,7 +212,7 @@ export function PlanResult({
                   boardView === v ? "bg-brand text-on-strong" : "text-muted hover:text-foreground"
                 }`}
               >
-                {v === "now" ? t("viewNow") : t("viewPlanned")}
+                {v === "now" ? t("viewNow") : v === "planned" ? t("viewPlanned") : t("viewOverlay")}
               </button>
             ))}
           </div>
@@ -220,6 +221,8 @@ export function PlanResult({
         <div className="mt-3">
           {boardView === "planned" ? (
             <ConceptBoard plants={plan.plants} />
+          ) : boardView === "overlay" && photoUrl ? (
+            <YardPreviewOverlay photoUrl={photoUrl} plants={plan.plants} />
           ) : photoUrl ? (
             <div className="overflow-hidden rounded-xl border border-border" style={{ aspectRatio: "5 / 3" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}

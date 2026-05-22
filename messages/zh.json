@@ -12,6 +12,10 @@
     "createAccount": "注册账户",
     "me": "我"
   },
+  "Meta": {
+    "title": "Bloomprint —— 为真实住宅打造可落地的庭院方案",
+    "description": "把你的院子想法变成真实可执行的方案：植物、材料、预算、人力、风险和购物清单。不用照片也能用。"
+  },
   "Footer": {
     "tagline": "🌿 Bloomprint —— 为真实住宅打造可落地的庭院方案。",
     "github": "GitHub",
@@ -109,6 +113,15 @@
   "Form": {
     "nameRequired": "请填写你的名字。",
     "emailInvalid": "请填写有效的邮箱，或者留空。"
+  },
+  "Errors": {
+    "notFoundTitle": "页面找不到了",
+    "notFoundBody": "这个页面不存在，或者已经移走了。我们带你回去继续做方案吧。",
+    "goHome": "回到首页",
+    "errorTitle": "出了点问题",
+    "errorBody": "Bloomprint 遇到了一个意外问题。你保存的方案都在本设备上，可以重试，不会丢失整个应用。",
+    "tryAgain": "重试",
+    "freshPlan": "重新做一份方案"
   },
   "PhotoPanel": {
     "title": "你的照片",
@@ -394,6 +407,8 @@
     "openYardMap": "打开院子地图（测试版）",
     "viewNow": "现状",
     "viewPlanned": "规划后",
+    "viewOverlay": "叠加预览",
+    "overlayCaption": "概念叠加——把带标签的植物和间距圈叠放在你的照片上。仅为示意，并非精确的位置或比例；种植前请参考每种植物的间距说明。",
     "yourYardNow": "你院子的现状",
     "viewInSpace": "📱 在你的空间里看（3D / AR）",
     "firstDraft": "这是你的初稿。来调整它：",
