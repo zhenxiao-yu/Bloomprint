@@ -67,7 +67,7 @@ export default function PlansPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
+    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
       <div className="mb-6 flex items-center justify-between">
         <Link href="/plan" className="text-sm font-semibold text-brand">
           ← Back to planning

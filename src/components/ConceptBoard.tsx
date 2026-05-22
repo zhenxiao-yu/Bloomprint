@@ -36,6 +36,7 @@ export function ConceptBoard({ plants }: { plants: PlantPlacement[] }) {
   }, [plants]);
 
   const [overrides, setOverrides] = useState<Map<string, Pos>>(new Map());
+  const [activeId, setActiveId] = useState<string | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const dragId = useRef<string | null>(null);
 
@@ -43,6 +44,7 @@ export function ConceptBoard({ plants }: { plants: PlantPlacement[] }) {
 
   function onPointerDown(e: React.PointerEvent, id: string) {
     dragId.current = id;
+    setActiveId(id);
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
   }
 
@@ -58,6 +60,7 @@ export function ConceptBoard({ plants }: { plants: PlantPlacement[] }) {
 
   function endDrag() {
     dragId.current = null;
+    setActiveId(null);
   }
 
   const typesUsed = useMemo(() => {
@@ -90,19 +93,26 @@ export function ConceptBoard({ plants }: { plants: PlantPlacement[] }) {
         {plants.map((p) => {
           const pos = posOf(p.plantId);
           const size = Math.round(34 * pos.scale);
+          const isActive = activeId === p.plantId;
           return (
             <button
               key={p.plantId}
               onPointerDown={(e) => onPointerDown(e, p.plantId)}
               title={`${p.quantity}× ${p.commonName} — ${TYPE_LABEL[p.type]}`}
-              className="absolute flex cursor-grab touch-none select-none items-center justify-center rounded-full text-[9px] font-semibold text-white shadow active:cursor-grabbing"
+              className="absolute flex cursor-grab touch-none select-none items-center justify-center rounded-full text-[9px] font-semibold text-white outline-2 outline-white/70 hover:z-10 hover:brightness-110 active:cursor-grabbing"
               style={{
                 left: `${pos.x}%`,
                 top: `${pos.y}%`,
                 width: size,
                 height: size,
-                transform: "translate(-50%, -50%)",
+                transform: `translate(-50%, -50%) scale(${isActive ? 1.18 : 1})`,
                 background: TYPE_COLOR[p.type],
+                boxShadow: isActive
+                  ? "0 6px 16px rgba(0,0,0,0.25)"
+                  : "0 1px 3px rgba(0,0,0,0.2)",
+                zIndex: isActive ? 20 : 1,
+                transition: "transform 0.12s ease, box-shadow 0.15s ease, filter 0.15s ease",
+                outlineStyle: isActive ? "solid" : "none",
               }}
             >
               {p.quantity}

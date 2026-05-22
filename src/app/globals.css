@@ -42,6 +42,79 @@ body {
   border-radius: 1rem;
 }
 
+/* ---- Interaction & motion polish ---- */
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.12s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.15s ease;
+}
+
+/* Tactile press feedback on every control */
+button:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+/* Consistent, accessible keyboard focus */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 0.35rem;
+}
+
+/* Entrance animation for results/cards */
+@keyframes bp-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: bp-fade-up 0.32s ease both;
+}
+
+/* Loading skeleton shimmer */
+@keyframes bp-shimmer {
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, #eef1ea 37%, var(--border) 63%);
+  background-size: 200% 100%;
+  animation: bp-shimmer 1.3s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+/* Honor user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  button:not(:disabled):active {
+    transform: none;
+  }
+}
+
 @media print {
   .no-print {
     display: none !important;

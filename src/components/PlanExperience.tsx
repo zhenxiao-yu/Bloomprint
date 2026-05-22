@@ -126,6 +126,13 @@ export function PlanExperience() {
     void fetchPlan(boot.request, boot.adjustments, boot.source);
   }, [boot, fetchPlan]);
 
+  // Auto-dismiss the "Saved" confirmation.
+  useEffect(() => {
+    if (!savedNote) return;
+    const t = setTimeout(() => setSavedNote(false), 2500);
+    return () => clearTimeout(t);
+  }, [savedNote]);
+
   function handleIntake(values: IntakeValues) {
     const next: SavedProfile = {
       regionId: values.regionId,
@@ -227,7 +234,7 @@ export function PlanExperience() {
     : undefined;
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
+    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
       <div className="mb-6 flex items-center justify-between">
         <Link href="/" className="text-sm font-semibold text-brand">
           ← Bloomprint
@@ -264,9 +271,28 @@ export function PlanExperience() {
       ) : null}
 
       {step === "loading" ? (
-        <div className="card flex items-center gap-3 p-8 text-muted">
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-          Building your plan…
+        <div className="space-y-4" aria-live="polite" aria-busy="true">
+          <p className="flex items-center gap-2 text-sm text-muted">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+            Building your plan…
+          </p>
+          <div className="card overflow-hidden p-6">
+            <div className="skeleton h-6 w-2/3" />
+            <div className="skeleton mt-3 h-4 w-full" />
+            <div className="skeleton mt-2 h-4 w-5/6" />
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <div className="skeleton h-20" />
+              <div className="skeleton h-20" />
+            </div>
+          </div>
+          <div className="card p-5">
+            <div className="skeleton h-4 w-1/3" />
+            <div className="mt-3 flex gap-2">
+              <div className="skeleton h-8 w-24 rounded-full" />
+              <div className="skeleton h-8 w-24 rounded-full" />
+              <div className="skeleton h-8 w-20 rounded-full" />
+            </div>
+          </div>
         </div>
       ) : null}
 
@@ -284,7 +310,7 @@ export function PlanExperience() {
       ) : null}
 
       {step === "result" && result ? (
-        <>
+        <div className="animate-fade-up">
           {profile ? <MemoryBanner profile={profile} className="mb-4" /> : null}
 
           {/* Action bar — save, share, history (the engagement loop) */}
@@ -384,7 +410,7 @@ export function PlanExperience() {
               ← Plan another yard
             </Link>
           </div>
-        </>
+        </div>
       ) : null}
     </main>
   );

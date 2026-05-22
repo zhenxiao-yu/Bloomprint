@@ -41,7 +41,7 @@ export default async function StorePage({
   const backHref = `/plan?${SHARE_PARAM}=${typeof raw === "string" ? raw : ""}`;
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10 print:py-0">
+    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:px-6 sm:py-10 print:py-0">
       <PrintBar backHref={backHref} />
 
       <h1 className="text-2xl font-semibold text-foreground">Shopping list</h1>

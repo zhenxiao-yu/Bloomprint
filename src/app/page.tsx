@@ -23,24 +23,25 @@ const CTAS = [
 
 export default function Home() {
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-10 px-6 py-16">
-      <header className="space-y-4">
+    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center gap-8 px-5 py-12 sm:gap-10 sm:px-6 sm:py-16">
+      <header className="animate-fade-up space-y-4">
         <p className="text-sm font-medium uppercase tracking-wide text-brand">Bloomprint</p>
-        <h1 className="text-4xl font-semibold leading-tight text-foreground sm:text-5xl">
+        <h1 className="text-3xl font-semibold leading-tight text-foreground sm:text-5xl">
           Buildable yard plans for real homes.
         </h1>
-        <p className="max-w-xl text-lg text-muted">
+        <p className="max-w-xl text-base text-muted sm:text-lg">
           Tell us a little about your yard and Bloomprint turns it into a plan you can actually
           build — what to buy, how much, what tools, and in what order.
         </p>
       </header>
 
       <div className="grid gap-3 sm:grid-cols-3">
-        {CTAS.map((c) => (
+        {CTAS.map((c, i) => (
           <Link
             key={c.href}
             href={c.href}
-            className={`card flex flex-col gap-2 p-5 transition hover:-translate-y-0.5 hover:shadow-sm ${
+            style={{ animationDelay: `${80 + i * 70}ms` }}
+            className={`card animate-fade-up flex flex-col gap-2 p-5 transition hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 ${
               c.primary ? "ring-2 ring-brand" : ""
             }`}
           >
