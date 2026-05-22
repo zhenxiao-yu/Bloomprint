@@ -49,3 +49,15 @@ export function saveProfile(value: unknown): void {
   }
   for (const l of listeners) l();
 }
+
+/** Non-hook reader for the storage layer (parsed profile object, or null). */
+export function readSavedProfile(): Record<string, unknown> | null {
+  const raw = read();
+  if (!raw) return null;
+  try {
+    const v = JSON.parse(raw);
+    return v && typeof v === "object" ? (v as Record<string, unknown>) : null;
+  } catch {
+    return null;
+  }
+}

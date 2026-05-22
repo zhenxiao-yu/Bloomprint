@@ -62,6 +62,31 @@ Auth.js + a DB) can replace it without touching the rest of the app. Cloud sync 
 retention data and a chosen provider/keys justify it. *Why:* deliver real account UX now without
 faking secure cloud auth.
 
+## D15 — Cloud sync is a hybrid adapter behind the local-first seam
+The local-first behavior (D10/D12) is the fallback, not a throwaway. Storage is expressed as three
+interfaces — `ProjectStore`, `ProfileStore`, `PhotoStore` (`src/lib/storage/types.ts`) — with a
+**local adapter** (wraps the existing on-device stores), a **Supabase adapter**, and a **hybrid**
+adapter that selects cloud only when *both* the public env vars and an auth session exist, and
+falls back to local on any cloud error while surfacing a non-blocking "Saved on this device"
+warning. Rules: never use the service-role key in client code (it lives only in `src/lib/supabase/
+server.ts` + `cache.ts`, both server-only); the `project-photos` bucket is private with paths
+`userId/projectId/photoId.ext`; `ai_prompt_cache` is service-role only (no client policies);
+nothing here may block deterministic plan generation. *Why:* become cloud-capable without becoming
+cloud-dependent — the magic that works today keeps working with no backend. See
+docs/SUPABASE_MIGRATION.md.
+
+## D16 — Payments are entitlement-gated and free-by-default
+Monetization is Stripe Billing (Checkout + Customer Portal + webhooks) on top of Supabase. Rules:
+the deterministic engine is **never** gated (it's the hook, D1); with no `STRIPE_SECRET_KEY` the app
+runs in Free/local mode. Access is driven by **entitlements**, not plan names (`src/lib/billing/
+plans.ts`), resolved server-side (`server.ts`) — the client copy (`useEntitlements`) is for UI only
+and is never trusted. Subscription rows are written **only** by the signature-verified webhook via
+the service-role client; RLS makes `billing_customers` / `subscriptions` / `usage_counters`
+read-own-only (`supabase/migrations/0001_billing.sql`). Browser sessions live in localStorage, so
+billing routes authenticate via a Bearer access token, not cookies. Tiers: Free (3 cloud projects),
+Plus (cloud scale + export + advanced evidence + 50 AI/mo), Pro (staff mode + 300 AI/mo). *Why:*
+add payments now without a paywall — the free product must still prove value.
+
 ## D13 — AR is wired, assets are configurable
 "View in your space" loads Google's `<model-viewer>` (CDN, lazy) with AR enabled. The model is
 **configurable via `NEXT_PUBLIC_AR_MODEL_URL`** and defaults to a clearly-labeled *representative*

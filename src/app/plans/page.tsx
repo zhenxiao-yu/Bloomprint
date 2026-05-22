@@ -6,6 +6,7 @@ import type { BloomprintPlan } from "@/domain/models";
 import { deletePlan, renamePlan, useSavedPlans, type SavedPlan } from "@/lib/plansStore";
 import { SavedPlans } from "@/components/SavedPlans";
 import { CompareView } from "@/components/CompareView";
+import { SyncStatusBadge } from "@/components/SyncStatusBadge";
 import { trackEvent } from "@/lib/analytics";
 import { readApiError } from "@/lib/apiError";
 
@@ -78,9 +79,12 @@ export default function PlansPage() {
         </Link>
       </div>
 
-      <h1 className="text-2xl font-semibold text-foreground">Saved plans</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="text-2xl font-semibold text-foreground">Saved plans</h1>
+        <SyncStatusBadge />
+      </div>
       <p className="mt-1 text-sm text-muted">
-        Saved on this device. Select two to compare. Open re-generates the exact plan.
+        Select two to compare. Open re-generates the exact plan.
       </p>
 
       {plans.length >= 2 ? (

@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { initials, useAccount } from "@/lib/accountStore";
 import { useSavedPlans } from "@/lib/plansStore";
+import { CloudSyncCard } from "@/components/CloudSyncCard";
+import { BillingStatus } from "@/components/billing/BillingStatus";
 
 export default function AccountPage() {
   const account = useAccount();
@@ -20,6 +22,9 @@ export default function AccountPage() {
           >
             Create account
           </Link>
+        </div>
+        <div className="mt-4">
+          <CloudSyncCard />
         </div>
       </main>
     );
@@ -60,8 +65,13 @@ export default function AccountPage() {
         </Link>
       </div>
 
+      <div className="mt-4 space-y-3">
+        <CloudSyncCard />
+        <BillingStatus />
+      </div>
+
       <p className="mt-6 text-xs text-muted">
-        Your account and plans live in this browser. Cloud sync across devices is on the roadmap.
+        Your account and plans save on this device. Signing in to cloud sync keeps them across your devices.
       </p>
     </main>
   );

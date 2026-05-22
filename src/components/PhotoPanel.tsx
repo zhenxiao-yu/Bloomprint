@@ -47,10 +47,13 @@ export function PhotoPanel({
   photoUrl,
   onPhoto,
   onApplySun,
+  cloudSync = false,
 }: {
   photoUrl: string | null;
   onPhoto: (dataUrl: string | null) => void;
   onApplySun: (sun: SunExposure) => void;
+  /** When true, the user is signed into cloud sync and saving uploads the photo privately. */
+  cloudSync?: boolean;
 }) {
   const [visionEnabled, setVisionEnabled] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
@@ -128,7 +131,11 @@ export function PhotoPanel({
             Remove
           </button>
         ) : null}
-        <span className="ml-auto text-xs text-muted">Stays in your browser — never uploaded or saved.</span>
+        <span className="ml-auto text-xs text-muted">
+          {cloudSync
+            ? "Uploaded privately to your account when you save this plan."
+            : "Stays in your browser — never uploaded or saved."}
+        </span>
       </div>
 
       {photoUrl ? (

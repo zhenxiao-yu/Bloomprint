@@ -22,7 +22,8 @@ export type LoopEvent =
   | "photo_added"
   | "photo_analyzed"
   | "account_created"
-  | "ar_opened";
+  | "ar_opened"
+  | "upgrade_clicked";
 
 type Primitive = string | number | boolean | null;
 

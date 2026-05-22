@@ -7,9 +7,11 @@ import type { BloomprintPlan, RefinementAdjustment } from "@/domain/models";
 import { IntakeForm, type IntakeDefaults, type IntakeValues } from "@/components/IntakeForm";
 import { PlanResult, type ViewMode } from "@/components/PlanResult";
 import { PhotoPanel } from "@/components/PhotoPanel";
+import { SyncStatusBadge } from "@/components/SyncStatusBadge";
 import { BUDGETS, REGION_OPTIONS } from "@/lib/uiOptions";
 import { saveProfile, useSavedProfileRaw } from "@/lib/profileStore";
 import { savePlan } from "@/lib/plansStore";
+import { useStores } from "@/lib/storage";
 import { buildShareUrl, decodeShare, encodeShare, SHARE_PARAM } from "@/lib/shareLink";
 import { buildCareCalendar } from "@/lib/ics";
 import { trackEvent } from "@/lib/analytics";
@@ -122,6 +124,7 @@ export function PlanExperience() {
     () => parseSavedProfile(profileRaw),
     [profileRaw],
   );
+  const stores = useStores();
   const started = useRef(false);
 
   const fetchPlan = useCallback(
@@ -204,34 +207,56 @@ export function PlanExperience() {
   function handleSave() {
     if (!result) return;
     const p = result.plan;
-    savePlan({
-      label: `${versionLabel(adjustments)} — ${p.styleLabel} ${p.intake.goal.replace(/-/g, " ")}`,
-      intake: p.intake,
-      adjustments,
-      summary: {
-        styleLabel: p.styleLabel,
-        goal: p.intake.goal,
-        diyMin: p.budget.diyTotal.min,
-        diyMax: p.budget.diyTotal.max,
-        confidence: p.confidence,
-        plantCount: p.plants.length,
-        laborHours: p.labor.totalHours,
-        privacy: p.plants.some((plant) => plant.role === "screen") ? "screening included" : "not privacy-led",
-        maintenance: p.plants.some((plant) => plant.maintenance === "high")
-          ? "higher touch"
-          : p.plants.every((plant) => plant.maintenance === "low")
-            ? "low"
-            : "medium",
-        heavyWorkWarning: p.equipment.length > 0 || p.storeSearches.some((s) => s.deliveryRecommended),
-        versionLabel: versionLabel(adjustments),
-      },
-    });
+    const vLabel = versionLabel(adjustments);
+    const label = `${vLabel} — ${p.styleLabel} ${p.intake.goal.replace(/-/g, " ")}`;
+    const summary = {
+      styleLabel: p.styleLabel,
+      goal: p.intake.goal,
+      diyMin: p.budget.diyTotal.min,
+      diyMax: p.budget.diyTotal.max,
+      confidence: p.confidence,
+      plantCount: p.plants.length,
+      laborHours: p.labor.totalHours,
+      privacy: p.plants.some((plant) => plant.role === "screen") ? "screening included" : "not privacy-led",
+      maintenance: p.plants.some((plant) => plant.maintenance === "high")
+        ? "higher touch"
+        : p.plants.every((plant) => plant.maintenance === "low")
+          ? "low"
+          : "medium",
+      heavyWorkWarning: p.equipment.length > 0 || p.storeSearches.some((s) => s.deliveryRecommended),
+      versionLabel: vLabel,
+    };
+
+    // Always save on-device first — the engagement loop never depends on the cloud (D10).
+    savePlan({ label, intake: p.intake, adjustments, summary });
     // Remember the tweaks the user committed to, so the profile feels like it knows them.
     if (profile && adjustments.length > 0) {
       saveProfile({ ...profile, rememberedTweaks: adjustments.slice(0, 5) });
     }
     trackEvent("plan_saved", { goal: p.intake.goal });
     setSavedNote(true);
+
+    // When signed into cloud sync, mirror the save (and any photo) to Supabase — non-blocking.
+    if (stores.mode === "cloud") {
+      void stores.projects
+        .saveProjectWithVersion({
+          label,
+          versionLabel: vLabel,
+          intake: p.intake,
+          adjustments,
+          summary,
+          deterministicPlan: p,
+          aiEnhancement: result.enhancement,
+          scores: p.scores,
+          evidence: p.evidence,
+        })
+        .then((project) => {
+          if (photoUrl) return stores.photos.saveProjectPhoto(project.id, photoUrl).then(() => undefined);
+        })
+        .catch(() => {
+          /* hybrid store already fell back to local + flagged a warning */
+        });
+    }
   }
 
   async function handleShare() {
@@ -411,6 +436,9 @@ export function PlanExperience() {
             >
               Saved &amp; compare
             </Link>
+            <span className="ml-auto">
+              <SyncStatusBadge />
+            </span>
             {savedNote ? <span className="text-xs font-medium text-brand-strong">✓ Saved</span> : null}
             {shareUrl ? (
               <span className="text-xs text-muted">✓ Link copied — sharable anywhere</span>
@@ -456,6 +484,7 @@ export function PlanExperience() {
             <PhotoPanel
               photoUrl={photoUrl}
               onPhoto={setPhotoUrl}
+              cloudSync={stores.mode === "cloud"}
               onApplySun={(sun) => handleAccuracy("sun", sun)}
             />
           </div>

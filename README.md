@@ -44,9 +44,26 @@ intake → region/site rules → Core Library → candidate selection → scorin
 Set `AI_PROVIDER=claude` and `ANTHROPIC_API_KEY` in `.env.local`. If the key is missing or a call
 fails, Bloomprint silently falls back to the deterministic plan.
 
+## Cloud sync (optional)
+
+Bloomprint is **local-first**: saved plans, profile, and photos live on-device (localStorage) and
+the deterministic plan never waits on a network. Setting Supabase env vars adds optional accounts +
+cross-device sync **behind** that local layer — when the cloud is unconfigured or unreachable, the
+app silently uses local storage and labels it "Saved on this device."
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...   # browser-safe; RLS protects every row
+SUPABASE_SERVICE_ROLE_KEY=...             # server-only, optional (AI prompt cache)
+```
+
+See [docs/SUPABASE_MIGRATION.md](docs/SUPABASE_MIGRATION.md) for the storage architecture, RLS
+expectations, private photo rules, and how to regenerate the database types.
+
 ## Docs
 
 - [docs/SPEC.md](docs/SPEC.md) — product & design spec
 - [docs/BUILD_PLAN.md](docs/BUILD_PLAN.md) — build phases
 - [docs/DECISIONS.md](docs/DECISIONS.md) — locked architecture decisions
+- [docs/SUPABASE_MIGRATION.md](docs/SUPABASE_MIGRATION.md) — optional cloud sync (storage adapters, RLS)
 - [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) — what V1 does not know precisely

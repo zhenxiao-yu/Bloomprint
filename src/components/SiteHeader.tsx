@@ -7,6 +7,7 @@ import { initials, signOut, useAccount } from "@/lib/accountStore";
 const NAV = [
   { href: "/plan", label: "Plan" },
   { href: "/plans", label: "Saved" },
+  { href: "/pricing", label: "Pricing" },
   { href: "/guide", label: "Guide" },
   { href: "/about", label: "About" },
 ];

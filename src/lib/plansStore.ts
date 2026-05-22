@@ -91,6 +91,16 @@ function currentPlans(): SavedPlan[] {
   return parse(read());
 }
 
+/** Non-hook reader for the storage layer (same data `useSavedPlans` exposes to React). */
+export function listSavedPlans(): SavedPlan[] {
+  return currentPlans();
+}
+
+/** Non-hook single-plan lookup for the storage layer. */
+export function getSavedPlan(id: string): SavedPlan | null {
+  return currentPlans().find((p) => p.id === id) ?? null;
+}
+
 function sameInputs(a: SavedPlan, intake: YardIntake, adjustments: RefinementAdjustment[]): boolean {
   return (
     JSON.stringify(a.intake) === JSON.stringify(intake) &&
