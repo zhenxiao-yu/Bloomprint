@@ -37,6 +37,14 @@ the plan's spacing notes, not the visual board.
 ## AR (Phase 5, deferred)
 Not in V1. Planned only as progressive enhancement via `model-viewer`; not a blocker.
 
+## Concept board & care reminders (Phase 3)
+The concept board is an **approximate, illustrative** top-down layout (plants banded by role) — not
+a scale drawing. Blob size and position are for communication; real spacing comes from each plant's
+spacing note. The "Take to the store" page reuses the share encoding, so it regenerates the plan
+from inputs. The `.ics` care reminders are anchored to a **user-chosen** planting date (not an
+inferred one) and use general timing (deep-water early, check at ~6 weeks, spring tidy) — adjust to
+local conditions.
+
 ## Saved plans & sharing (Phase 2)
 Saved plans live in **this browser only** (localStorage) — they aren't synced across devices and are
 lost if the user clears site data. Share links encode the plan's **inputs**, not a stored record, so

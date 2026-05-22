@@ -14,7 +14,10 @@ export type LoopEvent =
   | "plan_saved"
   | "plan_shared"
   | "plan_compared"
-  | "plan_opened_from_history";
+  | "plan_opened_from_history"
+  | "plan_visualized"
+  | "store_opened"
+  | "calendar_added";
 
 type Primitive = string | number | boolean | null;
 

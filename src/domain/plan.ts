@@ -65,6 +65,7 @@ export function generateDeterministicPlan(intake: YardIntake, options: PlanOptio
         unitPrice: top.plant.unitPrice,
         lineTotal: { min: top.plant.unitPrice.min * 3, max: top.plant.unitPrice.max * 3 },
         fit: top.fit,
+        type: top.plant.type,
         matureSize: matureSize(top.plant.matureHeightCm, top.plant.matureWidthCm),
         sunLabel: sunLabel(top.plant.sun),
         maintenance: top.plant.maintenance,

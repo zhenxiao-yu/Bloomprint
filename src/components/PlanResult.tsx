@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import type { BloomprintPlan, ShoppingPriority } from "@/domain/models";
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
 import { Chip, Money, Section, SeverityTag } from "@/components/ui";
+import { ConceptBoard } from "@/components/ConceptBoard";
+import { trackEvent } from "@/lib/analytics";
 
 export type ViewMode = "simple" | "details" | "staff";
 
@@ -42,6 +45,7 @@ export function PlanResult({
 }) {
   const { plan, enhancement } = result;
   const showNumbers = view !== "simple";
+  const [boardView, setBoardView] = useState<"now" | "planned">("planned");
 
   const heroDescription =
     enhancement?.homeownerExplanation ?? `${plan.narrative} ${plan.insight}`;
@@ -115,6 +119,46 @@ export function PlanResult({
             {PLAN_LABEL_TEXT[plan.planLabel]}
           </span>
         </div>
+      </section>
+
+      {/* See your yard — deterministic concept board with a Now / Planned toggle */}
+      <section className="card p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-base font-semibold text-foreground">See your yard</h3>
+          <div className="flex gap-1 rounded-full border border-border p-0.5 text-xs">
+            {(["now", "planned"] as const).map((v) => (
+              <button
+                key={v}
+                onClick={() => {
+                  setBoardView(v);
+                  if (v === "planned") trackEvent("plan_visualized", { goal: plan.intake.goal });
+                }}
+                aria-pressed={boardView === v}
+                className={`rounded-full px-3 py-1 capitalize transition ${
+                  boardView === v ? "bg-brand text-white" : "text-muted hover:text-foreground"
+                }`}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-3">
+          {boardView === "planned" ? (
+            <ConceptBoard plants={plan.plants} />
+          ) : (
+            <div
+              className="flex w-full items-center justify-center rounded-xl border border-dashed border-border p-6 text-center"
+              style={{ aspectRatio: "5 / 3" }}
+            >
+              <p className="max-w-sm text-sm text-muted">{plan.visualSummary.transformation.current}</p>
+            </div>
+          )}
+        </div>
+        <p className="mt-2 text-sm font-medium text-brand-strong">
+          {plan.visualSummary.transformation.feeling}
+        </p>
       </section>
 
       {/* Refinement chips — first plan is Draft 1 */}

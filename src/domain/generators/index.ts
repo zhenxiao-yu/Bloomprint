@@ -132,6 +132,7 @@ export function composePalette(
         unitPrice: plant.unitPrice,
         lineTotal: scaleRange(plant.unitPrice, qty),
         fit: cand.fit,
+        type: plant.type,
         matureSize: matureSize(plant.matureHeightCm, plant.matureWidthCm),
         sunLabel: sunLabel(plant.sun),
         maintenance: plant.maintenance,

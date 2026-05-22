@@ -49,11 +49,25 @@ Validate the core loop (generate → refine → **save → compare → share**).
 - [x] Cookieless analytics: `src/lib/analytics.ts` + `<Analytics/>` (events: generated/refined/saved/shared/compared/accuracy)
 
 ## Delight gate
-Validate "this actually understands my yard" before Phases 4–5. Engagement-loop telemetry now
+Validate "this actually understands my yard" before deep platform work. Engagement-loop telemetry
 feeds this decision.
 
-## Phase 4 — Yard Preview (deferred)
-Photo upload, 2D placement board, before/planned, approximate-scale disclaimer.
+## Phase 3 (post-V1) — "See it & Use it" ✅
+- [x] Deterministic concept board: `src/domain/layout.ts` (pure) + `src/components/ConceptBoard.tsx`
+      (top-down, role-banded, draggable, illustrative-scale disclaimer) + Now/Planned toggle
+- [x] Take-to-the-store: `/plan/store` print route (reuses share encoding) + print CSS
+- [x] `.ics` care reminders: `src/lib/ics.ts` (planting/watering/establishment/spring, user-anchored date)
+- [x] Analytics: `plan_visualized`, `store_opened`, `calendar_added`
+
+## Deferred (researched, not yet built — with reasons)
+- **AI photorealistic render** of the design: needs an external image-gen key; must be opt-in and
+  clearly labeled "imagined illustration, not a photo." Defer until a key is configured.
+- **Real hardiness accuracy** (ZIP/postal → USDA/NRCan zone): bundle a static dataset (~100–200 KB);
+  biggest honest accuracy gain. Defer until the dataset is sourced/licensed in-repo.
+- **Photo-vision** (Claude analyzing the yard photo): opt-in *estimates only*, Zod-validated.
+
+## Phase 4 — Yard Preview, photo edition (deferred)
+Photo upload + overlaying the concept board / AI render on a real photo.
 
 ## Phase 5 — AR preview (deferred)
 `model-viewer` progressive enhancement.

@@ -9,7 +9,8 @@ import { PlanResult, type ViewMode } from "@/components/PlanResult";
 import { BUDGETS, REGION_OPTIONS } from "@/lib/uiOptions";
 import { saveProfile, useSavedProfileRaw } from "@/lib/profileStore";
 import { savePlan } from "@/lib/plansStore";
-import { buildShareUrl, decodeShare, SHARE_PARAM } from "@/lib/shareLink";
+import { buildShareUrl, decodeShare, encodeShare, SHARE_PARAM } from "@/lib/shareLink";
+import { buildCareCalendar } from "@/lib/ics";
 import { trackEvent } from "@/lib/analytics";
 
 type GenerateSource = "form" | "demo" | "shared" | "refine" | "accuracy";
@@ -78,6 +79,7 @@ export function PlanExperience() {
   const [error, setError] = useState<string | null>(boot.error);
   const [savedNote, setSavedNote] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const profileRaw = useSavedProfileRaw();
   const profile = useMemo<SavedProfile | null>(
     () => (profileRaw ? (JSON.parse(profileRaw) as SavedProfile) : null),
@@ -190,6 +192,26 @@ export function PlanExperience() {
     }
   }
 
+  function handleCalendar(dateStr: string) {
+    if (!result || !dateStr) return;
+    const start = new Date(`${dateStr}T00:00:00`);
+    const ics = buildCareCalendar(result.plan, start);
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "bloomprint-care-reminders.ics";
+    a.click();
+    URL.revokeObjectURL(url);
+    trackEvent("calendar_added", { goal: result.plan.intake.goal });
+    setCalendarOpen(false);
+  }
+
+  const storeHref = result
+    ? `/plan/store?${SHARE_PARAM}=${encodeShare({ intake: result.plan.intake, adjustments })}`
+    : "/plan";
+  const today = new Date().toISOString().slice(0, 10);
+
   const defaults: IntakeDefaults | undefined = profile
     ? {
         regionId: profile.regionId,
@@ -280,6 +302,18 @@ export function PlanExperience() {
               Share
             </button>
             <Link
+              href={storeHref}
+              className="rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition hover:border-brand"
+            >
+              Take to the store
+            </Link>
+            <button
+              onClick={() => setCalendarOpen((o) => !o)}
+              className="rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition hover:border-brand"
+            >
+              Care reminders
+            </button>
+            <Link
               href="/plans"
               className="rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition hover:border-brand"
             >
@@ -290,6 +324,32 @@ export function PlanExperience() {
               <span className="text-xs text-muted">✓ Link copied — sharable anywhere</span>
             ) : null}
           </div>
+          {calendarOpen ? (
+            <div className="card mb-4 flex flex-wrap items-center gap-3 p-3">
+              <label className="text-sm text-foreground">
+                Planting start date{" "}
+                <input
+                  type="date"
+                  defaultValue={today}
+                  id="care-start"
+                  className="card ml-1 p-1.5 text-sm"
+                />
+              </label>
+              <button
+                onClick={() =>
+                  handleCalendar(
+                    (document.getElementById("care-start") as HTMLInputElement | null)?.value ?? today,
+                  )
+                }
+                className="rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-white hover:bg-brand-strong"
+              >
+                Download .ics
+              </button>
+              <span className="text-xs text-muted">
+                Adds planting, watering &amp; seasonal reminders to your calendar.
+              </span>
+            </div>
+          ) : null}
           {shareUrl ? (
             <input
               readOnly

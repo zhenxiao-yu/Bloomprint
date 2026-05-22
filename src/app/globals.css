@@ -41,3 +41,13 @@ body {
   border: 1px solid var(--border);
   border-radius: 1rem;
 }
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+}

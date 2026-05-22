@@ -292,6 +292,7 @@ export const PlantPlacement = z.object({
   lineTotal: MoneyRange,
   fit: PlantFitScore,
   // Curated display facts (so the UI needn't import the engine):
+  type: PlantType,
   matureSize: z.string(),
   sunLabel: z.string(),
   maintenance: MaintenanceLevel,
