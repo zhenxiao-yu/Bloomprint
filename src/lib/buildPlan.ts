@@ -12,6 +12,7 @@ import {
 } from "@/domain/models";
 import { generateDeterministicPlan } from "@/domain";
 import { getProvider } from "@/ai";
+import { aiCacheKey, getCachedEnhancement, setCachedEnhancement } from "@/ai/promptCache";
 
 export async function buildBloomprintPlan(
   intake: YardIntake,
@@ -24,7 +25,9 @@ export async function buildBloomprintPlan(
   let enhancedBy: PlanProvider = "none";
 
   try {
-    const raw = await provider.enhancePlan(plan);
+    const cacheKey = aiCacheKey(provider.name, plan, adjustments);
+    const cached = getCachedEnhancement(cacheKey);
+    const raw = cached !== undefined ? cached : setCachedEnhancement(cacheKey, await provider.enhancePlan(plan));
     const parsed = raw ? AIPlanEnhancement.safeParse(raw) : null;
     if (parsed?.success) {
       enhancement = parsed.data;

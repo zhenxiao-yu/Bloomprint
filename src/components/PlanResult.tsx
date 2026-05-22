@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { BloomprintPlan, ShoppingPriority } from "@/domain/models";
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
-import { Chip, Money, Section, SeverityTag } from "@/components/ui";
+import { Chip, MetricPill, Money, Section, SeverityTag } from "@/components/ui";
 import { ConceptBoard } from "@/components/ConceptBoard";
 import { ImaginedView } from "@/components/ImaginedView";
 import { ArView } from "@/components/ArView";
@@ -63,11 +63,35 @@ export function PlanResult({
     (u): u is typeof u & { field: SiteField } =>
       u.field === "sun" || u.field === "soil" || u.field === "drainage",
   );
+  const navItems = [
+    { id: "summary", label: "Summary" },
+    { id: "buy", label: "Buy" },
+    { id: "install", label: "Install" },
+    { id: "plants", label: "Plants" },
+    { id: "risks", label: "Risks" },
+    { id: "store", label: "Store" },
+    { id: "evidence", label: "Evidence" },
+    ...(view === "staff" ? [{ id: "staff", label: "Staff" }] : []),
+  ];
 
   return (
     <div className="space-y-5">
+      <nav className="sticky top-2 z-20 -mx-1 overflow-x-auto rounded-full border border-border bg-surface/95 p-1 shadow-sm backdrop-blur sm:top-4">
+        <div className="flex min-w-max gap-1">
+          {navItems.map((item) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className="rounded-full px-3 py-1.5 text-xs font-medium text-muted transition hover:bg-brand-soft hover:text-brand-strong"
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+      </nav>
+
       {/* Hero moment — confidence sentence + visual summary, before any logistics */}
-      <section className="card overflow-hidden">
+      <section id="summary" className="card scroll-mt-24 overflow-hidden">
         <div className="bg-brand-soft p-6">
           {enhancement?.conceptName ? (
             <p className="text-xs font-semibold uppercase tracking-wide text-brand-strong">
@@ -132,7 +156,17 @@ export function PlanResult({
       </section>
 
       <ReadinessMeter readiness={plan.readiness} />
-      <EvidenceDrawer evidence={plan.evidence} view={view} />
+
+      <section className="grid gap-2 rounded-xl border border-brand/20 bg-surface p-3 shadow-sm sm:grid-cols-4">
+        <MetricPill label="DIY range" value={<Money value={plan.budget.diyTotal} />} tone="brand" />
+        <MetricPill label="Install" value={`${plan.labor.totalHours}h / ${plan.labor.weekends} weekend`} />
+        <MetricPill label="Confidence" value={plan.confidence} tone={plan.confidence === "low" ? "warn" : "brand"} />
+        <MetricPill
+          label="Store"
+          value={plan.storeSearches.some((s) => s.deliveryRecommended) ? "check delivery" : "search-ready"}
+          tone={plan.storeSearches.some((s) => s.deliveryRecommended) ? "warn" : "neutral"}
+        />
+      </section>
 
       {/* See your yard — deterministic concept board with a Now / Planned toggle */}
       <section className="card p-5">
@@ -251,7 +285,7 @@ export function PlanResult({
       ) : null}
 
       {/* Top actions */}
-      <Section title="Top actions">
+      <Section title="Top actions" variant="decision">
         <ol className="space-y-2">
           {plan.topActions.map((a, i) => (
             <li key={i} className="flex gap-3 text-sm text-foreground">
@@ -265,7 +299,7 @@ export function PlanResult({
       </Section>
 
       {/* Budget */}
-      <Section title="Budget" subtitle="Ranges, not quotes — confirm local prices before buying.">
+      <Section id="buy" title="Budget" subtitle="Ranges, not quotes — confirm local prices before buying." variant="action">
         <p className="text-2xl font-semibold text-foreground">
           Expected DIY total: <Money value={plan.budget.diyTotal} />
         </p>
@@ -280,7 +314,7 @@ export function PlanResult({
       </Section>
 
       {/* Shopping list grouped by priority */}
-      <Section title="Shopping list">
+      <Section title="Shopping list" variant="action">
         <div className="space-y-4">
           {PRIORITY_GROUPS.map((group) => {
             const items = plan.shoppingList.filter((i) => i.priority === group.key);
@@ -310,7 +344,9 @@ export function PlanResult({
 
       {/* Install timeline — framed as achievable weekends with a planting window */}
       <Section
+        id="install"
         title="Install plan"
+        variant="action"
         subtitle={`About ${plan.labor.totalHours} hours · ${plan.labor.people} person(s) · ${plan.visualSummary.expectedEffort.split(" · ")[0]}`}
       >
         <p className="mb-3 inline-block rounded bg-brand-soft px-3 py-1 text-xs font-medium text-brand-strong">
@@ -330,7 +366,7 @@ export function PlanResult({
       </Section>
 
       {/* Plants */}
-      <Section title="Plants" subtitle={`${plan.plants.length} types from the Bloomprint Core Library`}>
+      <Section id="plants" title="Plants" subtitle={`${plan.plants.length} types from the Bloomprint Core Library`} variant="quiet">
         <div className="grid gap-3 sm:grid-cols-2">
           {plan.plants.map((p) => (
             <div key={p.plantId} className="rounded-lg border border-border p-3">
@@ -361,7 +397,7 @@ export function PlanResult({
 
       {/* Risks */}
       {plan.risks.length > 0 ? (
-        <Section title="What to watch">
+        <Section id="risks" title="What to watch" variant="trust">
           <ul className="space-y-2">
             {plan.risks.map((r) => (
               <li key={r.id} className="text-sm">
@@ -378,7 +414,13 @@ export function PlanResult({
 
       {/* Trust moat: what-if failures + honest store reality */}
       <FailurePointsCard points={plan.failurePoints} />
-      <StoreRealityCheck searches={plan.storeSearches} />
+      <div id="store" className="scroll-mt-24">
+        <StoreRealityCheck searches={plan.storeSearches} />
+      </div>
+
+      <div id="evidence" className="scroll-mt-24">
+        <EvidenceDrawer evidence={plan.evidence} view={view} />
+      </div>
 
       {/* Tools & equipment (details) */}
       {view !== "simple" ? (
@@ -397,28 +439,24 @@ export function PlanResult({
 
       {/* Staff helper — deterministic, practical content (works without AI) */}
       {view === "staff" ? (
-        <Section title="Staff helper" subtitle="Guidance for helping a customer — not a guarantee.">
+        <Section id="staff" title="Staff helper" subtitle="Garden-center conversation aid — guidance, not a guarantee.">
           <div className="grid gap-4 sm:grid-cols-2">
+            <StaffList title="Ask these 3 questions first" items={plan.staff.questionsFirst} />
             <StaffList title="Customer probably underestimates" items={plan.staff.customerUnderestimates} />
-            <StaffList title="If out of stock, try" items={plan.staff.substitutions} />
+            <StaffList title="Good / Better / Best" items={plan.staff.goodBetterBest} />
+            <StaffList title="If too expensive" items={plan.staff.ifTooExpensive} />
+            <StaffList title="If no truck or delivery" items={plan.staff.ifNoTruckOrDelivery} />
+            <StaffList title="If dog/kid safety matters" items={plan.staff.ifDogKidSafetyMatters} />
+            <StaffList title="If out of stock" items={plan.staff.ifOutOfStock} />
+            <StaffList title="Substitutions" items={plan.staff.substitutions} />
             <StaffList title="Genuine add-ons to mention" items={plan.staff.upsells} />
+            <StaffList title="What not to sell" items={plan.staff.whatNotToSell} />
             {enhancement?.staffTalkingPoints ? (
               <StaffList title="Talking points" items={enhancement.staffTalkingPoints} />
             ) : null}
           </div>
-          {enhancement?.alternatives ? (
-            <div className="mt-3">
-              <p className="text-sm font-semibold text-foreground">Good / Better / Best</p>
-              <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-foreground">
-                {enhancement.alternatives.map((t, i) => (
-                  <li key={i}>{t}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
           <p className="mt-3 rounded bg-border/50 p-2 text-xs text-muted">
-            Use this as guidance, not a guarantee. Confirm local availability, the customer&apos;s
-            actual site conditions, and product labels.
+            {plan.staff.disclaimer}
           </p>
         </Section>
       ) : null}

@@ -387,9 +387,17 @@ export type VisualSummary = z.infer<typeof VisualSummary>;
 
 /** Practical, deterministic notes for garden-center staff (works without AI). */
 export const StaffNotes = z.object({
+  questionsFirst: z.array(z.string()).default([]),
   customerUnderestimates: z.array(z.string()),
+  goodBetterBest: z.array(z.string()).default([]),
+  ifTooExpensive: z.array(z.string()).default([]),
+  ifNoTruckOrDelivery: z.array(z.string()).default([]),
+  ifDogKidSafetyMatters: z.array(z.string()).default([]),
+  ifOutOfStock: z.array(z.string()).default([]),
   substitutions: z.array(z.string()),
   upsells: z.array(z.string()),
+  whatNotToSell: z.array(z.string()).default([]),
+  disclaimer: z.string().default("Guidance only, not a guarantee. Verify local conditions, labels, and availability."),
 });
 export type StaffNotes = z.infer<typeof StaffNotes>;
 
@@ -409,11 +417,33 @@ export type VisualPlacement = z.infer<typeof VisualPlacement>;
 /* Trust moat: evidence, alternatives, failure points, store, readiness */
 /* ------------------------------------------------------------------ */
 
+export const SourceType = z.enum([
+  "user-input",
+  "core-library",
+  "official",
+  "extension-botanical",
+  "retailer-cost",
+  "ai-inference",
+  "live-context",
+]);
+export type SourceType = z.infer<typeof SourceType>;
+
+export const CacheStatus = z.enum(["disabled", "fresh", "stale", "miss", "unavailable"]);
+export type CacheStatus = z.infer<typeof CacheStatus>;
+
 /** A source on the Source Quality Ladder (1 = user input … 6 = AI-only). */
 export const SourceRef = z.object({
   name: z.string(),
+  sourceName: z.string().optional(),
+  sourceType: SourceType.optional(),
   level: z.number().int().min(1).max(6),
   url: z.string().optional(),
+  retrievedAt: z.string().optional(),
+  supports: z.array(z.string()).default([]),
+  confidence: ConfidenceLevel.optional(),
+  cacheStatus: CacheStatus.optional(),
+  sourceQuality: z.string().optional(),
+  needsLocalVerification: z.boolean().default(false),
 });
 export type SourceRef = z.infer<typeof SourceRef>;
 
@@ -426,6 +456,8 @@ export const PlanEvidence = z.object({
   assumptions: z.array(z.string()),
   sources: z.array(SourceRef),
   confidenceByDimension: z.array(ConfidenceDimension),
+  needsLocalVerification: z.array(z.string()).default([]),
+  fallbackNotes: z.array(z.string()).default([]),
 });
 export type PlanEvidence = z.infer<typeof PlanEvidence>;
 
@@ -469,6 +501,11 @@ export const StoreSearch = z.object({
   name: z.string(),
   query: z.string(),
   availability: AvailabilityState,
+  substitute: z.string().optional(),
+  cheaperAlternative: z.string().optional(),
+  easierAlternative: z.string().optional(),
+  deliveryRecommended: z.boolean().default(false),
+  note: z.string().optional(),
 });
 export type StoreSearch = z.infer<typeof StoreSearch>;
 
@@ -537,7 +574,17 @@ export const AIPlanEnhancement = z.object({
 });
 export type AIPlanEnhancement = z.infer<typeof AIPlanEnhancement>;
 
-export const PlanProvider = z.enum(["mock", "claude", "none"]);
+export const PlanProvider = z.enum([
+  "mock",
+  "claude",
+  "deepseek",
+  "qwen",
+  "doubao",
+  "glm",
+  "siliconflow",
+  "ollama",
+  "none",
+]);
 export type PlanProvider = z.infer<typeof PlanProvider>;
 
 /** The full plan returned to the UI: deterministic truth + optional presentation layer. */

@@ -22,25 +22,68 @@ export const SOURCE_LEVELS: SourceLevel[] = [
   { level: 6, name: "AI inference", description: "Wording / low-confidence suggestions only." },
 ];
 
+function source(
+  input: Omit<SourceRef, "sourceName" | "sourceQuality" | "supports" | "needsLocalVerification"> & {
+    supports?: string[];
+    needsLocalVerification?: boolean;
+    sourceQuality?: string;
+  },
+): SourceRef {
+  return {
+    ...input,
+    sourceName: input.name,
+    supports: input.supports ?? [],
+    needsLocalVerification: input.needsLocalVerification ?? false,
+    sourceQuality: input.sourceQuality ?? SOURCE_LEVELS.find((l) => l.level === input.level)?.name,
+  };
+}
+
 export const TRUSTED_SOURCES = {
-  userInput: { name: "Your inputs", level: 1 as const },
-  coreLibrary: { name: "Bloomprint Core Library", level: 2 as const },
-  usdaHardiness: {
+  userInput: source({
+    name: "Your inputs",
+    sourceType: "user-input",
+    level: 1,
+    supports: ["goal", "budget", "effort", "known site conditions"],
+    confidence: "high",
+  }),
+  coreLibrary: source({
+    name: "Bloomprint Core Library",
+    sourceType: "core-library",
+    level: 2,
+    supports: ["plant roles", "spacing", "budget ranges", "labor estimates"],
+    confidence: "good",
+  }),
+  usdaHardiness: source({
     name: "USDA Plant Hardiness Zone Map",
-    level: 3 as const,
+    sourceType: "official",
+    level: 3,
     url: "https://planthardiness.ars.usda.gov/",
-  },
-  canadaHardiness: {
+    supports: ["regional hardiness context"],
+    confidence: "good",
+    sourceQuality: "Official sources",
+    needsLocalVerification: true,
+  }),
+  canadaHardiness: source({
     name: "Canada Plant Hardiness (NRCan)",
-    level: 3 as const,
+    sourceType: "official",
+    level: 3,
     url: "https://planthardiness.gc.ca/",
-  },
-  nrcsSoil: {
+    supports: ["regional hardiness context"],
+    confidence: "good",
+    sourceQuality: "Official sources",
+    needsLocalVerification: true,
+  }),
+  nrcsSoil: source({
     name: "USDA-NRCS Web Soil Survey",
-    level: 3 as const,
+    sourceType: "official",
+    level: 3,
     url: "https://websoilsurvey.nrcs.usda.gov/",
-  },
-} as const;
+    supports: ["soil verification reference"],
+    confidence: "medium",
+    sourceQuality: "Official sources",
+    needsLocalVerification: true,
+  }),
+};
 
 const GOAL_TEXT: Record<string, string> = {
   privacy: "privacy",
@@ -81,5 +124,28 @@ export function buildPlanEvidence(site: SiteCondition, intake: YardIntake): Plan
     { dimension: "Store availability", level: "Needs local check" },
   ];
 
-  return { inputs, assumptions: site.assumptions, sources, confidenceByDimension };
+  const needsLocalVerification = [
+    "Confirm plant tags against your exact sun exposure, mature size, and local hardiness guidance.",
+    "Call or search local stores before driving; Bloomprint does not know live inventory.",
+  ];
+  if (intake.soil === "unknown" || intake.drainage === "unknown") {
+    needsLocalVerification.push("Check soil and drainage before buying moisture-sensitive plants.");
+  }
+  if (intake.hasPetsOrKids) {
+    needsLocalVerification.push("Verify toxicity and safety on the plant label before planting near pets or play areas.");
+  }
+
+  const fallbackNotes = [
+    "Live data is optional and currently treated as supporting context only.",
+    "Missing live checks do not block the deterministic plan.",
+  ];
+
+  return {
+    inputs,
+    assumptions: site.assumptions,
+    sources,
+    confidenceByDimension,
+    needsLocalVerification,
+    fallbackNotes,
+  };
 }

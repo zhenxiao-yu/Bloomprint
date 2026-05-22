@@ -42,6 +42,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: `Unknown fixture: ${fixtureKey}` }, { status: 400 });
   }
 
-  const result = await buildBloomprintPlan(resolvedIntake, adjustments ?? []);
-  return NextResponse.json(result);
+  try {
+    const result = await buildBloomprintPlan(resolvedIntake, adjustments ?? []);
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error("Bloomprint plan build failed", error);
+    return NextResponse.json(
+      { error: "Bloomprint couldn't build that plan right now. Try again in a moment." },
+      { status: 500 },
+    );
+  }
 }

@@ -7,6 +7,7 @@ import { deletePlan, renamePlan, useSavedPlans, type SavedPlan } from "@/lib/pla
 import { SavedPlans } from "@/components/SavedPlans";
 import { CompareView } from "@/components/CompareView";
 import { trackEvent } from "@/lib/analytics";
+import { readApiError } from "@/lib/apiError";
 
 interface Comparison {
   a: { label: string; plan: BloomprintPlan };
@@ -19,7 +20,7 @@ async function fetchSaved(p: SavedPlan): Promise<BloomprintPlan> {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ intake: p.intake, adjustments: p.adjustments }),
   });
-  if (!res.ok) throw new Error(`Request failed (${res.status})`);
+  if (!res.ok) throw new Error(await readApiError(res, "Couldn't regenerate that saved plan."));
   return res.json();
 }
 

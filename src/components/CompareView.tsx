@@ -2,7 +2,7 @@
 
 import type { BloomprintPlan } from "@/domain/models";
 import { diffPlans } from "@/lib/planDiff";
-import { Money, Section } from "@/components/ui";
+import { MetricPill, Money, Section } from "@/components/ui";
 
 function deltaLabel(min: number, max: number): string {
   const fmt = (n: number) => (n > 0 ? `+$${n}` : n < 0 ? `-$${Math.abs(n)}` : "$0");
@@ -43,6 +43,14 @@ export function CompareView({
             <dt className="text-muted">Effort</dt>
             <dd className="text-right text-xs">{p.visualSummary.expectedEffort}</dd>
           </div>
+          <div className="flex justify-between">
+            <dt className="text-muted">Labor</dt>
+            <dd>{p.labor.totalHours}h</dd>
+          </div>
+          <div className="flex justify-between">
+            <dt className="text-muted">Privacy</dt>
+            <dd>{p.plants.filter((plant) => plant.role === "screen").length > 0 ? "screening" : "light"}</dd>
+          </div>
         </dl>
       </div>
     );
@@ -55,14 +63,20 @@ export function CompareView({
         {column(b)}
       </div>
 
+      <div className="mt-4 grid gap-2 sm:grid-cols-4">
+        <MetricPill label="Budget" value={deltaLabel(diff.budgetDelta.min, diff.budgetDelta.max)} tone={diff.budgetDelta.max > 0 ? "warn" : "brand"} />
+        <MetricPill label="Labor" value={diff.laborDelta > 0 ? `+${diff.laborDelta}h` : `${diff.laborDelta}h`} />
+        <MetricPill label="Privacy" value={`${diff.privacyA} → ${diff.privacyB}`} />
+        <MetricPill label="Heavy work" value={`${diff.heavyWorkA ? "yes" : "no"} → ${diff.heavyWorkB ? "yes" : "no"}`} tone={diff.heavyWorkB ? "warn" : "neutral"} />
+      </div>
+
       <div className="mt-4 space-y-2 text-sm">
         <p>
           <span className="font-medium text-foreground">Style:</span>{" "}
           {diff.styleChanged ? `${diff.styleA} → ${diff.styleB}` : `Same (${diff.styleA})`}
         </p>
         <p>
-          <span className="font-medium text-foreground">Budget change:</span>{" "}
-          {deltaLabel(diff.budgetDelta.min, diff.budgetDelta.max)}
+          <span className="font-medium text-foreground">Maintenance:</span> {diff.maintenanceA} → {diff.maintenanceB}
         </p>
         {diff.addedPlants.length > 0 ? (
           <p>

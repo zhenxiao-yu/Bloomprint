@@ -17,6 +17,8 @@ describe("plan evidence", () => {
     expect(ev.inputs.length).toBeGreaterThan(0);
     expect(ev.confidenceByDimension.length).toBe(4);
     expect(ev.sources.every((s) => s.level >= 1 && s.level <= 6)).toBe(true);
+    expect(ev.sources.every((s) => s.sourceName && s.supports.length > 0)).toBe(true);
+    expect(ev.needsLocalVerification.length).toBeGreaterThan(0);
   });
 });
 
@@ -49,6 +51,19 @@ describe("failure points & store searches", () => {
     const plantSearch = plan.storeSearches.find((s) => s.query.length > 0);
     expect(plantSearch).toBeDefined();
     expect(plan.storeSearches.every((s) => s.availability !== undefined)).toBe(true);
+    expect(plan.storeSearches.every((s) => !/in stock/i.test(s.availability))).toBe(true);
+    expect(plan.storeSearches.every((s) => s.substitute || s.cheaperAlternative || s.easierAlternative)).toBe(true);
+  });
+});
+
+describe("staff helper", () => {
+  it("includes conversation prompts, substitutions, warnings, and a disclaimer", () => {
+    const plan = generateDeterministicPlan(FIXTURES["privacy-side-yard"]);
+    expect(plan.staff.questionsFirst.length).toBe(3);
+    expect(plan.staff.goodBetterBest.length).toBe(3);
+    expect(plan.staff.ifOutOfStock.length).toBeGreaterThan(0);
+    expect(plan.staff.whatNotToSell.length).toBeGreaterThan(0);
+    expect(plan.staff.disclaimer).toMatch(/not a guarantee/i);
   });
 });
 

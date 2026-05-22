@@ -15,6 +15,9 @@ export function SiteFooter() {
           <Link href="/about" className="hover:text-foreground">
             About
           </Link>
+          <Link href="/guide" className="hover:text-foreground">
+            Guide
+          </Link>
           <a
             href="https://github.com/zhenxiao-yu/Bloomprint"
             target="_blank"

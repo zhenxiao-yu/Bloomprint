@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { trackEvent } from "@/lib/analytics";
+import { readApiError } from "@/lib/apiError";
 
 type Status = "idle" | "loading" | "done" | "error";
 
@@ -14,6 +15,7 @@ export function ImaginedView({ prompt }: { prompt?: string }) {
   const [enabled, setEnabled] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
   const [image, setImage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -34,18 +36,21 @@ export function ImaginedView({ prompt }: { prompt?: string }) {
 
   async function generate() {
     setStatus("loading");
+    setError(null);
     try {
       const res = await fetch("/api/render", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ prompt }),
       });
+      if (!res.ok) throw new Error(await readApiError(res, "Image rendering is temporarily unavailable."));
       const data = (await res.json()) as { image?: string };
-      if (!res.ok || !data.image) throw new Error("render failed");
+      if (!data.image) throw new Error("Couldn't generate an image right now.");
       setImage(data.image);
       setStatus("done");
       trackEvent("image_rendered");
-    } catch {
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't generate an image — try again.");
       setStatus("error");
     }
   }
@@ -62,7 +67,7 @@ export function ImaginedView({ prompt }: { prompt?: string }) {
         </button>
       ) : null}
       {status === "error" ? (
-        <p className="mt-2 text-xs text-[var(--warn)]">Couldn&apos;t generate an image — try again.</p>
+        <p className="mt-2 text-xs text-[var(--warn)]">{error ?? "Couldn't generate an image — try again."}</p>
       ) : null}
       {image ? (
         <figure className="mt-2">

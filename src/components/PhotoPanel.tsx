@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { SunExposure } from "@/domain/models";
 import { trackEvent } from "@/lib/analytics";
+import { readApiError } from "@/lib/apiError";
 
 interface Suggestion {
   sun: SunExposure;
@@ -53,6 +54,7 @@ export function PhotoPanel({
 }) {
   const [visionEnabled, setVisionEnabled] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [error, setError] = useState<string | null>(null);
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -75,6 +77,7 @@ export function PhotoPanel({
       onPhoto(dataUrl);
       setSuggestion(null);
       setStatus("idle");
+      setError(null);
       trackEvent("photo_added");
     } catch {
       setStatus("error");
@@ -84,18 +87,21 @@ export function PhotoPanel({
   async function analyze() {
     if (!photoUrl) return;
     setStatus("loading");
+    setError(null);
     try {
       const res = await fetch("/api/vision", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ imageBase64: photoUrl.split(",")[1], mediaType: "image/jpeg" }),
       });
+      if (!res.ok) throw new Error(await readApiError(res, "Photo analysis is temporarily unavailable."));
       const data = (await res.json()) as { suggestion?: Suggestion };
-      if (!res.ok || !data.suggestion) throw new Error("vision failed");
+      if (!data.suggestion) throw new Error("Couldn't read that photo — try a clearer one.");
       setSuggestion(data.suggestion);
       setStatus("done");
       trackEvent("photo_analyzed", { sun: data.suggestion.sun });
-    } catch {
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't read that photo — try another.");
       setStatus("error");
     }
   }
@@ -141,7 +147,7 @@ export function PhotoPanel({
                 </button>
               ) : null}
               {status === "error" ? (
-                <p className="mt-1 text-xs text-[var(--warn)]">Couldn&apos;t read that photo — try another.</p>
+                <p className="mt-1 text-xs text-[var(--warn)]">{error ?? "Couldn't read that photo — try another."}</p>
               ) : null}
               {suggestion ? (
                 <div className="text-sm">

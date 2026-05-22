@@ -46,19 +46,29 @@ export function SavedPlans({
         return (
           <li key={plan.id} className={`card p-4 ${isSelected ? "ring-2 ring-brand" : ""}`}>
             <div className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                checked={isSelected}
-                onChange={() => onToggle(plan.id)}
-                className="mt-1"
+              <button
+                type="button"
+                onClick={() => onToggle(plan.id)}
+                aria-pressed={isSelected}
                 aria-label={`Select ${plan.label} to compare`}
-              />
+                className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border text-sm font-semibold transition ${
+                  isSelected ? "border-brand bg-brand text-white" : "border-border text-muted hover:border-brand"
+                }`}
+              >
+                {isSelected ? "✓" : "+"}
+              </button>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold capitalize text-foreground">{plan.label}</p>
                 <p className="mt-0.5 text-xs text-muted">
+                  {plan.summary.versionLabel ?? "Draft 1"} ·{" "}
                   {plan.summary.styleLabel} · ${plan.summary.diyMin.toLocaleString()}–$
                   {plan.summary.diyMax.toLocaleString()} · {plan.summary.confidence} confidence ·{" "}
                   {plan.summary.plantCount} plant types
+                </p>
+                <p className="mt-0.5 text-xs text-muted">
+                  {plan.summary.laborHours ?? "?"} labor hours · {plan.summary.privacy ?? "privacy unknown"} ·{" "}
+                  {plan.summary.maintenance ?? "maintenance unknown"} maintenance
+                  {plan.summary.heavyWorkWarning ? " · heavy materials likely" : ""}
                 </p>
                 <p className="mt-0.5 text-xs text-muted">
                   Saved {new Date(plan.createdAt).toLocaleDateString()}

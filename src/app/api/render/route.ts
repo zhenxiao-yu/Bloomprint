@@ -32,9 +32,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "A prompt (10–1000 chars) is required." }, { status: 400 });
   }
 
-  const image = await renderImage(parsed.data.prompt);
-  if (!image) {
-    return NextResponse.json({ error: "Couldn't generate an image right now." }, { status: 502 });
+  try {
+    const image = await renderImage(parsed.data.prompt);
+    if (!image) {
+      return NextResponse.json({ error: "Couldn't generate an image right now." }, { status: 502 });
+    }
+    return NextResponse.json({ image });
+  } catch (error) {
+    console.error("Bloomprint image render failed", error);
+    return NextResponse.json({ error: "Image rendering is temporarily unavailable." }, { status: 502 });
   }
-  return NextResponse.json({ image });
 }

@@ -13,6 +13,7 @@ import { savePlan } from "@/lib/plansStore";
 import { buildShareUrl, decodeShare, encodeShare, SHARE_PARAM } from "@/lib/shareLink";
 import { buildCareCalendar } from "@/lib/ics";
 import { trackEvent } from "@/lib/analytics";
+import { readApiError } from "@/lib/apiError";
 
 type GenerateSource = "form" | "demo" | "shared" | "refine" | "accuracy";
 
@@ -25,11 +26,43 @@ const VIEW_LABELS: { value: ViewMode; label: string }[] = [
   { value: "staff", label: "Staff Helper" },
 ];
 
+const VERSION_LABELS: Partial<Record<RefinementAdjustment, string>> = {
+  cheaper: "Cheaper version",
+  "dog-safe": "Dog-safe version",
+  "more-flowers": "More flowers version",
+  easier: "Easier version",
+  "more-privacy": "Store-ready privacy version",
+  "stone-to-mulch": "Store-ready version",
+};
+
+function versionLabel(adjustments: RefinementAdjustment[]): string {
+  const last = adjustments.at(-1);
+  return last ? VERSION_LABELS[last] ?? `${last.replace(/-/g, " ")} version` : "Draft 1";
+}
+
 interface SavedProfile {
   regionId: string;
   goal: IntakeValues["goal"];
   effortLevel: IntakeValues["effortLevel"];
   budget: number;
+}
+
+function parseSavedProfile(raw: string | null): SavedProfile | null {
+  if (!raw) return null;
+  try {
+    const data = JSON.parse(raw) as Partial<SavedProfile>;
+    if (
+      typeof data.regionId === "string" &&
+      typeof data.goal === "string" &&
+      typeof data.effortLevel === "string" &&
+      typeof data.budget === "number"
+    ) {
+      return data as SavedProfile;
+    }
+  } catch {
+    return null;
+  }
+  return null;
 }
 
 export function PlanExperience() {
@@ -84,7 +117,7 @@ export function PlanExperience() {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const profileRaw = useSavedProfileRaw();
   const profile = useMemo<SavedProfile | null>(
-    () => (profileRaw ? (JSON.parse(profileRaw) as SavedProfile) : null),
+    () => parseSavedProfile(profileRaw),
     [profileRaw],
   );
   const started = useRef(false);
@@ -101,7 +134,7 @@ export function PlanExperience() {
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ ...req, adjustments: adj }),
         });
-        if (!res.ok) throw new Error(`Request failed (${res.status})`);
+        if (!res.ok) throw new Error(await readApiError(res, "We couldn't build that plan."));
         const data: BloomprintPlan = await res.json();
         setResult(data);
         setStep("result");
@@ -170,7 +203,7 @@ export function PlanExperience() {
     if (!result) return;
     const p = result.plan;
     savePlan({
-      label: `${p.styleLabel} — ${p.intake.goal.replace(/-/g, " ")}`,
+      label: `${versionLabel(adjustments)} — ${p.styleLabel} ${p.intake.goal.replace(/-/g, " ")}`,
       intake: p.intake,
       adjustments,
       summary: {
@@ -180,6 +213,15 @@ export function PlanExperience() {
         diyMax: p.budget.diyTotal.max,
         confidence: p.confidence,
         plantCount: p.plants.length,
+        laborHours: p.labor.totalHours,
+        privacy: p.plants.some((plant) => plant.role === "screen") ? "screening included" : "not privacy-led",
+        maintenance: p.plants.some((plant) => plant.maintenance === "high")
+          ? "higher touch"
+          : p.plants.every((plant) => plant.maintenance === "low")
+            ? "low"
+            : "medium",
+        heavyWorkWarning: p.equipment.length > 0 || p.storeSearches.some((s) => s.deliveryRecommended),
+        versionLabel: versionLabel(adjustments),
       },
     });
     trackEvent("plan_saved", { goal: p.intake.goal });
@@ -314,7 +356,7 @@ export function PlanExperience() {
           {profile ? <MemoryBanner profile={profile} className="mb-4" /> : null}
 
           {/* Action bar — save, share, history (the engagement loop) */}
-          <div className="card mb-4 flex flex-wrap items-center gap-2 p-3">
+          <div className="card mb-4 flex flex-wrap items-center gap-2 p-3 shadow-sm">
             <button
               onClick={handleSave}
               disabled={busy}
@@ -337,13 +379,13 @@ export function PlanExperience() {
             </Link>
             <button
               onClick={() => setCalendarOpen((o) => !o)}
-              className="rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition hover:border-brand"
+              className="hidden rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition hover:border-brand sm:inline-flex"
             >
               Care reminders
             </button>
             <Link
               href="/plans"
-              className="rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition hover:border-brand"
+              className="hidden rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition hover:border-brand sm:inline-flex"
             >
               Saved &amp; compare
             </Link>

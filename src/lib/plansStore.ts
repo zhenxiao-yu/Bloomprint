@@ -16,6 +16,11 @@ export interface SavedPlanSummary {
   diyMax: number;
   confidence: string;
   plantCount: number;
+  laborHours?: number;
+  privacy?: string;
+  maintenance?: string;
+  heavyWorkWarning?: boolean;
+  versionLabel?: string;
 }
 
 export interface SavedPlan {

@@ -36,9 +36,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "A base64 image and mediaType are required." }, { status: 400 });
   }
 
-  const suggestion = await analyzeYardPhoto(parsed.data.imageBase64, parsed.data.mediaType);
-  if (!suggestion) {
-    return NextResponse.json({ error: "Couldn't read that photo — try a clearer one." }, { status: 502 });
+  try {
+    const suggestion = await analyzeYardPhoto(parsed.data.imageBase64, parsed.data.mediaType);
+    if (!suggestion) {
+      return NextResponse.json({ error: "Couldn't read that photo — try a clearer one." }, { status: 502 });
+    }
+    return NextResponse.json({ suggestion });
+  } catch (error) {
+    console.error("Bloomprint photo analysis failed", error);
+    return NextResponse.json({ error: "Photo analysis is temporarily unavailable." }, { status: 502 });
   }
-  return NextResponse.json({ suggestion });
 }

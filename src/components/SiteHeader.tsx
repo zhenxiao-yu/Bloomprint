@@ -7,6 +7,7 @@ import { initials, signOut, useAccount } from "@/lib/accountStore";
 const NAV = [
   { href: "/plan", label: "Plan" },
   { href: "/plans", label: "Saved" },
+  { href: "/guide", label: "Guide" },
   { href: "/about", label: "About" },
 ];
 
@@ -17,19 +18,21 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-surface/85 backdrop-blur">
       <div className="mx-auto flex h-14 w-full max-w-5xl items-center gap-3 px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 font-semibold text-brand">
-          <span className="text-lg">🌿</span>
+        <Link href="/" className="flex shrink-0 items-center gap-2 font-semibold text-brand">
+          <span className="flex size-8 items-center justify-center rounded-full bg-brand-soft text-xs font-bold">
+            BP
+          </span>
           <span className="hidden sm:inline">Bloomprint</span>
         </Link>
 
-        <nav className="ml-2 flex items-center gap-1 text-sm">
+        <nav className="ml-1 flex items-center gap-1 overflow-x-auto text-sm sm:ml-2">
           {NAV.map((n) => {
             const active = pathname === n.href || (n.href !== "/" && pathname.startsWith(n.href));
             return (
               <Link
                 key={n.href}
                 href={n.href}
-                className={`rounded-full px-3 py-1.5 transition ${
+                className={`shrink-0 rounded-full px-2.5 py-1.5 transition sm:px-3 ${
                   active ? "bg-brand-soft text-brand-strong" : "text-muted hover:text-foreground"
                 }`}
               >
@@ -66,9 +69,10 @@ export function SiteHeader() {
           ) : (
             <Link
               href="/signup"
-              className="rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-white transition hover:bg-brand-strong"
+              className="rounded-full bg-brand px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-brand-strong sm:px-4"
             >
-              Create account
+              <span className="sm:hidden">Me</span>
+              <span className="hidden sm:inline">Create account</span>
             </Link>
           )}
         </div>

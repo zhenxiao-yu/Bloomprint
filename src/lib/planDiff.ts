@@ -15,6 +15,25 @@ export interface PlanDiff {
   effortChanged: boolean;
   effortA: string;
   effortB: string;
+  laborDelta: number;
+  privacyA: number;
+  privacyB: number;
+  heavyWorkA: boolean;
+  heavyWorkB: boolean;
+  maintenanceA: string;
+  maintenanceB: string;
+}
+
+function privacyScore(plan: BloomprintPlan): number {
+  const screens = plan.plan.plants.filter((p) => p.role === "screen").length;
+  return Math.min(3, screens);
+}
+
+function maintenanceLabel(plan: BloomprintPlan): string {
+  const levels = plan.plan.plants.map((p) => p.maintenance);
+  if (levels.includes("high")) return "higher touch";
+  if (levels.every((l) => l === "low")) return "low";
+  return "medium";
 }
 
 export function diffPlans(a: BloomprintPlan, b: BloomprintPlan): PlanDiff {
@@ -41,5 +60,12 @@ export function diffPlans(a: BloomprintPlan, b: BloomprintPlan): PlanDiff {
     effortChanged: pa.intake.effortLevel !== pb.intake.effortLevel,
     effortA: pa.visualSummary.expectedEffort,
     effortB: pb.visualSummary.expectedEffort,
+    laborDelta: Number((pb.labor.totalHours - pa.labor.totalHours).toFixed(1)),
+    privacyA: privacyScore(a),
+    privacyB: privacyScore(b),
+    heavyWorkA: pa.equipment.length > 0 || pa.storeSearches.some((s) => s.deliveryRecommended),
+    heavyWorkB: pb.equipment.length > 0 || pb.storeSearches.some((s) => s.deliveryRecommended),
+    maintenanceA: maintenanceLabel(a),
+    maintenanceB: maintenanceLabel(b),
   };
 }

@@ -13,6 +13,18 @@ describe("buildBloomprintPlan — full pipeline with the default mock provider",
     expect(result.plan.plants.length).toBeGreaterThan(0);
   });
 
+  it("works with AI disabled and no provider key", async () => {
+    const oldEnabled = process.env.ENABLE_AI;
+    const oldProvider = process.env.AI_PROVIDER;
+    process.env.ENABLE_AI = "false";
+    process.env.AI_PROVIDER = "deepseek";
+    const result = await buildBloomprintPlan(FIXTURES["oakville-front-yard"]);
+    expect(() => BloomprintPlan.parse(result)).not.toThrow();
+    expect(result.enhancedBy).toBe("mock");
+    process.env.ENABLE_AI = oldEnabled;
+    process.env.AI_PROVIDER = oldProvider;
+  });
+
   it("applies refinement adjustments through the pipeline", async () => {
     const result = await buildBloomprintPlan(FIXTURES["pet-safe-front-yard"], ["dog-safe"]);
     expect(() => BloomprintPlan.parse(result)).not.toThrow();

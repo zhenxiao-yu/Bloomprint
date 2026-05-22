@@ -525,7 +525,61 @@ export function buildStaffNotes(
   if (shoppingList.some((i) => i.category === "lighting")) upsells.push("Low-voltage lighting to extend the bed into the evening");
   upsells.push("A soaker/drip hose to make first-season watering effortless");
 
-  return { customerUnderestimates, substitutions, upsells };
+  const questionsFirst = [
+    "How many hours of direct sun does this spot get in June?",
+    "Is water sitting here after a heavy rain, or does it drain away?",
+    site.saltExposure === "yes"
+      ? "Does snow or road salt get piled against this bed?"
+      : "What mature height do you actually need before this feels finished?",
+  ];
+
+  const hasPrivacy = placements.some((p) => p.role === "screen");
+  const goodBetterBest = [
+    `Good: build the Buy First list now with ${placements[0]?.commonName ?? "the highest-fit plants"} and mulch.`,
+    hasPrivacy
+      ? "Better: add the full screen layer plus edging so the bed reads as intentional from day one."
+      : "Better: add edging and repeat the strongest plant for a cleaner finished look.",
+    shoppingList.some((i) => i.category === "lighting")
+      ? "Best: include low-voltage lighting after planting, once the bed line is set."
+      : "Best: upgrade pot sizes for the structure plants and add lighting later.",
+  ];
+
+  const ifTooExpensive = [
+    "Reduce pot size before reducing spacing; spacing mistakes are harder to fix.",
+    "Keep the structure plants and mulch, then defer decorative stone, lighting, or extra perennials.",
+  ];
+  const ifNoTruckOrDelivery = [
+    "Avoid pushing stone or bulk soil if the customer cannot haul heavy bags.",
+    "Suggest mulch, smaller bag counts, or store delivery for soil and stone.",
+  ];
+  const ifDogKidSafetyMatters = [
+    "Point them to the plant tag and confirm toxicity before checkout.",
+    "Steer play-area edges toward non-toxic, thorn-free, lower-maintenance picks.",
+  ];
+  const ifOutOfStock = [
+    "Match by role, mature size, sun tolerance, and maintenance level before matching by flower color.",
+    ...substitutions.slice(0, 3),
+  ];
+  const whatNotToSell = [
+    site.saltExposure === "yes"
+      ? "Do not sell salt-sensitive plants for spots where snow piles against the driveway."
+      : "Do not sell a plant just because it is blooming today if the mature size is wrong.",
+    "Do not recommend tight spacing to make the bed look full immediately; it creates a removal problem later.",
+  ];
+
+  return {
+    questionsFirst,
+    customerUnderestimates,
+    goodBetterBest,
+    ifTooExpensive,
+    ifNoTruckOrDelivery,
+    ifDogKidSafetyMatters,
+    ifOutOfStock,
+    substitutions,
+    upsells,
+    whatNotToSell,
+    disclaimer: "Guidance only, not a guarantee. Confirm local availability, the customer's actual site conditions, and product labels.",
+  };
 }
 
 /* ----------------------------- top actions, confidence, labels ----------- */
