@@ -43,6 +43,22 @@ and portable. UI and API depend on the domain, not the reverse.
 Visual Yard Preview (Phase 4) and AR (Phase 5) are deferred until the core flow earns "this actually
 understands my yard." Emotional resonance before platform expansion.
 
+## D12 — Accounts are device-local first (cloud-ready seam)
+Account creation/management is implemented as a **device account** in localStorage
+(`src/lib/accountStore.ts`) — no password, no backend — because we can ship and verify it today and
+it matches the app's privacy-light model. The store exposes a small read/write API
+(`useAccount`/`createAccount`/`updateAccount`/`signOut`) so a real cloud provider (Clerk/Supabase/
+Auth.js + a DB) can replace it without touching the rest of the app. Cloud sync is the upgrade when
+retention data and a chosen provider/keys justify it. *Why:* deliver real account UX now without
+faking secure cloud auth.
+
+## D13 — AR is wired, assets are configurable
+"View in your space" loads Google's `<model-viewer>` (CDN, lazy) with AR enabled. The model is
+**configurable via `NEXT_PUBLIC_AR_MODEL_URL`** and defaults to a clearly-labeled *representative*
+model, since per-plant 3D assets (.glb) are a content task, not code. The feature is opt-in and
+degrades gracefully if the model fails to load. *Why:* ship the AR capability honestly without
+implying the 3D shown is the user's exact plants.
+
 ## D11 — Optional capabilities degrade to off, never block
 Location accuracy uses a *curated* ZIP/postal→zone lookup (no fabricated nationwide data); a miss
 falls back to the approximate preset. AI image render is **off unless `IMAGE_API_KEY` is set** and

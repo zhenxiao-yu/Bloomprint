@@ -106,6 +106,10 @@ export function deletePlan(id: string): void {
   write(currentPlans().filter((p) => p.id !== id));
 }
 
+export function clearPlans(): void {
+  write([]);
+}
+
 export function renamePlan(id: string, label: string): void {
   write(currentPlans().map((p) => (p.id === id ? { ...p, label } : p)));
 }

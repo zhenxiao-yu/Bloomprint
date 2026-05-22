@@ -6,6 +6,7 @@ import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/
 import { Chip, Money, Section, SeverityTag } from "@/components/ui";
 import { ConceptBoard } from "@/components/ConceptBoard";
 import { ImaginedView } from "@/components/ImaginedView";
+import { ArView } from "@/components/ArView";
 import { trackEvent } from "@/lib/analytics";
 
 export type ViewMode = "simple" | "details" | "staff";
@@ -49,6 +50,7 @@ export function PlanResult({
   const { plan, enhancement } = result;
   const showNumbers = view !== "simple";
   const [boardView, setBoardView] = useState<"now" | "planned">("planned");
+  const [arOpen, setArOpen] = useState(false);
 
   const heroDescription =
     enhancement?.homeownerExplanation ?? `${plan.narrative} ${plan.insight}`;
@@ -168,6 +170,22 @@ export function PlanResult({
           {plan.visualSummary.transformation.feeling}
         </p>
         <ImaginedView prompt={enhancement?.imagePrompt} />
+
+        <div className="mt-4 border-t border-border pt-4">
+          {!arOpen ? (
+            <button
+              onClick={() => {
+                setArOpen(true);
+                trackEvent("ar_opened");
+              }}
+              className="rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition hover:border-brand"
+            >
+              📱 View in your space (3D / AR)
+            </button>
+          ) : (
+            <ArView />
+          )}
+        </div>
       </section>
 
       {/* Refinement chips — first plan is Draft 1 */}
