@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { BloomprintPlan, RefinementAdjustment } from "@/domain/models";
 import { IntakeForm, type IntakeDefaults, type IntakeValues } from "@/components/IntakeForm";
@@ -22,10 +23,10 @@ type GenerateSource = "form" | "demo" | "shared" | "refine" | "accuracy";
 type PlanIntake = IntakeValues & { sun?: string; soil?: string; drainage?: string };
 type PlanRequest = { intake?: PlanIntake; fixtureKey?: string };
 
-const VIEW_LABELS: { value: ViewMode; label: string }[] = [
-  { value: "simple", label: "Simple" },
-  { value: "details", label: "Details" },
-  { value: "staff", label: "Staff Helper" },
+const VIEW_VALUES: { value: ViewMode; key: "simple" | "details" | "staff" }[] = [
+  { value: "simple", key: "simple" },
+  { value: "details", key: "details" },
+  { value: "staff", key: "staff" },
 ];
 
 const VERSION_LABELS: Partial<Record<RefinementAdjustment, string>> = {
@@ -70,6 +71,8 @@ function parseSavedProfile(raw: string | null): SavedProfile | null {
 }
 
 export function PlanExperience() {
+  const t = useTranslations("Plan");
+  const tModes = useTranslations("Modes");
   const params = useSearchParams();
   const isDemo = params.get("demo") === "1";
   const staffParam = params.get("mode") === "staff";
@@ -97,14 +100,14 @@ export function PlanExperience() {
         request: null,
         adjustments: [],
         source: null,
-        error: "That shared link looks invalid — let's start a fresh plan.",
+        error: t("invalidShareLink"),
       };
     }
     if (isDemo) {
       return { request: { fixtureKey: "oakville-front-yard" }, adjustments: [], source: "demo", error: null };
     }
     return { request: null, adjustments: [], source: null, error: null };
-  }, [sharedParam, isDemo]);
+  }, [sharedParam, isDemo, t]);
 
   const [view, setView] = useState<ViewMode>(staffParam ? "staff" : "simple");
   const [step, setStep] = useState<"intake" | "loading" | "result" | "error">(
@@ -139,7 +142,7 @@ export function PlanExperience() {
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ ...req, adjustments: adj }),
         });
-        if (!res.ok) throw new Error(await readApiError(res, "We couldn't build that plan."));
+        if (!res.ok) throw new Error(await readApiError(res, t("buildError")));
         const data: BloomprintPlan = await res.json();
         setResult(data);
         setStep("result");
@@ -147,13 +150,13 @@ export function PlanExperience() {
           trackEvent("plan_generated", { source, goal: data.plan.intake.goal });
         }
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Something went wrong.");
+        setError(e instanceof Error ? e.message : t("somethingWrong"));
         setStep("error");
       } finally {
         setBusy(false);
       }
     },
-    [],
+    [t],
   );
 
   // Kick off the URL-driven plan (shared link or demo) exactly once. The effect only calls
@@ -310,11 +313,11 @@ export function PlanExperience() {
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
       <div className="mb-6 flex items-center justify-between">
         <Link href="/" className="text-sm font-semibold text-brand">
-          ← Bloomprint
+          {t("back")}
         </Link>
         {step === "result" ? (
           <div className="flex gap-1 rounded-full border border-border p-0.5 text-xs">
-            {VIEW_LABELS.map((v) => (
+            {VIEW_VALUES.map((v) => (
               <button
                 key={v.value}
                 onClick={() => setView(v.value)}
@@ -323,7 +326,7 @@ export function PlanExperience() {
                   view === v.value ? "bg-brand text-on-strong" : "text-muted hover:text-foreground"
                 } ${v.value === "staff" && !staffParam ? "opacity-70" : ""}`}
               >
-                {v.label}
+                {tModes(v.key)}
               </button>
             ))}
           </div>
@@ -337,8 +340,8 @@ export function PlanExperience() {
               {error}
             </div>
           ) : null}
-          {profile ? <MemoryBanner profile={profile} /> : null}
-          <h1 className="text-2xl font-semibold text-foreground">Let&apos;s plan your yard</h1>
+          {profile ? <MemoryBanner profile={profile} t={t} /> : null}
+          <h1 className="text-2xl font-semibold text-foreground">{t("intakeTitle")}</h1>
           <IntakeForm defaults={defaults} onSubmit={handleIntake} />
         </div>
       ) : null}
@@ -347,7 +350,7 @@ export function PlanExperience() {
         <div className="space-y-4" aria-live="polite" aria-busy="true">
           <p className="flex items-center gap-2 text-sm text-muted">
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-            Building your plan…
+            {t("building")}
           </p>
           <div className="card overflow-hidden p-6">
             <div className="skeleton h-6 w-2/3" />
@@ -371,20 +374,20 @@ export function PlanExperience() {
 
       {step === "error" ? (
         <div className="card space-y-3 p-6">
-          <p className="font-medium text-foreground">We couldn&apos;t build that plan.</p>
+          <p className="font-medium text-foreground">{t("errorTitle")}</p>
           <p className="text-sm text-muted">{error}</p>
           <button
             onClick={() => setStep("intake")}
             className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong"
           >
-            Start over
+            {t("startOver")}
           </button>
         </div>
       ) : null}
 
       {step === "result" && result ? (
         <div className="animate-fade-up">
-          {profile ? <MemoryBanner profile={profile} className="mb-4" /> : null}
+          {profile ? <MemoryBanner profile={profile} className="mb-4" t={t} /> : null}
 
           {(() => {
             const missing = result.plan.accuracyUpgrades.filter(
@@ -394,10 +397,13 @@ export function PlanExperience() {
             return (
               <div className="mb-4 rounded-lg border border-[var(--warn)]/30 bg-[var(--warn)]/10 px-4 py-2.5 text-xs text-[var(--warn)]">
                 <span className="font-semibold">
-                  This plan is missing {missing.length} detail{missing.length > 1 ? "s" : ""} that affect accuracy:
+                  {t("missingDetails", {
+                    count: missing.length,
+                    plural: missing.length > 1 ? "s" : "",
+                  })}
                 </span>{" "}
-                {missing.map((m) => m.field).join(", ")}. You can still save, share, and shop —
-                answering them (in the plan below) tightens the estimate.
+                {missing.map((m) => m.field).join(", ")}
+                {t("missingDetailsTail")}
               </div>
             );
           })()}
@@ -409,45 +415,45 @@ export function PlanExperience() {
               disabled={busy}
               className="rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
             >
-              Save plan
+              {t("savePlan")}
             </button>
             <button
               onClick={handleShare}
               disabled={busy}
               className="rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition hover:border-brand disabled:opacity-50"
             >
-              Share
+              {t("share")}
             </button>
             <Link
               href={storeHref}
               className="rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition hover:border-brand"
             >
-              Take to the store
+              {t("takeToStore")}
             </Link>
             <button
               onClick={() => setCalendarOpen((o) => !o)}
               className="hidden rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition hover:border-brand sm:inline-flex"
             >
-              Care reminders
+              {t("careReminders")}
             </button>
             <Link
               href="/plans"
               className="hidden rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition hover:border-brand sm:inline-flex"
             >
-              Saved &amp; compare
+              {t("savedAndCompare")}
             </Link>
             <span className="ml-auto">
               <SyncStatusBadge />
             </span>
-            {savedNote ? <span className="text-xs font-medium text-brand-strong">✓ Saved</span> : null}
+            {savedNote ? <span className="text-xs font-medium text-brand-strong">{t("savedConfirm")}</span> : null}
             {shareUrl ? (
-              <span className="text-xs text-muted">✓ Link copied — sharable anywhere</span>
+              <span className="text-xs text-muted">{t("linkCopied")}</span>
             ) : null}
           </div>
           {calendarOpen ? (
             <div className="card mb-4 flex flex-wrap items-center gap-3 p-3">
               <label className="text-sm text-foreground">
-                Planting start date{" "}
+                {t("plantingStart")}{" "}
                 <input
                   type="date"
                   defaultValue={today}
@@ -463,11 +469,9 @@ export function PlanExperience() {
                 }
                 className="rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-on-strong hover:bg-brand-strong"
               >
-                Download .ics
+                {t("downloadIcs")}
               </button>
-              <span className="text-xs text-muted">
-                Adds planting, watering &amp; seasonal reminders to your calendar.
-              </span>
+              <span className="text-xs text-muted">{t("calendarNote")}</span>
             </div>
           ) : null}
           {shareUrl ? (
@@ -476,7 +480,7 @@ export function PlanExperience() {
               value={shareUrl}
               onFocus={(e) => e.currentTarget.select()}
               className="card mb-4 w-full p-2 text-xs text-muted"
-              aria-label="Shareable plan link"
+              aria-label={t("shareAria")}
             />
           ) : null}
 
@@ -500,7 +504,7 @@ export function PlanExperience() {
           />
           <div className="mt-6">
             <Link href="/plan" className="text-sm font-semibold text-brand">
-              ← Plan another yard
+              {t("planAnother")}
             </Link>
           </div>
         </div>
@@ -525,7 +529,15 @@ const EFFORT_PREF: Record<string, string> = {
   "hire-help": "may hire help",
 };
 
-function MemoryBanner({ profile, className = "" }: { profile: SavedProfile; className?: string }) {
+function MemoryBanner({
+  profile,
+  className = "",
+  t,
+}: {
+  profile: SavedProfile;
+  className?: string;
+  t: ReturnType<typeof useTranslations<"Plan">>;
+}) {
   const region = REGION_OPTIONS.find((r) => r.value === profile.regionId)?.label ?? profile.regionId;
   const prefs = [
     GOAL_PREF[profile.goal] ?? "a good plan",
@@ -533,13 +545,13 @@ function MemoryBanner({ profile, className = "" }: { profile: SavedProfile; clas
     `around $${profile.budget.toLocaleString()} budget`,
     region,
   ];
-  const tweaks = (profile.rememberedTweaks ?? []).map((t) => t.replace(/-/g, " "));
+  const tweaks = (profile.rememberedTweaks ?? []).map((tw) => tw.replace(/-/g, " "));
   return (
     <div className={`rounded-lg bg-brand-soft px-4 py-3 text-xs text-brand-strong ${className}`}>
-      <span className="font-semibold">Using your saved preferences:</span>
+      <span className="font-semibold">{t("savedPrefsTitle")}</span>
       <span className="ml-1">{prefs.map((p) => `✓ ${p}`).join("  ·  ")}</span>
       {tweaks.length > 0 ? (
-        <span className="mt-1 block opacity-80">Remembers your tweaks: {tweaks.join(", ")}</span>
+        <span className="mt-1 block opacity-80">{t("remembersTweaks", { tweaks: tweaks.join(", ") })}</span>
       ) : null}
     </div>
   );

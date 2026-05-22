@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import type { BloomprintPlan, ShoppingPriority } from "@/domain/models";
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
 import { Chip, MetricPill, Money, Section, SeverityTag } from "@/components/ui";
@@ -16,16 +17,16 @@ import { trackEvent } from "@/lib/analytics";
 
 export type ViewMode = "simple" | "details" | "staff";
 
-const PLAN_LABEL_TEXT: Record<string, string> = {
-  "buildable-estimate": "Buildable estimate",
-  "concept-placement": "Concept placement",
-  "needs-local-verification": "Needs local verification",
+const PLAN_LABEL_KEY: Record<string, "labelBuildable" | "labelConcept" | "labelNeedsVerification"> = {
+  "buildable-estimate": "labelBuildable",
+  "concept-placement": "labelConcept",
+  "needs-local-verification": "labelNeedsVerification",
 };
 
-const PRIORITY_GROUPS: { key: ShoppingPriority; label: string; note: string }[] = [
-  { key: "buy-first", label: "Buy First", note: "Everything you need for planting day." },
-  { key: "can-wait", label: "Can Wait", note: "Improves the finished look later." },
-  { key: "optional", label: "Optional Upgrades", note: "Only if the budget allows." },
+const PRIORITY_GROUPS: { key: ShoppingPriority; labelKey: "buyFirst" | "canWait" | "optionalUpgrades"; noteKey: "buyFirstNote" | "canWaitNote" | "optionalNote" }[] = [
+  { key: "buy-first", labelKey: "buyFirst", noteKey: "buyFirstNote" },
+  { key: "can-wait", labelKey: "canWait", noteKey: "canWaitNote" },
+  { key: "optional", labelKey: "optionalUpgrades", noteKey: "optionalNote" },
 ];
 
 type SiteField = "sun" | "soil" | "drainage";
@@ -52,6 +53,7 @@ export function PlanResult({
   onAccuracy: (field: "sun" | "soil" | "drainage", value: string) => void;
   photoUrl?: string | null;
 }) {
+  const t = useTranslations("Result");
   const { plan, enhancement } = result;
   const showNumbers = view !== "simple";
   const [boardView, setBoardView] = useState<"now" | "planned">("planned");
@@ -64,14 +66,14 @@ export function PlanResult({
       u.field === "sun" || u.field === "soil" || u.field === "drainage",
   );
   const navItems = [
-    { id: "summary", label: "Summary" },
-    { id: "buy", label: "Buy" },
-    { id: "install", label: "Install" },
-    { id: "plants", label: "Plants" },
-    { id: "risks", label: "Risks" },
-    { id: "store", label: "Store" },
-    { id: "evidence", label: "Evidence" },
-    ...(view === "staff" ? [{ id: "staff", label: "Staff" }] : []),
+    { id: "summary", label: t("navSummary") },
+    { id: "buy", label: t("navBuy") },
+    { id: "install", label: t("navInstall") },
+    { id: "plants", label: t("navPlants") },
+    { id: "risks", label: t("navRisks") },
+    { id: "store", label: t("navStore") },
+    { id: "evidence", label: t("navEvidence") },
+    ...(view === "staff" ? [{ id: "staff", label: t("navStaff") }] : []),
   ];
 
   return (
@@ -110,11 +112,11 @@ export function PlanResult({
           {/* Transformation preview — help users FEEL the before → after */}
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             <div className="rounded-lg border border-border bg-surface/70 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted">Now</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t("now")}</p>
               <p className="mt-1 text-sm text-foreground">{plan.visualSummary.transformation.current}</p>
             </div>
             <div className="rounded-lg border border-brand bg-surface p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-brand-strong">Planned</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-brand-strong">{t("planned")}</p>
               <p className="mt-1 text-sm text-foreground">{plan.visualSummary.transformation.planned}</p>
             </div>
           </div>
@@ -138,7 +140,7 @@ export function PlanResult({
             </ul>
           </div>
           <div className="rounded-lg bg-[var(--accent)]/10 p-4 text-sm text-foreground">
-            <p className="font-semibold text-[var(--accent)]">Why this is smart</p>
+            <p className="font-semibold text-[var(--accent)]">{t("whySmart")}</p>
             <p className="mt-1">{plan.insight}</p>
           </div>
         </div>
@@ -150,7 +152,7 @@ export function PlanResult({
             </span>
           ))}
           <span className="ml-auto rounded bg-border px-2 py-0.5 text-xs font-medium text-foreground">
-            {PLAN_LABEL_TEXT[plan.planLabel]}
+            {PLAN_LABEL_KEY[plan.planLabel] ? t(PLAN_LABEL_KEY[plan.planLabel]) : plan.planLabel}
           </span>
         </div>
       </section>
@@ -158,12 +160,15 @@ export function PlanResult({
       <ReadinessMeter readiness={plan.readiness} />
 
       <section className="grid gap-2 rounded-xl border border-brand/20 bg-surface p-3 shadow-sm sm:grid-cols-4">
-        <MetricPill label="DIY range" value={<Money value={plan.budget.diyTotal} />} tone="brand" />
-        <MetricPill label="Install" value={`${plan.labor.totalHours}h / ${plan.labor.weekends} weekend`} />
-        <MetricPill label="Confidence" value={plan.confidence} tone={plan.confidence === "low" ? "warn" : "brand"} />
+        <MetricPill label={t("metricDiyRange")} value={<Money value={plan.budget.diyTotal} />} tone="brand" />
         <MetricPill
-          label="Store"
-          value={plan.storeSearches.some((s) => s.deliveryRecommended) ? "check delivery" : "search-ready"}
+          label={t("metricInstall")}
+          value={t("metricInstallValue", { hours: plan.labor.totalHours, weekends: plan.labor.weekends })}
+        />
+        <MetricPill label={t("metricConfidence")} value={plan.confidence} tone={plan.confidence === "low" ? "warn" : "brand"} />
+        <MetricPill
+          label={t("metricStore")}
+          value={plan.storeSearches.some((s) => s.deliveryRecommended) ? t("metricStoreDelivery") : t("metricStoreReady")}
           tone={plan.storeSearches.some((s) => s.deliveryRecommended) ? "warn" : "neutral"}
         />
       </section>
@@ -171,7 +176,7 @@ export function PlanResult({
       {/* See your yard — deterministic concept board with a Now / Planned toggle */}
       <section className="card p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-base font-semibold text-foreground">See your yard</h3>
+          <h3 className="text-base font-semibold text-foreground">{t("seeYard")}</h3>
           <div className="flex gap-1 rounded-full border border-border p-0.5 text-xs">
             {(["now", "planned"] as const).map((v) => (
               <button
@@ -185,7 +190,7 @@ export function PlanResult({
                   boardView === v ? "bg-brand text-on-strong" : "text-muted hover:text-foreground"
                 }`}
               >
-                {v}
+                {v === "now" ? t("viewNow") : t("viewPlanned")}
               </button>
             ))}
           </div>
@@ -197,7 +202,7 @@ export function PlanResult({
           ) : photoUrl ? (
             <div className="overflow-hidden rounded-xl border border-border" style={{ aspectRatio: "5 / 3" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={photoUrl} alt="Your yard now" className="h-full w-full object-cover" />
+              <img src={photoUrl} alt={t("yourYardNow")} className="h-full w-full object-cover" />
             </div>
           ) : (
             <div
@@ -222,7 +227,7 @@ export function PlanResult({
               }}
               className="rounded-full border border-border px-4 py-1.5 text-sm font-medium text-foreground transition hover:border-brand"
             >
-              📱 View in your space (3D / AR)
+              {t("viewInSpace")}
             </button>
           ) : (
             <ArView />
@@ -232,7 +237,7 @@ export function PlanResult({
 
       {/* Refinement chips — first plan is Draft 1 */}
       <section className="card p-5">
-        <p className="text-sm font-semibold text-foreground">This is your first draft. Adjust it:</p>
+        <p className="text-sm font-semibold text-foreground">{t("firstDraft")}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {REFINEMENTS.map((r) => {
             const active = adjustments.includes(r.value);
@@ -256,8 +261,8 @@ export function PlanResult({
       {/* Accuracy Upgrade Card — unknown reduces confidence, never blocks */}
       {accuracyControls.length > 0 ? (
         <Section
-          title="Make this more accurate"
-          subtitle="Your plan is usable now. A few details would sharpen it — answer any you know."
+          title={t("moreAccurateTitle")}
+          subtitle={t("moreAccurateSubtitle")}
         >
           <div className="grid gap-3 sm:grid-cols-3">
             {accuracyControls.map((u) => (
@@ -270,7 +275,7 @@ export function PlanResult({
                   className="card w-full p-2 text-sm"
                 >
                   <option value="" disabled>
-                    Choose…
+                    {t("choose")}
                   </option>
                   {ACCURACY_CONTROLS[u.field].map((o) => (
                     <option key={o.value} value={o.value}>
@@ -285,7 +290,7 @@ export function PlanResult({
       ) : null}
 
       {/* Top actions */}
-      <Section title="Top actions" variant="decision">
+      <Section title={t("topActions")} variant="decision">
         <ol className="space-y-2">
           {plan.topActions.map((a, i) => (
             <li key={i} className="flex gap-3 text-sm text-foreground">
@@ -299,9 +304,9 @@ export function PlanResult({
       </Section>
 
       {/* Budget */}
-      <Section id="buy" title="Budget" subtitle="Ranges, not quotes — confirm local prices before buying." variant="action">
+      <Section id="buy" title={t("budget")} subtitle={t("budgetSubtitle")} variant="action">
         <p className="text-2xl font-semibold text-foreground">
-          Expected DIY total: <Money value={plan.budget.diyTotal} />
+          {t("expectedDiyTotal")} <Money value={plan.budget.diyTotal} />
         </p>
         <ul className="mt-3 divide-y divide-border text-sm">
           {plan.budget.byCategory.map((c) => (
@@ -314,7 +319,7 @@ export function PlanResult({
       </Section>
 
       {/* Shopping list grouped by priority */}
-      <Section title="Shopping list" variant="action">
+      <Section title={t("shoppingList")} variant="action">
         <div className="space-y-4">
           {PRIORITY_GROUPS.map((group) => {
             const items = plan.shoppingList.filter((i) => i.priority === group.key);
@@ -322,8 +327,8 @@ export function PlanResult({
             return (
               <div key={group.key}>
                 <div className="flex items-baseline justify-between">
-                  <h4 className="text-sm font-semibold text-foreground">{group.label}</h4>
-                  <span className="text-xs text-muted">{group.note}</span>
+                  <h4 className="text-sm font-semibold text-foreground">{t(group.labelKey)}</h4>
+                  <span className="text-xs text-muted">{t(group.noteKey)}</span>
                 </div>
                 <ul className="mt-1 divide-y divide-border text-sm">
                   {items.map((item, i) => (
@@ -345,12 +350,16 @@ export function PlanResult({
       {/* Install timeline — framed as achievable weekends with a planting window */}
       <Section
         id="install"
-        title="Install plan"
+        title={t("installPlan")}
         variant="action"
-        subtitle={`About ${plan.labor.totalHours} hours · ${plan.labor.people} person(s) · ${plan.visualSummary.expectedEffort.split(" · ")[0]}`}
+        subtitle={t("installSubtitle", {
+          hours: plan.labor.totalHours,
+          people: plan.labor.people,
+          effort: plan.visualSummary.expectedEffort.split(" · ")[0],
+        })}
       >
         <p className="mb-3 inline-block rounded bg-brand-soft px-3 py-1 text-xs font-medium text-brand-strong">
-          🌱 Best planting window: {plan.bestWeatherWindow}
+          {t("bestPlantingWindow", { window: plan.bestWeatherWindow })}
         </p>
         <ol className="space-y-3">
           {plan.installPhases.map((p) => (
@@ -366,7 +375,7 @@ export function PlanResult({
       </Section>
 
       {/* Plants */}
-      <Section id="plants" title="Plants" subtitle={`${plan.plants.length} types from the Bloomprint Core Library`} variant="quiet">
+      <Section id="plants" title={t("plants")} subtitle={t("plantsSubtitle", { count: plan.plants.length })} variant="quiet">
         <div className="grid gap-3 sm:grid-cols-2">
           {plan.plants.map((p) => (
             <div key={p.plantId} className="rounded-lg border border-border p-3">
@@ -375,13 +384,13 @@ export function PlanResult({
                   {p.quantity}× {p.commonName}
                 </span>
                 {showNumbers ? (
-                  <span className="text-xs text-muted">fit {Math.round(p.fit.score * 100)}%</span>
+                  <span className="text-xs text-muted">{t("fitScore", { score: Math.round(p.fit.score * 100) })}</span>
                 ) : null}
               </div>
               <p className="text-xs text-muted">{p.spacingNote}</p>
               {showNumbers ? (
                 <p className="mt-1 text-xs text-muted">
-                  {p.matureSize} · {p.sunLabel} · {p.maintenance} maintenance
+                  {p.matureSize} · {p.sunLabel} · {t("maintenanceSuffix", { level: p.maintenance })}
                 </p>
               ) : null}
               {p.fit.reasons[0] ? <p className="mt-1 text-xs text-brand-strong">✓ {p.fit.reasons[0]}</p> : null}
@@ -397,7 +406,7 @@ export function PlanResult({
 
       {/* Risks */}
       {plan.risks.length > 0 ? (
-        <Section id="risks" title="What to watch" variant="trust">
+        <Section id="risks" title={t("whatToWatch")} variant="trust">
           <ul className="space-y-2">
             {plan.risks.map((r) => (
               <li key={r.id} className="text-sm">
@@ -424,13 +433,13 @@ export function PlanResult({
 
       {/* Tools & equipment (details) */}
       {view !== "simple" ? (
-        <Section title="Tools & equipment">
+        <Section title={t("toolsTitle")}>
           <p className="text-sm text-foreground">
-            <span className="font-medium">Tools:</span> {plan.tools.map((t) => t.name).join(", ")}
+            <span className="font-medium">{t("toolsLabel")}</span> {plan.tools.map((tool) => tool.name).join(", ")}
           </p>
           {plan.equipment.length > 0 ? (
             <p className="mt-1 text-sm text-foreground">
-              <span className="font-medium">Possible rentals:</span>{" "}
+              <span className="font-medium">{t("rentalsLabel")}</span>{" "}
               {plan.equipment.map((e) => e.name).join(", ")}
             </p>
           ) : null}
@@ -439,20 +448,20 @@ export function PlanResult({
 
       {/* Staff helper — deterministic, practical content (works without AI) */}
       {view === "staff" ? (
-        <Section id="staff" title="Staff helper" subtitle="Garden-center conversation aid — guidance, not a guarantee.">
+        <Section id="staff" title={t("staffTitle")} subtitle={t("staffSubtitle")}>
           <div className="grid gap-4 sm:grid-cols-2">
-            <StaffList title="Ask these 3 questions first" items={plan.staff.questionsFirst} />
-            <StaffList title="Customer probably underestimates" items={plan.staff.customerUnderestimates} />
-            <StaffList title="Good / Better / Best" items={plan.staff.goodBetterBest} />
-            <StaffList title="If too expensive" items={plan.staff.ifTooExpensive} />
-            <StaffList title="If no truck or delivery" items={plan.staff.ifNoTruckOrDelivery} />
-            <StaffList title="If dog/kid safety matters" items={plan.staff.ifDogKidSafetyMatters} />
-            <StaffList title="If out of stock" items={plan.staff.ifOutOfStock} />
-            <StaffList title="Substitutions" items={plan.staff.substitutions} />
-            <StaffList title="Genuine add-ons to mention" items={plan.staff.upsells} />
-            <StaffList title="What not to sell" items={plan.staff.whatNotToSell} />
+            <StaffList title={t("staffQuestionsFirst")} items={plan.staff.questionsFirst} />
+            <StaffList title={t("staffUnderestimates")} items={plan.staff.customerUnderestimates} />
+            <StaffList title={t("staffGoodBetterBest")} items={plan.staff.goodBetterBest} />
+            <StaffList title={t("staffIfTooExpensive")} items={plan.staff.ifTooExpensive} />
+            <StaffList title={t("staffIfNoTruck")} items={plan.staff.ifNoTruckOrDelivery} />
+            <StaffList title={t("staffIfSafety")} items={plan.staff.ifDogKidSafetyMatters} />
+            <StaffList title={t("staffIfOutOfStock")} items={plan.staff.ifOutOfStock} />
+            <StaffList title={t("staffSubstitutions")} items={plan.staff.substitutions} />
+            <StaffList title={t("staffUpsells")} items={plan.staff.upsells} />
+            <StaffList title={t("staffWhatNotToSell")} items={plan.staff.whatNotToSell} />
             {enhancement?.staffTalkingPoints ? (
-              <StaffList title="Talking points" items={enhancement.staffTalkingPoints} />
+              <StaffList title={t("staffTalkingPoints")} items={enhancement.staffTalkingPoints} />
             ) : null}
           </div>
           <p className="mt-3 rounded bg-border/50 p-2 text-xs text-muted">
@@ -464,7 +473,7 @@ export function PlanResult({
       {/* Honesty footer */}
       {plan.site.assumptions.length > 0 ? (
         <p className="px-1 text-xs text-muted">
-          <span className="font-medium">Assumptions:</span> {plan.site.assumptions.join(" ")}
+          <span className="font-medium">{t("assumptionsLabel")}</span> {plan.site.assumptions.join(" ")}
         </p>
       ) : null}
     </div>

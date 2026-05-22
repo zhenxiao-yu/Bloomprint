@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { BloomprintPlan } from "@/domain/models";
 import { deletePlan, renamePlan, useSavedPlans, type SavedPlan } from "@/lib/plansStore";
@@ -15,17 +16,18 @@ interface Comparison {
   b: { label: string; plan: BloomprintPlan };
 }
 
-async function fetchSaved(p: SavedPlan): Promise<BloomprintPlan> {
+async function fetchSaved(p: SavedPlan, regenError: string): Promise<BloomprintPlan> {
   const res = await fetch("/api/plan", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ intake: p.intake, adjustments: p.adjustments }),
   });
-  if (!res.ok) throw new Error(await readApiError(res, "Couldn't regenerate that saved plan."));
+  if (!res.ok) throw new Error(await readApiError(res, regenError));
   return res.json();
 }
 
 export default function PlansPage() {
+  const t = useTranslations("SavedPlans");
   const plans = useSavedPlans();
   const [selected, setSelected] = useState<string[]>([]);
   const [comparison, setComparison] = useState<Comparison | null>(null);
@@ -41,7 +43,7 @@ export default function PlansPage() {
 
   function rename(id: string) {
     const current = plans.find((p) => p.id === id);
-    const label = window.prompt("Rename this plan", current?.label ?? "");
+    const label = window.prompt(t("renamePrompt"), current?.label ?? "");
     if (label && label.trim()) renamePlan(id, label.trim());
   }
 
@@ -58,11 +60,14 @@ export default function PlansPage() {
     setBusy(true);
     setError(null);
     try {
-      const [a, b] = await Promise.all([fetchSaved(aSaved), fetchSaved(bSaved)]);
+      const [a, b] = await Promise.all([
+        fetchSaved(aSaved, t("regenError")),
+        fetchSaved(bSaved, t("regenError")),
+      ]);
       setComparison({ a: { label: aSaved.label, plan: a }, b: { label: bSaved.label, plan: b } });
       trackEvent("plan_compared");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't compare those plans.");
+      setError(e instanceof Error ? e.message : t("compareError"));
     } finally {
       setBusy(false);
     }
@@ -72,20 +77,18 @@ export default function PlansPage() {
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
       <div className="mb-6 flex items-center justify-between">
         <Link href="/plan" className="text-sm font-semibold text-brand">
-          ← Back to planning
+          {t("backToPlanning")}
         </Link>
         <Link href="/" className="text-sm text-muted hover:text-foreground">
-          Home
+          {t("home")}
         </Link>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-semibold text-foreground">Saved plans</h1>
+        <h1 className="text-2xl font-semibold text-foreground">{t("title")}</h1>
         <SyncStatusBadge />
       </div>
-      <p className="mt-1 text-sm text-muted">
-        Select two to compare. Open re-generates the exact plan.
-      </p>
+      <p className="mt-1 text-sm text-muted">{t("subtitle")}</p>
 
       {plans.length >= 2 ? (
         <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -94,7 +97,7 @@ export default function PlansPage() {
             disabled={selected.length !== 2 || busy}
             className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
           >
-            {busy ? "Comparing…" : `Compare selected (${selected.length}/2)`}
+            {busy ? t("comparing") : t("compareSelected", { count: selected.length })}
           </button>
           {error ? <span className="text-xs text-[var(--danger)]">{error}</span> : null}
         </div>
