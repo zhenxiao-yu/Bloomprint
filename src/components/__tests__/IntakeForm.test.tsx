@@ -47,4 +47,42 @@ describe("IntakeForm", () => {
     const values = onSubmit.mock.calls[0][0] as IntakeValues;
     expect(values.goal).toBe("pollinator");
   });
+
+  it("lets the user choose a project scope", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    renderWithIntl(<IntakeForm onSubmit={onSubmit} />, { locale: "en" });
+
+    await user.click(screen.getByRole("button", { name: "Fix one spot" }));
+    await user.click(screen.getByRole("button", { name: "Build my plan" }));
+
+    const values = onSubmit.mock.calls[0][0] as IntakeValues;
+    expect(values.scope).toBe("spot_fix");
+  });
+
+  it("pre-fills the goal when a problem chip is chosen (problem language → goal)", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    renderWithIntl(<IntakeForm onSubmit={onSubmit} />, { locale: "en" });
+
+    await user.click(screen.getByRole("button", { name: "Privacy gap" }));
+    await user.click(screen.getByRole("button", { name: "Build my plan" }));
+
+    const values = onSubmit.mock.calls[0][0] as IntakeValues;
+    expect(values.problemType).toBe("privacy_gap");
+    expect(values.goal).toBe("privacy"); // mapped from the problem
+  });
+
+  it("builds a manual measurement from length × width", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    renderWithIntl(<IntakeForm onSubmit={onSubmit} />, { locale: "en" });
+
+    await user.type(screen.getByLabelText("Length"), "20");
+    await user.type(screen.getByLabelText("Width"), "4");
+    await user.click(screen.getByRole("button", { name: "Build my plan" }));
+
+    const values = onSubmit.mock.calls[0][0] as IntakeValues;
+    expect(values.measurement).toMatchObject({ length: 20, width: 4, unit: "ft", source: "manual" });
+  });
 });

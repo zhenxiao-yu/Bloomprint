@@ -10,6 +10,12 @@ annotates, and verifies** the deterministic plan. It never overrides plants, pri
 toxicity, invasive status, quantities, spacing, or labor (see DECISIONS D1/D2/D7/D14). If it is
 disabled, slow, or fails, the plan renders fully on its own.
 
+> **Live data is optional; free mode is the default-safe baseline.** When
+> `NEXT_PUBLIC_ENABLE_LIVE_DATA=false` (the default), Bloomprint runs in **Free/Open Data Mode**
+> (docs/FREE_DATA_MODE.md): curated catalog + generated retailer **search links** (not inventory) +
+> seasonal-rule weather, with no keys. External providers only ever *enrich* on top of that — they
+> are never required, and the engine never depends on them.
+
 ## Honesty contract
 
 - Prices are **estimate ranges**, never a live or final/checkout price. In mock mode the range is

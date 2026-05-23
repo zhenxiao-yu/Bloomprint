@@ -51,4 +51,19 @@ describe("StoreRealityCheck", () => {
     expect(screen.getByText("Emerald Cedar")).toBeInTheDocument();
     expect(screen.queryByText(/\$40–\$90/)).not.toBeInTheDocument(); // no live price estimate
   });
+
+  it("shows Canadian retailers for an Ontario region plus the verify-before-buying warning", () => {
+    renderWithIntl(<StoreRealityCheck searches={searches} regionId="gta-ontario" />);
+    expect(screen.getByText("Home Depot Canada")).toBeInTheDocument();
+    expect(screen.getByText("Canadian Tire")).toBeInTheDocument();
+    expect(screen.getByText(/can't guarantee live stock or final checkout price/i)).toBeInTheDocument();
+    // Never claims live stock / final price.
+    expect(screen.queryByText(/in stock/i)).not.toBeInTheDocument();
+  });
+
+  it("shows US retailers for a us-* region", () => {
+    renderWithIntl(<StoreRealityCheck searches={searches} regionId="us-midwest-chicago" />);
+    expect(screen.getByText("Home Depot")).toBeInTheDocument();
+    expect(screen.getByText("Lowe's")).toBeInTheDocument();
+  });
 });

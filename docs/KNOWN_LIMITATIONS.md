@@ -80,3 +80,22 @@ Saved plans live in **this browser only** (localStorage) — they aren't synced 
 lost if the user clears site data. Share links encode the plan's **inputs**, not a stored record, so
 a very long/edited link may not decode (it falls back to a fresh plan). If the Core Library or engine
 changes between versions, an old share link regenerates with the *current* engine, not the original.
+
+## Free/Open Data Mode (default)
+See docs/FREE_DATA_MODE.md. In the default free mode:
+- **Live stock is never guaranteed** — retailer links are generated *search* links, not inventory.
+- **Prices are estimate bands** (ranges), never exact or final/checkout prices.
+- **Free data may be incomplete** — the curated catalog is a starter set; species/regions outside it
+  fall back to broad rules flagged "local verification recommended."
+- **Plant facts require local verification** — confirm hardiness, toxicity, and invasive status on
+  the plant tag and with your municipality/extension.
+- **Microclimate matters** — region/zone is approximate; your yard may differ.
+- **Guides/tutorials** are generated search links, not vetted citations, unless explicitly marked
+  authoritative.
+- **Plant images** are not bundled — `PlantImageAsset` exists in the schema, but no image catalog
+  ships until license-cleared assets are curated (we never fabricate URLs or licenses).
+
+## Measurements
+See docs/MEASUREMENT_STRATEGY.md. Dimensions are optional; missing or low-confidence measurements
+produce **wider ranges**, never fake-precise quantities. Spacing always comes from each plant's
+spacing note, not from a measurement or the concept board.

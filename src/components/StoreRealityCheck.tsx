@@ -3,13 +3,8 @@
 import { useTranslations } from "next-intl";
 import type { StoreSearch } from "@/domain/models";
 import type { StoreRealityResult } from "@/lib/live-data/schema";
-import {
-  AVAILABILITY_LABEL,
-  homeDepotSearchUrl,
-  lowesSearchUrl,
-  nearbyGardenCentersUrl,
-  webSearchUrl,
-} from "@/domain/store";
+import { AVAILABILITY_LABEL } from "@/domain/store";
+import { getRetailerSearchLinks, nearbyGardenCentersUrl } from "@/domain/store/retailers";
 import { Section } from "@/components/ui";
 import { LiveBadge } from "@/components/live/LiveBadge";
 
@@ -32,9 +27,12 @@ function lastCheckedLabel(iso: string, justNow: string): string {
 export function StoreRealityCheck({
   searches,
   live = [],
+  regionId,
 }: {
   searches: StoreSearch[];
   live?: StoreRealityResult[];
+  /** Drives region-aware retailer links (Canadian for Ontario/Canada, US for us-* regions). */
+  regionId?: string;
 }) {
   const t = useTranslations("Live");
   if (searches.length === 0) return null;
@@ -43,13 +41,14 @@ export function StoreRealityCheck({
   return (
     <Section title={t("storeTitle")} subtitle={t("storeSubtitle")}>
       <a
-        href={nearbyGardenCentersUrl()}
+        href={nearbyGardenCentersUrl(regionId)}
         target="_blank"
         rel="noreferrer"
         className="inline-block rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-on-strong"
       >
         📍 {t("findNearby")}
       </a>
+      <p className="mt-2 text-xs font-medium text-warn">{t("retailerWarning")}</p>
 
       <ul className="mt-3 divide-y divide-border">
         {searches.map((s, i) => {
@@ -68,16 +67,18 @@ export function StoreRealityCheck({
                     {t("deliveryWorthChecking")}
                   </span>
                 ) : null}
-                <span className="ml-auto flex gap-2 text-xs">
-                  <a href={homeDepotSearchUrl(s.query)} target="_blank" rel="noreferrer" className="text-brand hover:underline">
-                    Home Depot
-                  </a>
-                  <a href={lowesSearchUrl(s.query)} target="_blank" rel="noreferrer" className="text-brand hover:underline">
-                    Lowe&apos;s
-                  </a>
-                  <a href={webSearchUrl(s.query)} target="_blank" rel="noreferrer" className="text-brand hover:underline">
-                    Search
-                  </a>
+                <span className="ml-auto flex flex-wrap justify-end gap-x-2 gap-y-1 text-xs">
+                  {getRetailerSearchLinks(s.query, regionId).map((link) => (
+                    <a
+                      key={link.retailerId}
+                      href={link.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand hover:underline"
+                    >
+                      {link.label}
+                    </a>
+                  ))}
                 </span>
               </div>
 

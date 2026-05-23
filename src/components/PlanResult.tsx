@@ -433,6 +433,29 @@ export function PlanResult({
         ) : null}
       </Section>
 
+      {/* Quick / Better / Best — estimate framings of the same plan (free-data grounded) */}
+      {plan.tiers && plan.tiers.length > 0 ? (
+        <Section title={t("tiersTitle")} subtitle={t("tiersSubtitle")} variant="quiet">
+          <div className="grid gap-3 sm:grid-cols-3">
+            {plan.tiers.map((tier) => (
+              <div
+                key={tier.tier}
+                className={`rounded-lg border p-3 ${
+                  tier.tier === "better_fix" ? "border-brand bg-brand-soft" : "border-border"
+                }`}
+              >
+                <p className="text-sm font-semibold text-foreground">{t(`tier_${tier.tier}`)}</p>
+                <p className="mt-0.5 text-lg font-semibold text-foreground">
+                  <Money value={tier.estTotal} />
+                </p>
+                <p className="mt-1 text-xs text-muted">{tier.summary}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-muted">{t("tiersDisclaimer")}</p>
+        </Section>
+      ) : null}
+
       {/* Shopping list — sortable table in Details, grouped by priority in Simple */}
       <Section title={t("shoppingList")} variant="action">
         {view !== "simple" ? (
@@ -491,6 +514,22 @@ export function PlanResult({
                   {p.title} <span className="font-normal text-muted">· ~{p.estHours}h</span>
                 </p>
                 <p className="text-sm text-muted">{p.description}</p>
+                {p.guides && p.guides.length > 0 ? (
+                  <p className="mt-1 flex flex-wrap gap-x-2 gap-y-1 text-xs">
+                    <span className="text-muted">{t("howToLabel")}:</span>
+                    {p.guides.map((g) => (
+                      <a
+                        key={g.topic}
+                        href={g.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-brand hover:underline"
+                      >
+                        {g.title}
+                      </a>
+                    ))}
+                  </p>
+                ) : null}
               </div>
             </li>
           ))}
@@ -565,7 +604,7 @@ export function PlanResult({
       {/* Trust moat: what-if failures + honest store reality */}
       <FailurePointsCard points={plan.failurePoints} />
       <div id="store" className="scroll-mt-24">
-        <StoreRealityCheck searches={plan.storeSearches} live={live?.storeReality} />
+        <StoreRealityCheck searches={plan.storeSearches} live={live?.storeReality} regionId={plan.site.regionId} />
       </div>
 
       <div id="evidence" className="scroll-mt-24">

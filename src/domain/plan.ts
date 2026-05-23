@@ -43,6 +43,11 @@ import { buildPlanEvidence } from "@/domain/evidence/sourceQuality";
 import { generateAllAlternatives } from "@/domain/alternatives";
 import { buildStoreSearches } from "@/domain/store";
 import { deriveTuning } from "@/domain/tuning";
+import { buildPlanTiers } from "@/domain/tiers";
+import { guidesForPhase } from "@/domain/guides";
+
+/** Spot fixes are intentionally tiny — a handful of plants, no decorative extras. */
+const SPOT_FIX_PLANT_LIMIT = 3;
 
 export interface PlanOptions {
   adjustments?: RefinementAdjustment[];
@@ -54,8 +59,12 @@ export function generateDeterministicPlan(intake: YardIntake, options: PlanOptio
   const site = resolveSite(intake);
   const style = tuning.forceStyle ?? resolveStyleFamily(intake);
 
+  const scope = intake.scope ?? "section_plan";
   const candidates = selectPlantCandidates(site, intake, style, tuning);
   let placements = composePalette(candidates, site, intake, tuning);
+
+  // A spot fix is a small, surgical change — keep just the best-fitting few plants.
+  if (scope === "spot_fix") placements = placements.slice(0, SPOT_FIX_PLANT_LIMIT);
 
   // Safety net: never return a plantless plan if any candidate survived the filters.
   if (placements.length === 0 && candidates.length > 0) {
@@ -78,7 +87,13 @@ export function generateDeterministicPlan(intake: YardIntake, options: PlanOptio
     ];
   }
 
-  const materialPicks = estimateMaterials(site, intake, style, tuning);
+  let materialPicks = estimateMaterials(site, intake, style, tuning);
+  // A spot fix skips decorative extras (stone, lighting) — just soil, mulch, and edging.
+  if (scope === "spot_fix") {
+    materialPicks = materialPicks.filter(
+      (p) => p.material.category !== "stone" && p.material.category !== "lighting",
+    );
+  }
   const tools = estimateTools(materialPicks);
   const equipment = estimateEquipment(site);
   const labor = estimateLabor(placements, site, intake);
@@ -86,7 +101,10 @@ export function generateDeterministicPlan(intake: YardIntake, options: PlanOptio
   const budget = estimateProjectBudget(shoppingList, equipment);
 
   const materialCategories = new Set<MaterialCategory>(materialPicks.map((p) => p.material.category));
-  const installPhases = generateInstallPhases(labor.totalHours, materialCategories);
+  const installPhases = generateInstallPhases(labor.totalHours, materialCategories).map((phase) => ({
+    ...phase,
+    guides: guidesForPhase(phase.title, materialCategories, intake),
+  }));
   const risks = generateRiskWarnings(site, intake, placements);
 
   const confidence = scoreConfidence(intake, recognized, region.confidence, site.zoneMatch?.precision ?? null);
@@ -126,6 +144,7 @@ export function generateDeterministicPlan(intake: YardIntake, options: PlanOptio
     failurePoints: generateFailurePoints(site, intake, placements),
     storeSearches: buildStoreSearches(shoppingList),
     readiness: computeReadiness(intake),
+    tiers: buildPlanTiers(intake, budget.diyTotal),
   };
 }
 

@@ -45,6 +45,7 @@ export const TRUSTED_SOURCES = {
     level: 1,
     supports: ["goal", "budget", "effort", "known site conditions"],
     confidence: "high",
+    notes: "Confirmed by you during intake.",
   }),
   coreLibrary: source({
     name: "Bloomprint Core Library",
@@ -100,10 +101,22 @@ export function buildPlanEvidence(site: SiteCondition, intake: YardIntake): Plan
     `Region: ${region?.label ?? site.regionId}`,
     `Goal: ${GOAL_TEXT[intake.goal] ?? intake.goal}`,
   ];
+  if (intake.problemType) inputs.push(`Problem: ${intake.problemType.replace(/_/g, " ")}`);
+  if (intake.scope) inputs.push(`Scope: ${intake.scope.replace(/_/g, " ")}`);
   if (site.zoneMatch) inputs.push(`Location: ${site.zoneMatch.label}`);
   if (intake.budget !== undefined) inputs.push(`Budget: ~$${intake.budget.toLocaleString()}`);
   inputs.push(`Effort: ${intake.effortLevel.replace("-", " ")}`);
   if (intake.sun !== "unknown") inputs.push(`Sun: ${intake.sun.replace("-", " ")}`);
+  if (intake.measurement) {
+    const m = intake.measurement;
+    const size =
+      m.length !== undefined && m.width !== undefined
+        ? `${m.length}×${m.width} ${m.unit}`
+        : m.area !== undefined
+          ? `${m.area} ${m.unit}²`
+          : "provided";
+    inputs.push(`Measured: ${size} (${m.source.replace(/_/g, " ")}, ${m.confidence} confidence)`);
+  }
   if (intake.hasPetsOrKids) inputs.push("Pets/kids: yes");
 
   const sources: SourceRef[] = [

@@ -60,6 +60,17 @@ SUPABASE_SERVICE_ROLE_KEY=...             # server-only, optional (AI prompt cac
 See [docs/SUPABASE_MIGRATION.md](docs/SUPABASE_MIGRATION.md) for the storage architecture, RLS
 expectations, private photo rules, and how to regenerate the database types.
 
+## Free/Open Data Mode (default)
+
+Bloomprint works **without any paid API** — and that's the default, not a fallback. Free/Open Data
+Mode wraps the deterministic plan with free, honest grounding: a curated **Ontario-first** catalog
+(each fact sourced + confidence-tagged), **region-aware retailer search links** (Home Depot Canada,
+Canadian Tire, RONA, Home Hardware, Amazon.ca for Canada; US retailers for US regions — search
+links, **not** live inventory), **price bands** (ranges, never exact), deterministic **material
+calculators** that widen when you haven't measured, per-phase **how-to guides**, and a *"verify
+before buying"* warning on every retailer result. Real providers are an optional upgrade behind the
+Live Data Layer. See [docs/FREE_DATA_MODE.md](docs/FREE_DATA_MODE.md).
+
 ## Live Data Layer (optional)
 
 Makes results *feel* current — retailer **price estimates**, planting **timing**, plant **care**, and
@@ -78,3 +89,5 @@ Real providers (SerpApi / Perenual / Open-Meteo / GBIF) drop in behind the same 
 - [docs/SUPABASE_MIGRATION.md](docs/SUPABASE_MIGRATION.md) — optional cloud sync (storage adapters, RLS)
 - [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) — what V1 does not know precisely
 - [docs/LIVE_DATA_LAYER.md](docs/LIVE_DATA_LAYER.md) — optional live enrichment (prices, weather, plant facts, invasive)
+- [docs/FREE_DATA_MODE.md](docs/FREE_DATA_MODE.md) — how Bloomprint works without paid APIs (default)
+- [docs/MEASUREMENT_STRATEGY.md](docs/MEASUREMENT_STRATEGY.md) — manual dimensions, unknowns, confidence

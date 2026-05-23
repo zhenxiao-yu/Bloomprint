@@ -8,7 +8,10 @@ import { Check, Sparkles } from "lucide-react";
 import type {
   Drainage,
   EffortLevel,
+  Measurement,
+  ProblemType,
   ProjectGoal,
+  ProjectScope,
   SoilType,
   StyleFamily,
   SunExposure,
@@ -20,7 +23,9 @@ import {
   EFFORTS,
   GOALS,
   HELPER_OPTIONS,
+  PROBLEM_OPTIONS,
   REGION_OPTIONS,
+  SCOPE_OPTIONS,
   SOIL_OPTIONS,
   STYLE_OPTIONS,
   SUN_OPTIONS,
@@ -32,12 +37,15 @@ export interface IntakeValues {
   regionId: string;
   locationQuery?: string;
   goal: ProjectGoal;
+  scope?: ProjectScope;
+  problemType?: ProblemType;
   budget: number;
   budgetStyle: "budget" | "balanced" | "premium";
   effortLevel: EffortLevel;
   areaType?: string;
   /** Measured/known planting-bed area in sq ft — sharpens material + plant counts. */
   areaSqft?: number;
+  measurement?: Measurement;
   sun?: SunExposure;
   soil?: SoilType;
   drainage?: Drainage;
@@ -62,10 +70,15 @@ const formSchema = z.object({
   regionId: z.string().min(1),
   locationQuery: z.string().optional(),
   goal: z.string(),
+  scope: z.string().optional(),
+  problemType: z.string().optional(),
   budgetIndex: z.number().int().min(0),
   effortLevel: z.string(),
   areaType: z.string().optional(),
   areaSqft: z.string().optional(),
+  lengthVal: z.string().optional(),
+  widthVal: z.string().optional(),
+  dimUnit: z.string().optional(),
   sun: z.string().optional(),
   soil: z.string().optional(),
   drainage: z.string().optional(),
@@ -86,16 +99,21 @@ export function IntakeForm({
   const tc = useTranslations("Common");
   const to = useTranslations("Options");
 
-  const { register, handleSubmit, control } = useForm<FormValues>({
+  const { register, handleSubmit, control, setValue } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       regionId: defaults?.regionId ?? REGION_OPTIONS[0].value,
       locationQuery: "",
       goal: defaults?.goal ?? "general",
+      scope: "section_plan",
+      problemType: "",
       budgetIndex: defaults?.budgetIndex ?? 1,
       effortLevel: defaults?.effortLevel ?? "moderate",
       areaType: "",
       areaSqft: defaults?.areaSqft ? String(Math.round(defaults.areaSqft)) : "",
+      lengthVal: "",
+      widthVal: "",
+      dimUnit: "ft",
       sun: "unknown",
       soil: "unknown",
       drainage: "unknown",
@@ -121,15 +139,31 @@ export function IntakeForm({
     const b = BUDGETS[values.budgetIndex];
     const area = values.areaSqft ? Number(values.areaSqft) : NaN;
     const helpers = values.helpers ? Number(values.helpers) : NaN;
+    const length = values.lengthVal ? Number(values.lengthVal) : NaN;
+    const width = values.widthVal ? Number(values.widthVal) : NaN;
+    // Manual dimensions → a high-confidence measurement (the user measured it themselves).
+    const measurement: Measurement | undefined =
+      Number.isFinite(length) && length > 0 && Number.isFinite(width) && width > 0
+        ? {
+            length,
+            width,
+            unit: values.dimUnit === "m" ? "m" : "ft",
+            source: "manual",
+            confidence: "good",
+          }
+        : undefined;
     onSubmit({
       regionId: values.regionId,
       locationQuery: values.locationQuery?.trim() || undefined,
       goal: values.goal as ProjectGoal,
+      scope: (values.scope as ProjectScope) || undefined,
+      problemType: (values.problemType as ProblemType) || undefined,
       budget: b.budget,
       budgetStyle: b.budgetStyle,
       effortLevel: values.effortLevel as EffortLevel,
       areaType: values.areaType || undefined,
       areaSqft: Number.isFinite(area) && area > 0 ? area : undefined,
+      measurement,
       sun: (values.sun as SunExposure) || undefined,
       soil: (values.soil as SoilType) || undefined,
       drainage: (values.drainage as Drainage) || undefined,
@@ -145,10 +179,71 @@ export function IntakeForm({
       <Reveal>
         <Controller
           control={control}
+          name="scope"
+          render={({ field }) => (
+            <fieldset>
+              <legend className="mb-2 text-sm font-semibold text-foreground">{t("scopeQuestion")}</legend>
+              <div className="flex flex-wrap gap-2">
+                {SCOPE_OPTIONS.map((s) => (
+                  <button
+                    type="button"
+                    key={s.value}
+                    onClick={() => field.onChange(s.value)}
+                    aria-pressed={field.value === s.value}
+                    className={`rounded-full px-4 py-2 text-sm transition duration-150 active:scale-[0.97] ${
+                      field.value === s.value ? "bg-brand text-on-strong shadow-sm" : "card text-foreground hover:border-brand"
+                    }`}
+                  >
+                    {to(`scope.${s.value}`)}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          )}
+        />
+      </Reveal>
+
+      <Reveal delay={40}>
+        <Controller
+          control={control}
           name="goal"
           render={({ field }) => (
             <fieldset>
               <legend className="mb-2 text-sm font-semibold text-foreground">{t("goalQuestion")}</legend>
+              {/* Problem-language shortcut: picking a problem pre-fills the goal below. */}
+              <Controller
+                control={control}
+                name="problemType"
+                render={({ field: problemField }) => (
+                  <div className="mb-3">
+                    <p className="mb-1.5 text-xs text-muted">{t("problemHint")}</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {PROBLEM_OPTIONS.map((p) => (
+                        <button
+                          type="button"
+                          key={p.value}
+                          onClick={() => {
+                            const next = problemField.value === p.value ? "" : p.value;
+                            problemField.onChange(next);
+                            if (next) {
+                              field.onChange(p.goal);
+                              setValue("goal", p.goal);
+                            }
+                          }}
+                          aria-pressed={problemField.value === p.value}
+                          className={`rounded-full px-3 py-1 text-xs transition ${
+                            problemField.value === p.value
+                              ? "bg-brand text-on-strong"
+                              : "border border-border text-foreground hover:border-brand"
+                          }`}
+                        >
+                          {to(`problems.${p.value}`)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              />
               <div className="grid gap-2 sm:grid-cols-2">
                 {GOALS.map((g) => {
                   const active = field.value === g.value;
@@ -300,6 +395,41 @@ export function IntakeForm({
                   <span className="mt-1 block text-xs text-brand-strong">{t("areaSqftMeasured")}</span>
                 ) : null}
               </label>
+
+              {/* Manual dimensions — optional; builds a measurement that sharpens material ranges. */}
+              <div className="sm:col-span-2">
+                <span className="mb-1 block text-sm font-semibold text-foreground">
+                  {t("dimsLabel")} <span className="font-normal text-muted">{t("areaOptional")}</span>
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <input
+                    type="number"
+                    min={0}
+                    step="any"
+                    inputMode="decimal"
+                    {...register("lengthVal")}
+                    placeholder={t("dimsLength")}
+                    aria-label={t("dimsLength")}
+                    className="card w-24 p-2.5 text-sm"
+                  />
+                  <span className="text-muted">×</span>
+                  <input
+                    type="number"
+                    min={0}
+                    step="any"
+                    inputMode="decimal"
+                    {...register("widthVal")}
+                    placeholder={t("dimsWidth")}
+                    aria-label={t("dimsWidth")}
+                    className="card w-24 p-2.5 text-sm"
+                  />
+                  <select {...register("dimUnit")} aria-label={t("dimsUnit")} className="card p-2.5 text-sm">
+                    <option value="ft">{t("dimsFeet")}</option>
+                    <option value="m">{t("dimsMetres")}</option>
+                  </select>
+                </div>
+                <span className="mt-1 block text-xs text-muted">{t("dimsHint")}</span>
+              </div>
 
               <SelectField label={t("sunQuestion")} field={register("sun")}>
                 {SUN_OPTIONS.map((o) => (

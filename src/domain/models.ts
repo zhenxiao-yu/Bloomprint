@@ -17,6 +17,19 @@ export const MoneyRange = z.object({
 });
 export type MoneyRange = z.infer<typeof MoneyRange>;
 
+/**
+ * A region-aware price estimate. Wraps {@link MoneyRange} so the engine can carry a currency
+ * and an explicit "this is never an exact/checkout price" guarantee on new surfaces (tiers,
+ * region store output) without disturbing the many records that use the bare {@link MoneyRange}.
+ */
+export const PriceBand = z.object({
+  range: MoneyRange,
+  currency: z.enum(["USD", "CAD"]).default("CAD"),
+  /** Bloomprint never claims an exact/final price — this is structurally pinned to false. */
+  isExactPrice: z.literal(false).default(false),
+});
+export type PriceBand = z.infer<typeof PriceBand>;
+
 /** Confidence-bearing values use "unknown" rather than forcing a guess. */
 export const Tri = z.enum(["yes", "no", "unknown"]);
 export type Tri = z.infer<typeof Tri>;
@@ -55,6 +68,34 @@ export const ProjectGoal = z.enum([
   "general", // "just give me a good plan"
 ]);
 export type ProjectGoal = z.infer<typeof ProjectGoal>;
+
+/**
+ * How big a bite the user wants to take. `section_plan` is the historical default (a single
+ * bed/area), so it is the default everywhere to keep existing behavior unchanged.
+ */
+export const ProjectScope = z.enum(["spot_fix", "section_plan", "whole_area_plan"]);
+export type ProjectScope = z.infer<typeof ProjectScope>;
+
+/**
+ * Problem-language entry point (CLAUDE.md UX principle). Optional and additive: it only
+ * *pre-fills* the user's {@link ProjectGoal} in the UI (see domain/problem) — the engine still
+ * reasons over `goal`, never over `problemType`.
+ */
+export const ProblemType = z.enum([
+  "dead_plants",
+  "empty_bed",
+  "overgrown",
+  "privacy_gap",
+  "muddy_erosion",
+  "boring_curb",
+  "too_much_upkeep",
+  "shady_bare_spot",
+]);
+export type ProblemType = z.infer<typeof ProblemType>;
+
+/** How the user told us about the space. Derived (not stored) — see domain/problem. */
+export const InputCaptureType = z.enum(["photo", "manual_dimensions", "no_photo", "ar_scan"]);
+export type InputCaptureType = z.infer<typeof InputCaptureType>;
 
 /** Where in the yard the project lives — drives the no-photo layout template. */
 export const AreaType = z.enum([
@@ -119,6 +160,30 @@ export const PlanLabel = z.enum([
 ]);
 export type PlanLabel = z.infer<typeof PlanLabel>;
 
+/**
+ * Constrained refinement chips (Draft 1 → iterate, D4). Defined here (rather than at the bottom)
+ * so plan tiers and other schemas above the plan can reference it.
+ */
+export const RefinementAdjustment = z.enum([
+  "easier",
+  "cheaper",
+  "more-flowers",
+  "dog-safe",
+  "less-watering",
+  "more-privacy",
+  "more-modern",
+  "more-colorful",
+  "salt-safe",
+  "more-shade",
+  "wildlife-friendly",
+  "better-winter",
+  "premium-look",
+  "less-trimming",
+  "better-resale",
+  "stone-to-mulch",
+]);
+export type RefinementAdjustment = z.infer<typeof RefinementAdjustment>;
+
 /* ------------------------------------------------------------------ */
 /* Evidence & catalog records                                          */
 /* ------------------------------------------------------------------ */
@@ -129,6 +194,43 @@ export const EvidenceRef = z.object({
   note: z.string().optional(),
 });
 export type EvidenceRef = z.infer<typeof EvidenceRef>;
+
+export const SourceType = z.enum([
+  "user-input",
+  "core-library",
+  "official",
+  "extension-botanical",
+  "retailer-cost",
+  "ai-inference",
+  "live-context",
+]);
+export type SourceType = z.infer<typeof SourceType>;
+
+export const CacheStatus = z.enum(["disabled", "fresh", "stale", "miss", "unavailable"]);
+export type CacheStatus = z.infer<typeof CacheStatus>;
+
+/**
+ * A source on the Source Quality Ladder (1 = user input … 6 = AI-only). Defined here (with the
+ * other evidence records) so risk warnings and plan evidence can both reference it.
+ */
+export const SourceRef = z.object({
+  name: z.string(),
+  sourceName: z.string().optional(),
+  sourceType: SourceType.optional(),
+  level: z.number().int().min(1).max(6),
+  url: z.string().optional(),
+  retrievedAt: z.string().optional(),
+  /** When a human or trusted process last confirmed this fact (optional, additive). */
+  verifiedAt: z.string().optional(),
+  supports: z.array(z.string()).default([]),
+  confidence: ConfidenceLevel.optional(),
+  cacheStatus: CacheStatus.optional(),
+  sourceQuality: z.string().optional(),
+  /** Free-text caveat shown in the evidence drawer (optional, additive). */
+  notes: z.string().optional(),
+  needsLocalVerification: z.boolean().default(false),
+});
+export type SourceRef = z.infer<typeof SourceRef>;
 
 export const PlantRecord = z.object({
   id: z.string(),
@@ -232,17 +334,43 @@ export type PropertyProfile = z.infer<typeof PropertyProfile>;
 /* Intake & resolved site                                              */
 /* ------------------------------------------------------------------ */
 
+export const MeasurementSource = z.enum(["manual", "estimated", "photo", "ar_scan"]);
+export type MeasurementSource = z.infer<typeof MeasurementSource>;
+
+/**
+ * A real-world size the user gave us (or we estimated). Optional and additive — when present
+ * and `areaSqft` is absent, the engine derives area from it (see domain/estimation/quantities).
+ * Lower-confidence measurements widen material quantity ranges rather than faking precision.
+ */
+export const Measurement = z.object({
+  length: z.number().positive().optional(),
+  width: z.number().positive().optional(),
+  depth: z.number().positive().optional(),
+  area: z.number().positive().optional(),
+  unit: z.enum(["m", "ft"]).default("ft"),
+  source: MeasurementSource.default("estimated"),
+  confidence: ConfidenceLevel.default("low"),
+  notes: z.string().optional(),
+});
+export type Measurement = z.infer<typeof Measurement>;
+
 /** Minimal first-plan input. Everything beyond goal/region is optional ("unknown" tolerant). */
 export const YardIntake = z.object({
   regionId: z.string(),
   /** Optional ZIP / postal code to refine the hardiness zone (see domain/data/zones.ts). */
   locationQuery: z.string().optional(),
   goal: ProjectGoal,
+  /** How broad a project; the engine treats an absent value as the historical "section_plan". */
+  scope: ProjectScope.optional(),
+  /** Optional problem-language shortcut that pre-fills `goal` in the UI (never used by the engine). */
+  problemType: ProblemType.optional(),
   budget: z.number().positive().optional(),
   budgetStyle: BudgetStyle.optional(),
   effortLevel: EffortLevel.default("moderate"),
   areaType: AreaType.optional(),
   areaSqft: z.number().positive().optional(),
+  /** Optional real-world dimensions; sharpens area + material ranges when provided. */
+  measurement: Measurement.optional(),
   hasPhoto: z.boolean().default(false),
   // Optional "accuracy upgrade" answers:
   sun: SunExposure.default("unknown"),
@@ -316,12 +444,47 @@ export const ShoppingItem = z.object({
 });
 export type ShoppingItem = z.infer<typeof ShoppingItem>;
 
+/** Curated how-to topics we can attach to an install phase (see domain/guides). */
+export const GuideTopic = z.enum([
+  "remove_dead_shrub",
+  "install_no_dig_edging",
+  "plant_evergreen_shrub",
+  "lay_landscape_stone",
+  "add_mulch",
+  "amend_clay_soil",
+  "water_new_shrubs",
+  "measure_garden_bed",
+  "choose_pet_safe_plants",
+  "improve_privacy_strip",
+]);
+export type GuideTopic = z.infer<typeof GuideTopic>;
+
+/**
+ * A how-to link. `kind: "search"` means a generated search URL (honest — we never fabricate an
+ * authoritative citation). `kind: "authoritative"` is a stable, known-good source.
+ */
+export const GuideLink = z.object({
+  topic: GuideTopic,
+  title: z.string(),
+  url: z.string(),
+  kind: z.enum(["authoritative", "search"]),
+  source: z.string().optional(),
+});
+export type GuideLink = z.infer<typeof GuideLink>;
+
+export const TutorialLink = GuideLink.extend({
+  medium: z.enum(["video", "article"]).default("article"),
+});
+export type TutorialLink = z.infer<typeof TutorialLink>;
+
 export const InstallPhase = z.object({
   order: z.number().int().positive(),
   title: z.string(),
   description: z.string(),
   estHours: z.number().nonnegative(),
   tools: z.array(z.string()).default([]),
+  /** Optional curated how-to links for this phase (additive). */
+  guides: z.array(GuideLink).optional(),
 });
 export type InstallPhase = z.infer<typeof InstallPhase>;
 
@@ -330,6 +493,10 @@ export const RiskWarning = z.object({
   severity: RiskSeverity,
   message: z.string(),
   mitigation: z.string(),
+  /** Item/plant ids this risk applies to (optional, additive). */
+  appliesTo: z.array(z.string()).optional(),
+  /** Supporting sources (optional, additive). */
+  sourceRefs: z.array(SourceRef).optional(),
 });
 export type RiskWarning = z.infer<typeof RiskWarning>;
 
@@ -417,35 +584,7 @@ export type VisualPlacement = z.infer<typeof VisualPlacement>;
 /* Trust moat: evidence, alternatives, failure points, store, readiness */
 /* ------------------------------------------------------------------ */
 
-export const SourceType = z.enum([
-  "user-input",
-  "core-library",
-  "official",
-  "extension-botanical",
-  "retailer-cost",
-  "ai-inference",
-  "live-context",
-]);
-export type SourceType = z.infer<typeof SourceType>;
-
-export const CacheStatus = z.enum(["disabled", "fresh", "stale", "miss", "unavailable"]);
-export type CacheStatus = z.infer<typeof CacheStatus>;
-
-/** A source on the Source Quality Ladder (1 = user input … 6 = AI-only). */
-export const SourceRef = z.object({
-  name: z.string(),
-  sourceName: z.string().optional(),
-  sourceType: SourceType.optional(),
-  level: z.number().int().min(1).max(6),
-  url: z.string().optional(),
-  retrievedAt: z.string().optional(),
-  supports: z.array(z.string()).default([]),
-  confidence: ConfidenceLevel.optional(),
-  cacheStatus: CacheStatus.optional(),
-  sourceQuality: z.string().optional(),
-  needsLocalVerification: z.boolean().default(false),
-});
-export type SourceRef = z.infer<typeof SourceRef>;
+/* SourceType, CacheStatus, and SourceRef are defined earlier (evidence records section). */
 
 export const ConfidenceDimension = z.object({ dimension: z.string(), level: z.string() });
 export type ConfidenceDimension = z.infer<typeof ConfidenceDimension>;
@@ -520,6 +659,51 @@ export const Readiness = z.object({
 });
 export type Readiness = z.infer<typeof Readiness>;
 
+/**
+ * A "quick / better / best" framing of the same plan. Derived deterministically from existing
+ * tuning + budget math (see domain/tiers) — not a new scoring engine. Totals are estimate ranges.
+ */
+export const PlanTier = z.object({
+  tier: z.enum(["quick_fix", "better_fix", "best_fix"]),
+  label: z.string(),
+  summary: z.string(),
+  estTotal: MoneyRange,
+  appliedAdjustments: z.array(RefinementAdjustment).default([]),
+});
+export type PlanTier = z.infer<typeof PlanTier>;
+
+/**
+ * Optional plant image with attribution/licensing. Schema only for now — the catalog is left
+ * empty until real, license-cleared assets are curated (we never fabricate URLs or licenses).
+ */
+export const PlantImageAsset = z.object({
+  plantId: z.string(),
+  url: z.string(),
+  thumbnailUrl: z.string().optional(),
+  source: z.string(),
+  creator: z.string().optional(),
+  license: z.string().optional(),
+  attributionText: z.string().optional(),
+  commercialOk: z.boolean(),
+  verifiedAt: z.string().optional(),
+});
+export type PlantImageAsset = z.infer<typeof PlantImageAsset>;
+
+/**
+ * Free/Open Data Mode configuration (resolved from env in src/lib/freeDataMode.ts). Kept as a
+ * plain domain type so the engine can stay framework- and env-free.
+ */
+export const FreeDataModeConfig = z.object({
+  enabled: z.boolean(),
+  allowExternalFetches: z.boolean(),
+  useGeneratedRetailerLinks: z.boolean(),
+  useCuratedGuides: z.boolean(),
+  useManualPriceBands: z.boolean(),
+  weatherMode: z.enum(["seasonal_rules", "optional_provider"]),
+  stockMode: z.enum(["search_links_only", "cached_signals"]),
+});
+export type FreeDataModeConfig = z.infer<typeof FreeDataModeConfig>;
+
 /* ------------------------------------------------------------------ */
 
 export const DeterministicPlan = z.object({
@@ -555,6 +739,8 @@ export const DeterministicPlan = z.object({
   failurePoints: z.array(FailurePoint),
   storeSearches: z.array(StoreSearch),
   readiness: Readiness,
+  /** Optional quick/better/best framings (additive; absent for spot fixes). */
+  tiers: z.array(PlanTier).optional(),
 });
 export type DeterministicPlan = z.infer<typeof DeterministicPlan>;
 
@@ -596,26 +782,4 @@ export const BloomprintPlan = z.object({
 });
 export type BloomprintPlan = z.infer<typeof BloomprintPlan>;
 
-/* ------------------------------------------------------------------ */
-/* Refinement (Draft 1 → iterate via constrained chips, D4)            */
-/* ------------------------------------------------------------------ */
-
-export const RefinementAdjustment = z.enum([
-  "easier",
-  "cheaper",
-  "more-flowers",
-  "dog-safe",
-  "less-watering",
-  "more-privacy",
-  "more-modern",
-  "more-colorful",
-  "salt-safe",
-  "more-shade",
-  "wildlife-friendly",
-  "better-winter",
-  "premium-look",
-  "less-trimming",
-  "better-resale",
-  "stone-to-mulch",
-]);
-export type RefinementAdjustment = z.infer<typeof RefinementAdjustment>;
+/* RefinementAdjustment is defined near the top (after PlanLabel) so plan tiers can use it. */

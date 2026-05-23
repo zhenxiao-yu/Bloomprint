@@ -44,6 +44,15 @@ export const MATERIALS: MaterialItem[] = [
     defaultPriority: "can-wait",
   },
   {
+    id: "white-decorative-stone",
+    name: "White Decorative Stone",
+    category: "stone",
+    unit: "bag",
+    coveragePerUnitSqft: 4,
+    unitPrice: { min: 7, max: 12 },
+    defaultPriority: "can-wait",
+  },
+  {
     id: "natural-flagstone",
     name: "Natural Flagstone",
     category: "stone",

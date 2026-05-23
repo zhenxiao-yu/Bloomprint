@@ -7,13 +7,31 @@ import type {
   BudgetStyle,
   Drainage,
   EffortLevel,
+  ProblemType,
   ProjectGoal,
+  ProjectScope,
   RefinementAdjustment,
   SoilType,
   StyleFamily,
   SunExposure,
 } from "@/domain/models";
 import { REGIONS } from "@/domain/data/regions";
+import { PROBLEM_TO_GOAL } from "@/domain/problem";
+
+/** How big a project — labels via Options.scope.* / Options.scopeBlurbs.*. */
+export const SCOPE_OPTIONS: { value: ProjectScope }[] = [
+  { value: "spot_fix" },
+  { value: "section_plan" },
+  { value: "whole_area_plan" },
+];
+
+/**
+ * Problem-language chips. Each pre-fills the engine goal via the domain mapping — labels via
+ * Options.problems.*. Order is roughly most-common first.
+ */
+export const PROBLEM_OPTIONS: { value: ProblemType; goal: ProjectGoal }[] = (
+  Object.keys(PROBLEM_TO_GOAL) as ProblemType[]
+).map((value) => ({ value, goal: PROBLEM_TO_GOAL[value] }));
 
 export const GOALS: { value: ProjectGoal; label: string; blurb: string }[] = [
   { value: "privacy", label: "Block the view from neighbors", blurb: "Add a green screen for privacy." },

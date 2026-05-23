@@ -111,6 +111,12 @@ export function EvidenceDrawer({ evidence, view }: { evidence: PlanEvidence; vie
                     Retrieved {new Date(s.retrievedAt).toLocaleString()}
                   </span>
                 ) : null}
+                {expert && s.verifiedAt ? (
+                  <span className="rounded bg-brand-soft px-1.5 py-0.5 text-xs text-brand-strong">
+                    Verified {new Date(s.verifiedAt).toLocaleDateString()}
+                  </span>
+                ) : null}
+                {expert && s.notes ? <span className="basis-full text-xs text-muted">{s.notes}</span> : null}
               </li>
             );
           })}

@@ -6,6 +6,7 @@
 import type { RegionPreset, SiteCondition, Tri, YardIntake } from "@/domain/models";
 import { getRegion, REGIONS } from "@/domain/data";
 import { lookupZone } from "@/domain/data/zones";
+import { measurementToSqft } from "@/domain/estimation/quantities";
 
 /** A safe fallback when an unknown region id slips through. */
 const FALLBACK_REGION: RegionPreset = REGIONS[0];
@@ -45,9 +46,17 @@ export function resolveSite(intake: YardIntake): SiteCondition {
 
   const saltExposure: Tri = region.saltRisk ? "yes" : "no";
 
-  const areaSqft = intake.areaSqft ?? DEFAULT_AREA_SQFT;
+  // Prefer an explicit areaSqft; otherwise derive from manual dimensions; otherwise assume.
+  const measuredSqft = intake.areaSqft === undefined ? measurementToSqft(intake.measurement) : undefined;
+  const areaSqft = intake.areaSqft ?? measuredSqft ?? DEFAULT_AREA_SQFT;
   if (intake.areaSqft === undefined) {
-    assumptions.push(`Bed size not given — assumed about ${DEFAULT_AREA_SQFT} sq ft.`);
+    if (measuredSqft !== undefined) {
+      assumptions.push(
+        `Bed size ~${Math.round(measuredSqft)} sq ft from your measurements (${intake.measurement?.confidence ?? "low"} confidence).`,
+      );
+    } else {
+      assumptions.push(`Bed size not given — assumed about ${DEFAULT_AREA_SQFT} sq ft.`);
+    }
   }
 
   // A recognized ZIP/postal code narrows the coarse preset to a real (but still "likely") zone.
