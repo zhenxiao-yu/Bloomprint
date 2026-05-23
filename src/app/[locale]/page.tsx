@@ -3,6 +3,7 @@ import { ArrowRight, Check, CheckCircle2, ClipboardList, ShieldCheck, ShoppingBa
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { Reveal } from "@/components/ui/reveal";
 
 export default function Home() {
   const t = useTranslations("Home");
@@ -47,10 +48,10 @@ export default function Home() {
       <header className="animate-fade-up grid gap-7 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
         <div>
           <p className="text-sm font-medium uppercase tracking-wide text-brand">{t("eyebrow")}</p>
-          <h1 className="text-3xl font-semibold leading-tight text-foreground sm:text-5xl">
+          <h1 className="mt-3 text-3xl font-semibold leading-tight text-foreground sm:text-5xl">
             {t("heroTitle")}
           </h1>
-          <p className="max-w-xl text-base text-muted sm:text-lg">{t("heroSubtitle")}</p>
+          <p className="mt-4 max-w-xl text-base text-muted sm:text-lg">{t("heroSubtitle")}</p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link href="/plan">
               <ShimmerButton background="var(--brand)" className="min-h-11 px-5 py-2.5">
@@ -93,39 +94,39 @@ export default function Home() {
         ))}
       </div>
 
-      <section className="grid gap-3 sm:grid-cols-4">
+      <Reveal as="section" className="grid gap-3 sm:grid-cols-4">
         {chips.map(({ icon: Icon, label }) => (
           <div
             key={label}
-            className="rounded-xl border border-border bg-surface p-4 text-sm font-medium text-foreground"
+            className="rounded-xl border border-border bg-surface p-4 text-sm font-medium text-foreground transition duration-200 hover:-translate-y-0.5 hover:border-brand hover:shadow-md"
           >
             <Icon className="mb-2 text-brand" aria-hidden="true" />
             {label}
           </div>
         ))}
-      </section>
+      </Reveal>
 
       {/* Why trust Bloomprint — the README says it; the product page should too. */}
-      <section className="grid gap-3 sm:grid-cols-3">
+      <Reveal as="section" className="grid gap-3 sm:grid-cols-3">
         {trust.map(({ icon: Icon, title, body }) => (
-          <div key={title} className="card p-5">
+          <div key={title} className="card p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <Icon className="mb-2 text-brand" aria-hidden="true" />
             <p className="text-sm font-semibold text-foreground">{title}</p>
             <p className="mt-1 text-sm text-muted">{body}</p>
           </div>
         ))}
-      </section>
+      </Reveal>
 
       {/* Why not just ask a chatbot? — the answer, honestly. */}
-      <section className="animate-fade-up">
+      <Reveal as="section">
         <h2 className="text-xl font-semibold text-foreground sm:text-2xl">{t("compare.title")}</h2>
         <p className="mt-1 max-w-2xl text-sm text-muted">{t("compare.subtitle")}</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {compare.map((row) => (
-            <div key={row.label} className="card flex flex-col gap-3 p-4">
+            <div key={row.label} className="card flex flex-col gap-3 p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-md">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">{row.label}</p>
               <div className="flex items-start gap-2">
-                <X className="mt-0.5 size-4 shrink-0 text-[var(--danger)]" aria-hidden />
+                <X className="mt-0.5 size-4 shrink-0 text-danger" aria-hidden />
                 <p className="text-sm text-muted">
                   <span className="sr-only">{t("compare.them")}: </span>
                   {row.them}
@@ -141,7 +142,7 @@ export default function Home() {
             </div>
           ))}
         </div>
-      </section>
+      </Reveal>
 
       <p className="text-xs text-muted">{t("disclaimer")}</p>
     </main>

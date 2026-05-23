@@ -39,6 +39,9 @@ supabase/.temp
 supabase/.branches
 supabase/signing_keys.json
 
+# agent skills (installed via skills.sh — local tooling, not app code)
+.agents/
+
 # vercel
 .vercel
 
