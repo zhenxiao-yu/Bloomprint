@@ -94,6 +94,44 @@ so regenerated types should drop in without adapter changes — verify column na
 - **Signed in:** set the public env vars, create an account on `/account`, save a plan → a row
   appears in `projects` + `plan_versions`; the badge reads "Synced to cloud".
 
+## Auth (Google / email / phone) — finished
+
+Auth uses `@supabase/ssr` (cookie sessions). Pieces:
+
+- Browser client: `src/lib/supabase/client.ts` (`createBrowserClient`). Server client + middleware
+  refresh: `src/lib/supabase/serverClient.ts`. Session refresh is composed with the i18n middleware
+  in `src/proxy.ts`.
+- Methods in `src/lib/supabase/useSession.ts`: email magic-link/OTP (`signInWithEmailOtp` +
+  `verifyEmailOtp`), email+password, Google (`signInWithGoogle`), and phone SMS OTP
+  (`signInWithPhoneOtp` + `verifyPhoneOtp`, gated by `NEXT_PUBLIC_ENABLE_PHONE_AUTH`).
+- Redirect handlers: `src/app/auth/callback/route.ts` (OAuth code exchange) and
+  `src/app/auth/confirm/route.ts` (email token_hash). `/auth/*` is excluded from the i18n matcher.
+- UI: `src/components/CloudSyncCard.tsx` (multi-method) is the real auth surface; `/signup` shows it
+  when Supabase is configured, and still offers "plan without an account" (local-first, D5/D12).
+
+## One-time SETUP (run with real credentials in `.env.local`)
+
+```bash
+# 1. Secrets — put these in .env.local (gitignored), never commit:
+#    NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, SUPABASE_SERVICE_ROLE_KEY,
+#    SUPABASE_ACCESS_TOKEN, SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID/SECRET
+# 2. Link + push schema + regenerate types:
+npx supabase login            # uses SUPABASE_ACCESS_TOKEN
+npx supabase link --project-ref xbbmllchylhfwfmcwnle
+npm run db:push               # applies 0001_billing.sql + 0002_core_schema.sql
+npm run db:types              # regenerates src/types/supabase.ts from the linked project
+npm run typecheck
+# 3. Dashboard config (Auth → Providers / URL config):
+#    - Google: paste the OAuth client id/secret; add the Supabase callback
+#      https://xbbmllchylhfwfmcwnle.supabase.co/auth/v1/callback in Google Cloud Console.
+#    - Site URL + Redirect URLs: add http://localhost:3000/auth/callback + /auth/confirm and prod.
+#    - Email: enable the email provider (OTP works out of the box).
+#    - Phone (optional, later): add an SMS provider (Twilio), then set NEXT_PUBLIC_ENABLE_PHONE_AUTH=true.
+```
+
+`supabase/config.toml` already declares the Google provider + redirect URLs + email OTP and can be
+applied to the remote project with `supabase config push` if you prefer config-as-code.
+
 ## Not yet wired (next steps)
 
 - The Saved (`/plans`) page still reads on-device plans via `useSavedPlans`. Listing **cloud**
@@ -102,3 +140,4 @@ so regenerated types should drop in without adapter changes — verify column na
   for regeneration); this was left out to avoid an untested async rewrite of a working page.
 - `live_data_cache` / `source_registry` read-through is available (`cache.ts`) but not yet called
   from the live-data layer.
+- Phone SMS OTP is wired but dormant until an SMS provider is configured.

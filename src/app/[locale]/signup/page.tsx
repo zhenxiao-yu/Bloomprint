@@ -8,6 +8,9 @@ import { useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { createAccount, useAccount } from "@/lib/accountStore";
 import { accountSchema, type AccountFormValues } from "@/lib/accountForm";
+import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { useSupabaseSession } from "@/lib/supabase/useSession";
+import { CloudSyncCard } from "@/components/CloudSyncCard";
 import { trackEvent } from "@/lib/analytics";
 
 export default function SignupPage() {
@@ -16,6 +19,8 @@ export default function SignupPage() {
   const tf = useTranslations("Form");
   const router = useRouter();
   const account = useAccount();
+  const { user } = useSupabaseSession();
+  const cloud = isSupabaseConfigured();
 
   const schema = useMemo(
     () => accountSchema({ nameRequired: tf("nameRequired"), emailInvalid: tf("emailInvalid") }),
@@ -31,14 +36,37 @@ export default function SignupPage() {
     mode: "onTouched",
   });
 
+  // Leave signup once there's any identity — a Supabase session or a local device account.
   useEffect(() => {
-    if (account) router.replace("/account");
-  }, [account, router]);
+    if (account || user) router.replace("/account");
+  }, [account, user, router]);
 
   function onSubmit(values: AccountFormValues) {
     createAccount({ name: values.name, email: values.email });
     trackEvent("account_created");
     router.push("/account");
+  }
+
+  // When cloud sync is configured, signup IS real Supabase auth (Google / email / phone).
+  if (cloud) {
+    return (
+      <main className="mx-auto w-full max-w-md flex-1 px-4 py-10 sm:px-6">
+        <div className="animate-fade-up">
+          <h1 className="text-2xl font-semibold text-foreground">{t("title")}</h1>
+          <p className="mt-1 text-sm text-muted">{t("subtitle")}</p>
+          <div className="mt-6">
+            <CloudSyncCard />
+          </div>
+          <p className="mt-4 text-xs text-muted">
+            {t("preferNotBefore")}{" "}
+            <Link href="/plan" className="font-medium text-brand">
+              {t("preferNotLink")}
+            </Link>
+            .
+          </p>
+        </div>
+      </main>
+    );
   }
 
   return (
