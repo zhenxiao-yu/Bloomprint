@@ -10,6 +10,7 @@ import type {
   ProjectGoal,
   RefinementAdjustment,
   SoilType,
+  StyleFamily,
   SunExposure,
 } from "@/domain/models";
 import { REGIONS } from "@/domain/data/regions";
@@ -65,6 +66,21 @@ export const DRAINAGE_OPTIONS: { value: Drainage; label: string }[] = [
   { value: "average", label: "Average" },
   { value: "poor", label: "Water sits after rain" },
   { value: "unknown", label: "I'm not sure" },
+];
+
+export const STYLE_OPTIONS: { value: StyleFamily; label: string }[] = [
+  { value: "modern-minimal", label: "Modern minimal" },
+  { value: "warm-cottage", label: "Warm cottage" },
+  { value: "clean-japanese", label: "Clean Japanese" },
+  { value: "layered-pollinator", label: "Layered pollinator" },
+  { value: "soft-prairie", label: "Soft prairie" },
+];
+
+/** Number of extra helpers beyond the homeowner (feeds the labor estimate). */
+export const HELPER_OPTIONS: { value: number; label: string }[] = [
+  { value: 0, label: "Just me" },
+  { value: 1, label: "Me + 1 helper" },
+  { value: 2, label: "A few of us (2+)" },
 ];
 
 export const REGION_OPTIONS = REGIONS.map((r) => ({ value: r.id, label: r.label }));

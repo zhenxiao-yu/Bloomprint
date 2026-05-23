@@ -1,79 +1,109 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { initials, signOut, useAccount } from "@/lib/accountStore";
+import { Link, usePathname } from "@/i18n/navigation";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSwitch } from "@/components/LanguageSwitch";
+import { SyncStatusBadge } from "@/components/SyncStatusBadge";
 
 const NAV = [
-  { href: "/plan", label: "Plan" },
-  { href: "/plans", label: "Saved" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/guide", label: "Guide" },
-  { href: "/about", label: "About" },
-];
+  { href: "/plan", key: "plan" },
+  { href: "/plans", key: "saved" },
+  { href: "/pricing", key: "pricing" },
+  { href: "/guide", key: "guide" },
+  { href: "/about", key: "about" },
+] as const;
 
 export function SiteHeader() {
   const pathname = usePathname();
   const account = useAccount();
+  const t = useTranslations("Nav");
+  const [scrolled, setScrolled] = useState(false);
+
+  // Scroll-aware elevation: the header firms up (more opaque + a soft shadow)
+  // once the page scrolls, the way native apps lift a top bar over content.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-surface/85 backdrop-blur">
+    <header
+      className={`sticky top-0 z-30 border-b backdrop-blur transition-[background-color,box-shadow,border-color] duration-300 ${
+        scrolled ? "border-border bg-surface/90 shadow-sm" : "border-transparent bg-surface/70"
+      }`}
+    >
       <div className="mx-auto flex h-14 w-full max-w-5xl items-center gap-3 px-4 sm:px-6">
-        <Link href="/" className="flex shrink-0 items-center gap-2 font-semibold text-brand">
+        <Link
+          href="/"
+          className="flex shrink-0 items-center gap-2 font-semibold text-brand transition active:scale-95"
+        >
           <span className="flex size-8 items-center justify-center rounded-full bg-brand-soft text-xs font-bold">
             BP
           </span>
-          <span className="hidden sm:inline">Bloomprint</span>
+          <span className="text-base">Bloomprint</span>
         </Link>
 
-        <nav className="ml-1 flex items-center gap-1 overflow-x-auto text-sm sm:ml-2">
+        {/* Primary nav is hidden on mobile — the fixed bottom MobileNav carries it there. */}
+        <nav className="ml-2 hidden items-center gap-1 text-sm sm:flex">
           {NAV.map((n) => {
-            const active = pathname === n.href || (n.href !== "/" && pathname.startsWith(n.href));
+            const href = n.href as string;
+            const active = pathname === href || pathname.startsWith(`${href}/`);
             return (
               <Link
                 key={n.href}
                 href={n.href}
+                aria-current={active ? "page" : undefined}
                 className={`shrink-0 rounded-full px-2.5 py-1.5 transition sm:px-3 ${
                   active ? "bg-brand-soft text-brand-strong" : "text-muted hover:text-foreground"
                 }`}
               >
-                {n.label}
+                {t(n.key)}
               </Link>
             );
           })}
         </nav>
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
+          <span className="hidden md:inline-flex">
+            <SyncStatusBadge />
+          </span>
+          <LanguageSwitch />
+          <ThemeToggle />
           {account ? (
             <details className="group relative">
               <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-border py-1 pl-1 pr-3 transition hover:border-brand">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-semibold text-white">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-semibold text-on-strong">
                   {initials(account.name) || "🌱"}
                 </span>
                 <span className="hidden max-w-[8rem] truncate text-sm text-foreground sm:inline">{account.name}</span>
               </summary>
               <div className="absolute right-0 mt-2 w-44 overflow-hidden rounded-xl border border-border bg-surface shadow-lg">
                 <Link href="/account" className="block px-4 py-2 text-sm text-foreground hover:bg-brand-soft">
-                  Account
+                  {t("account")}
                 </Link>
                 <Link href="/account/settings" className="block px-4 py-2 text-sm text-foreground hover:bg-brand-soft">
-                  Settings
+                  {t("settings")}
                 </Link>
                 <button
                   onClick={() => signOut()}
                   className="block w-full px-4 py-2 text-left text-sm text-[var(--danger)] hover:bg-brand-soft"
                 >
-                  Sign out
+                  {t("signOut")}
                 </button>
               </div>
             </details>
           ) : (
             <Link
               href="/signup"
-              className="rounded-full bg-brand px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-brand-strong sm:px-4"
+              className="rounded-full bg-brand px-3 py-1.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong sm:px-4"
             >
-              <span className="sm:hidden">Me</span>
-              <span className="hidden sm:inline">Create account</span>
+              <span className="sm:hidden">{t("me")}</span>
+              <span className="hidden sm:inline">{t("createAccount")}</span>
             </Link>
           )}
         </div>

@@ -5,19 +5,35 @@
  */
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { isImageRenderEnabled, renderImage } from "@/lib/imageProvider";
+import { isControlNetRenderEnabled, isImageRenderEnabled, renderImage } from "@/lib/imageProvider";
+import { clientIp, rateLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
 export async function GET() {
-  return NextResponse.json({ enabled: isImageRenderEnabled() });
+  return NextResponse.json({
+    enabled: isImageRenderEnabled(),
+    controlnet: isControlNetRenderEnabled(),
+  });
 }
 
-const Body = z.object({ prompt: z.string().min(10).max(1000) });
+const Body = z.object({
+  prompt: z.string().min(10).max(1000),
+  // Optional yard photo (base64, no data: prefix) for a ControlNet concept restyle.
+  photoBase64: z.string().max(8_000_000).optional(),
+});
 
 export async function POST(request: Request) {
   if (!isImageRenderEnabled()) {
     return NextResponse.json({ error: "Image rendering isn't enabled on this deployment.", enabled: false }, { status: 503 });
+  }
+
+  const rl = rateLimit(`${clientIp(request)}:render`, 6, 60_000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many image requests — please wait a moment." },
+      { status: 429, headers: { "retry-after": String(rl.retryAfterSec) } },
+    );
   }
 
   let json: unknown;
@@ -33,7 +49,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const image = await renderImage(parsed.data.prompt);
+    const image = await renderImage(parsed.data.prompt, { photoBase64: parsed.data.photoBase64 });
     if (!image) {
       return NextResponse.json({ error: "Couldn't generate an image right now." }, { status: 502 });
     }

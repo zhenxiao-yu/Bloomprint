@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useSupabaseSession } from "@/lib/supabase/useSession";
 import { useEntitlements } from "@/lib/billing/useEntitlements";
 import { PLANS } from "@/lib/billing/plans";
@@ -49,7 +49,7 @@ export function BillingStatus() {
         {planKey === "free" ? (
           <Link
             href="/pricing"
-            className="rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-white hover:bg-brand-strong"
+            className="rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-on-strong hover:bg-brand-strong"
           >
             See plans
           </Link>

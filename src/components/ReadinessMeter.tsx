@@ -1,11 +1,13 @@
+import { useTranslations } from "next-intl";
 import type { Readiness } from "@/domain/models";
 
 /** Gamified completeness meter — answering accuracy questions fills the bar. */
 export function ReadinessMeter({ readiness }: { readiness: Readiness }) {
+  const t = useTranslations("Result");
   return (
     <div className="card p-4">
       <div className="flex items-baseline justify-between">
-        <h3 className="text-sm font-semibold text-foreground">Plan readiness</h3>
+        <h3 className="text-sm font-semibold text-foreground">{t("readinessTitle")}</h3>
         <span className="text-sm font-semibold text-brand-strong">
           {readiness.label} · {readiness.score}%
         </span>
@@ -29,7 +31,7 @@ export function ReadinessMeter({ readiness }: { readiness: Readiness }) {
         ))}
       </div>
       {readiness.score < 100 ? (
-        <p className="mt-2 text-xs text-muted">Fill the open items above to sharpen the plan and raise confidence.</p>
+        <p className="mt-2 text-xs text-muted">{t("readinessHint")}</p>
       ) : null}
     </div>
   );

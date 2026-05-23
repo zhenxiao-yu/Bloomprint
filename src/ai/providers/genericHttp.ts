@@ -9,7 +9,24 @@ interface GenericProviderOptions {
   model?: string;
 }
 
-const SYSTEM = `You are Bloomprint's presentation layer. Rephrase only. Do not invent or change plants, prices, quantities, spacing, hardiness, toxicity, labor, availability, or risks. Return JSON only.`;
+const SYSTEM = `You are Bloomprint's presentation layer. You receive a finished, deterministic yard plan and rewrite it more warmly and clearly for a homeowner and garden-center staff.
+
+ABSOLUTE RULES:
+- You may ONLY rephrase and summarize. Do NOT invent or change any fact: no new plants, prices, quantities, spacing, hardiness, toxicity, labor, availability, or risks.
+- Use only the plants, numbers, and risks present in the provided plan. Keep prices as the ranges given; never state an exact price.
+- Be encouraging and concrete; never judgmental.
+
+Respond with ONLY a JSON object (no markdown, no prose) matching this shape, all fields optional:
+{
+  "conceptName": string,
+  "homeownerExplanation": string,
+  "refinedNarrative": string,
+  "staffTalkingPoints": string[],
+  "alternatives": string[],
+  "imagePrompt": string,
+  "whyNot": string[],
+  "simplifiedSummary": string
+}`;
 
 export class GenericHttpProvider implements AIProvider {
   readonly name: GenericProviderOptions["name"];
@@ -30,6 +47,8 @@ export class GenericHttpProvider implements AIProvider {
         },
         body: JSON.stringify({
           model: this.options.model,
+          // Cap output so a runaway response can't inflate cost; the enhancement is short.
+          max_tokens: 700,
           messages: [
             { role: "system", content: SYSTEM },
             { role: "user", content: JSON.stringify(summarizePlanForAi(plan)) },

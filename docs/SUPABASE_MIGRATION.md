@@ -7,7 +7,7 @@ env vars at all** — see [DECISIONS.md](DECISIONS.md) D10/D12/D15.
 
 ## Project
 
-- **Project ref:** `xbbmllchylhfwfmcwnle`
+- **Project ref:** `qojtvpkzwufqxzpnatha`
 - Storage bucket: `project-photos` (private)
 - Tables: `profiles`, `properties`, `projects`, `plan_versions`, `project_photos`,
   `source_registry`, `live_data_cache`, `ai_prompt_cache`
@@ -78,7 +78,7 @@ happens at save time. This keeps the on-screen promise truthful in both modes.
 Replace it with the canonical generated output once you have the CLI/env:
 
 ```bash
-npx supabase gen types typescript --project-id xbbmllchylhfwfmcwnle > src/types/supabase.ts
+npx supabase gen types typescript --project-id qojtvpkzwufqxzpnatha > src/types/supabase.ts
 # or, logged in to the CLI:
 supabase gen types typescript --linked > src/types/supabase.ts
 ```
@@ -94,6 +94,44 @@ so regenerated types should drop in without adapter changes — verify column na
 - **Signed in:** set the public env vars, create an account on `/account`, save a plan → a row
   appears in `projects` + `plan_versions`; the badge reads "Synced to cloud".
 
+## Auth (Google / email / phone) — finished
+
+Auth uses `@supabase/ssr` (cookie sessions). Pieces:
+
+- Browser client: `src/lib/supabase/client.ts` (`createBrowserClient`). Server client + middleware
+  refresh: `src/lib/supabase/serverClient.ts`. Session refresh is composed with the i18n middleware
+  in `src/proxy.ts`.
+- Methods in `src/lib/supabase/useSession.ts`: email magic-link/OTP (`signInWithEmailOtp` +
+  `verifyEmailOtp`), email+password, Google (`signInWithGoogle`), and phone SMS OTP
+  (`signInWithPhoneOtp` + `verifyPhoneOtp`, gated by `NEXT_PUBLIC_ENABLE_PHONE_AUTH`).
+- Redirect handlers: `src/app/auth/callback/route.ts` (OAuth code exchange) and
+  `src/app/auth/confirm/route.ts` (email token_hash). `/auth/*` is excluded from the i18n matcher.
+- UI: `src/components/CloudSyncCard.tsx` (multi-method) is the real auth surface; `/signup` shows it
+  when Supabase is configured, and still offers "plan without an account" (local-first, D5/D12).
+
+## One-time SETUP (run with real credentials in `.env.local`)
+
+```bash
+# 1. Secrets — put these in .env.local (gitignored), never commit:
+#    NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, SUPABASE_SERVICE_ROLE_KEY,
+#    SUPABASE_ACCESS_TOKEN, SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID/SECRET
+# 2. Link + push schema + regenerate types:
+npx supabase login            # uses SUPABASE_ACCESS_TOKEN
+npx supabase link --project-ref qojtvpkzwufqxzpnatha
+npm run db:push               # applies 0001_billing.sql + 0002_core_schema.sql
+npm run db:types              # regenerates src/types/supabase.ts from the linked project
+npm run typecheck
+# 3. Dashboard config (Auth → Providers / URL config):
+#    - Google: paste the OAuth client id/secret; add the Supabase callback
+#      https://qojtvpkzwufqxzpnatha.supabase.co/auth/v1/callback in Google Cloud Console.
+#    - Site URL + Redirect URLs: add http://localhost:3000/auth/callback + /auth/confirm and prod.
+#    - Email: enable the email provider (OTP works out of the box).
+#    - Phone (optional, later): add an SMS provider (Twilio), then set NEXT_PUBLIC_ENABLE_PHONE_AUTH=true.
+```
+
+`supabase/config.toml` already declares the Google provider + redirect URLs + email OTP and can be
+applied to the remote project with `supabase config push` if you prefer config-as-code.
+
 ## Not yet wired (next steps)
 
 - The Saved (`/plans`) page still reads on-device plans via `useSavedPlans`. Listing **cloud**
@@ -102,3 +140,24 @@ so regenerated types should drop in without adapter changes — verify column na
   for regeneration); this was left out to avoid an untested async rewrite of a working page.
 - `live_data_cache` / `source_registry` read-through is available (`cache.ts`) but not yet called
   from the live-data layer.
+- Phone SMS OTP is wired but dormant until an SMS provider is configured.
+
+## Power-ups enabled (migration 0003 — all free-tier safe)
+
+Applied to the live project and verified. All additive/idempotent; nothing here incurs cost.
+
+- **Search:** `pg_trgm` + `search_sources(q, max_results)` RPC (fuzzy source registry). Helper:
+  `src/lib/supabase/queries.ts → searchSources()`.
+- **Entitlement enforcement:** `check_and_increment_usage(metric, period, limit)` RPC (atomic, RLS-safe).
+  Helper: `src/lib/billing/usage.ts → checkAndIncrementUsage()` — call from a route before a metered
+  action (e.g. AI refinement) with the plan's limit.
+- **Plan sharing:** `projects.share_token` + `is_public` columns; permissive RLS for anonymous read of
+  public projects + their plan_versions. (Wire a `/shared/[token]` page next.)
+- **Realtime:** `projects` + `plan_versions` added to the `supabase_realtime` publication (subscribe client-side).
+- **pgvector:** `plant_embeddings(plant_id, embedding vector(384))` + `match_plants()` RPC (scaffold).
+  Populate embeddings later from an Edge Function using Supabase's free built-in `gte-small` model.
+- **Scheduled cleanup:** `pg_cron` job `bloomprint-prune-live-cache` (daily) prunes expired `live_data_cache`.
+
+Remaining (UI wiring): search box over sources, `/shared/[token]` route, realtime subscription in the
+plans list, embedding population + "similar plants" UI. All optional and key-free except embedding
+generation (free via Edge `gte-small`).

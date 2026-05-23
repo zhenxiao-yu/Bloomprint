@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { trackEvent } from "@/lib/analytics";
 
 export function PrintBar({ backHref }: { backHref: string }) {
@@ -16,7 +16,7 @@ export function PrintBar({ backHref }: { backHref: string }) {
       </Link>
       <button
         onClick={() => window.print()}
-        className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-strong"
+        className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
       >
         Print / Save PDF
       </button>

@@ -25,15 +25,27 @@ export function Section({
   const variantClass = {
     default: "card",
     decision: "rounded-xl border border-brand/30 bg-brand-soft/70",
-    action: "rounded-xl border border-accent/30 bg-white",
+    action: "rounded-xl border border-accent/30 bg-surface",
     trust: "rounded-xl border border-border bg-surface",
     quiet: "rounded-xl border border-border/70 bg-surface/75",
   }[variant];
+  // A short variant-tinted rule before each title gives the long report a
+  // consistent visual anchor, so the eye can chunk and scan sections quickly.
+  const accentClass = {
+    default: "bg-brand",
+    decision: "bg-brand",
+    action: "bg-accent",
+    trust: "bg-trust",
+    quiet: "bg-border",
+  }[variant];
   return (
     <section id={id} className={cn("scroll-mt-24 p-5", variantClass)}>
-      <h3 className="text-base font-semibold text-foreground">{title}</h3>
-      {subtitle ? <p className="mt-0.5 text-sm text-muted">{subtitle}</p> : null}
-      <div className="mt-3">{children}</div>
+      <div className="flex items-center gap-2.5">
+        <span className={cn("h-4 w-1 shrink-0 rounded-full", accentClass)} aria-hidden />
+        <h3 className="text-base font-semibold text-foreground">{title}</h3>
+      </div>
+      {subtitle ? <p className="mt-1 pl-3.5 text-sm text-muted">{subtitle}</p> : null}
+      <div className="mt-3.5">{children}</div>
     </section>
   );
 }

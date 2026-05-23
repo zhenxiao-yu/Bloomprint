@@ -7,6 +7,7 @@ import { z } from "zod";
 import { RefinementAdjustment, YardIntake } from "@/domain/models";
 import { FIXTURES } from "@/domain";
 import { buildBloomprintPlan } from "@/lib/buildPlan";
+import { clientIp, rateLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -21,6 +22,14 @@ const RequestBody = z
   });
 
 export async function POST(request: Request) {
+  const rl = rateLimit(`${clientIp(request)}:plan`, 30, 60_000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many requests — please wait a moment." },
+      { status: 429, headers: { "retry-after": String(rl.retryAfterSec) } },
+    );
+  }
+
   let json: unknown;
   try {
     json = await request.json();

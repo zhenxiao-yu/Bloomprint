@@ -1,22 +1,26 @@
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 export function SiteFooter() {
+  const t = useTranslations("Footer");
+  const tNav = useTranslations("Nav");
+
   return (
     <footer className="no-print border-t border-border">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 px-4 py-6 text-sm text-muted sm:flex-row sm:items-center sm:px-6">
-        <p>🌿 Bloomprint — buildable yard plans for real homes.</p>
+        <p>{t("tagline")}</p>
         <nav className="flex flex-wrap gap-4 sm:ml-auto">
           <Link href="/plan" className="hover:text-foreground">
-            Plan
+            {tNav("plan")}
           </Link>
           <Link href="/plans" className="hover:text-foreground">
-            Saved
+            {tNav("saved")}
           </Link>
           <Link href="/about" className="hover:text-foreground">
-            About
+            {tNav("about")}
           </Link>
           <Link href="/guide" className="hover:text-foreground">
-            Guide
+            {tNav("guide")}
           </Link>
           <a
             href="https://github.com/zhenxiao-yu/Bloomprint"
@@ -24,14 +28,11 @@ export function SiteFooter() {
             rel="noreferrer"
             className="hover:text-foreground"
           >
-            GitHub
+            {t("github")}
           </a>
         </nav>
       </div>
-      <p className="mx-auto w-full max-w-5xl px-4 pb-6 text-xs text-muted sm:px-6">
-        Plans use the Bloomprint Core Library and approximate regional rules. Prices are ranges, not
-        quotes. Accounts and saved plans are stored on your device.
-      </p>
+      <p className="mx-auto w-full max-w-5xl px-4 pb-6 text-xs text-muted sm:px-6">{t("disclaimer")}</p>
     </footer>
   );
 }
