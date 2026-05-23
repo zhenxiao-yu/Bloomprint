@@ -9,6 +9,7 @@ import { isControlNetRenderEnabled, isImageRenderEnabled, renderImage } from "@/
 import { clientIp, rateLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
+export const maxDuration = 30;
 
 export async function GET() {
   return NextResponse.json({
