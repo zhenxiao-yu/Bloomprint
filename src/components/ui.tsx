@@ -70,7 +70,7 @@ export function MetricPill({
   const tones = {
     neutral: "border-border bg-surface text-foreground",
     brand: "border-brand/25 bg-brand-soft text-brand-strong",
-    warn: "border-[var(--warn)]/25 bg-[var(--warn)]/10 text-[var(--warn)]",
+    warn: "border-warn/25 bg-warn/10 text-warn",
   };
   return (
     <span className={cn("inline-flex min-h-11 flex-col justify-center rounded-lg border px-3 py-1.5", tones[tone])}>
@@ -81,8 +81,8 @@ export function MetricPill({
 }
 
 const PRIORITY_BADGE: Record<string, string> = {
-  high: "bg-[var(--danger)]/10 text-[var(--danger)]",
-  medium: "bg-[var(--warn)]/10 text-[var(--warn)]",
+  high: "bg-danger/10 text-danger",
+  medium: "bg-warn/10 text-warn",
   low: "bg-brand-soft text-brand-strong",
 };
 

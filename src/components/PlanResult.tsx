@@ -176,8 +176,8 @@ export function PlanResult({
               ))}
             </ul>
           </div>
-          <div className="rounded-lg bg-[var(--accent)]/10 p-4 text-sm text-foreground">
-            <p className="font-semibold text-[var(--accent)]">{t("whySmart")}</p>
+          <div className="rounded-lg bg-accent/10 p-4 text-sm text-foreground">
+            <p className="font-semibold text-accent">{t("whySmart")}</p>
             <p className="mt-1">{plan.insight}</p>
           </div>
         </div>
@@ -419,12 +419,16 @@ export function PlanResult({
         </p>
         <ol className="space-y-3">
           {plan.installPhases.map((p) => (
-            <li key={p.order} className="border-l-2 border-brand pl-3">
-              <p className="text-sm font-semibold text-foreground">
-                {p.order}. {p.title}{" "}
-                <span className="font-normal text-muted">· ~{p.estHours}h</span>
-              </p>
-              <p className="text-sm text-muted">{p.description}</p>
+            <li key={p.order} className="flex gap-3">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand text-xs font-semibold text-on-strong">
+                {p.order}
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-foreground">
+                  {p.title} <span className="font-normal text-muted">· ~{p.estHours}h</span>
+                </p>
+                <p className="text-sm text-muted">{p.description}</p>
+              </div>
             </li>
           ))}
         </ol>
@@ -450,7 +454,7 @@ export function PlanResult({
                 </p>
               ) : null}
               {p.fit.reasons[0] ? <p className="mt-1 text-xs text-brand-strong">✓ {p.fit.reasons[0]}</p> : null}
-              {p.fit.warnings[0] ? <p className="mt-0.5 text-xs text-[var(--warn)]">⚠ {p.fit.warnings[0]}</p> : null}
+              {p.fit.warnings[0] ? <p className="mt-0.5 text-xs text-warn">⚠ {p.fit.warnings[0]}</p> : null}
               {(() => {
                 const alt = plan.alternatives.find((a) => a.plantId === p.plantId);
                 return alt ? <AlternativeOptions alt={alt} /> : null;
