@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { ArrowUp } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { BloomprintPlan, RefinementAdjustment, ShoppingPriority } from "@/domain/models";
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
 import { Chip, MetricPill, Money, Section, SeverityTag } from "@/components/ui";
-import { ConceptBoard } from "@/components/ConceptBoard";
 import { YardPreviewOverlay } from "@/components/yard-map/YardPreviewOverlay";
 import { CommandBar } from "@/components/CommandBar";
-import { PlanCharts } from "@/components/PlanCharts";
 import { ShoppingTable } from "@/components/ShoppingTable";
 import { ImaginedView } from "@/components/ImaginedView";
 import { ArView } from "@/components/ArView";
@@ -25,6 +24,26 @@ import { LivePlanEnrichment } from "@/lib/live-data/schema";
 import { LiveBadge } from "@/components/live/LiveBadge";
 
 export type ViewMode = "simple" | "details" | "staff";
+
+// Heavy, below-the-fold renderers are code-split so their libraries (@dnd-kit for the
+// concept board, recharts for the charts) stay out of the initial plan bundle and load
+// only when actually shown. Client-only (ssr:false) — they need the DOM.
+const ConceptBoard = dynamic(
+  () => import("@/components/ConceptBoard").then((m) => m.ConceptBoard),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="w-full animate-pulse rounded-xl border border-dashed border-border bg-surface"
+        style={{ aspectRatio: "5 / 3" }}
+      />
+    ),
+  },
+);
+const PlanCharts = dynamic(
+  () => import("@/components/PlanCharts").then((m) => m.PlanCharts),
+  { ssr: false, loading: () => null },
+);
 
 const PLAN_LABEL_KEY: Record<string, "labelBuildable" | "labelConcept" | "labelNeedsVerification"> = {
   "buildable-estimate": "labelBuildable",
