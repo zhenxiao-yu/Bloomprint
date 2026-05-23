@@ -63,8 +63,14 @@ export async function generateMetadata({
       description: t("description"),
       url: path,
       locale: locale === "zh" ? "zh_CN" : "en_US",
+      images: ["/opengraph-image"],
     },
-    twitter: { card: "summary_large_image", title: t("title"), description: t("description") },
+    twitter: {
+      card: "summary_large_image",
+      title: t("title"),
+      description: t("description"),
+      images: ["/opengraph-image"],
+    },
     robots: { index: true, follow: true },
   };
 }
