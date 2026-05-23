@@ -645,5 +645,32 @@
     "estPlantsValue": "~{count} plants",
     "estMetricNote": "Material estimates are computed from the area converted to square feet.",
     "disclaimer": "These are rough concept estimates from a photo, not exact scale or property boundaries. Always confirm on site before buying materials or digging."
+  },
+  "Live": {
+    "storeTitle": "At the store",
+    "storeSubtitle": "Live-ish check — similar products from retailers. Prices and stock change by store, size, brand, and season.",
+    "findNearby": "Find garden centers near me",
+    "priceEstimate": "Price estimate",
+    "lastChecked": "Last checked",
+    "checkedJustNow": "just now",
+    "ifUnavailable": "If unavailable",
+    "cheaper": "Cheaper",
+    "easier": "Easier",
+    "deliveryWorthChecking": "delivery worth checking",
+    "avail_unknown": "Availability unknown",
+    "avail_appears_available": "Appears available",
+    "avail_limited": "Limited",
+    "avail_unavailable": "Unavailable",
+    "avail_verify_locally": "Verify locally",
+    "badgeOfficial": "Official source",
+    "badgeRetailer": "Retailer search",
+    "badgeDataset": "Open dataset",
+    "badgeEstimate": "Estimate",
+    "badgeVerify": "Verify locally",
+    "storeDisclaimer": "Call before driving for plants, heavy materials, or large quantities. These are search links and price estimates — not stock, aisle, or final-price claims.",
+    "timingTitle": "Planting timing",
+    "cautionTitle": "Ecological caution",
+    "careTitle": "Care notes",
+    "sourceLabel": "Source"
   }
 }

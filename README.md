@@ -60,6 +60,16 @@ SUPABASE_SERVICE_ROLE_KEY=...             # server-only, optional (AI prompt cac
 See [docs/SUPABASE_MIGRATION.md](docs/SUPABASE_MIGRATION.md) for the storage architecture, RLS
 expectations, private photo rules, and how to regenerate the database types.
 
+## Live Data Layer (optional)
+
+Makes results *feel* current — retailer **price estimates**, planting **timing**, plant **care**, and
+**invasive/ecological cautions** — without faking certainty. It **enriches** the deterministic plan
+(never overrides facts) and works **mock-first with no API keys**: price "estimates" are the plan's
+own ranges, availability is always hedged ("verify locally"), and every live fact shows a source,
+confidence, and "last checked" time. Fetched lazily and best-effort, so the plan never waits on it.
+Real providers (SerpApi / Perenual / Open-Meteo / GBIF) drop in behind the same interface. See
+[docs/LIVE_DATA_LAYER.md](docs/LIVE_DATA_LAYER.md).
+
 ## Docs
 
 - [docs/SPEC.md](docs/SPEC.md) — product & design spec
@@ -67,3 +77,4 @@ expectations, private photo rules, and how to regenerate the database types.
 - [docs/DECISIONS.md](docs/DECISIONS.md) — locked architecture decisions
 - [docs/SUPABASE_MIGRATION.md](docs/SUPABASE_MIGRATION.md) — optional cloud sync (storage adapters, RLS)
 - [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) — what V1 does not know precisely
+- [docs/LIVE_DATA_LAYER.md](docs/LIVE_DATA_LAYER.md) — optional live enrichment (prices, weather, plant facts, invasive)

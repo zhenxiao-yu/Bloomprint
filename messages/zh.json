@@ -645,5 +645,32 @@
     "estPlantsValue": "约 {count} 株",
     "estMetricNote": "材料估算是按面积换算为平方英尺后计算的。",
     "disclaimer": "这些只是根据照片得出的大致概念估算，并非精确比例或地界。在购买材料或动土之前，请务必到现场核实。"
+  },
+  "Live": {
+    "storeTitle": "去门店",
+    "storeSubtitle": "准实时参考——来自零售商的相似商品。价格和库存会随门店、规格、品牌和季节变化。",
+    "findNearby": "查找附近的园艺中心",
+    "priceEstimate": "价格估算",
+    "lastChecked": "最近查询",
+    "checkedJustNow": "刚刚",
+    "ifUnavailable": "若缺货",
+    "cheaper": "更便宜",
+    "easier": "更省事",
+    "deliveryWorthChecking": "建议查配送",
+    "avail_unknown": "库存未知",
+    "avail_appears_available": "应该有货",
+    "avail_limited": "货量有限",
+    "avail_unavailable": "暂时缺货",
+    "avail_verify_locally": "到店核实",
+    "badgeOfficial": "官方来源",
+    "badgeRetailer": "零售搜索",
+    "badgeDataset": "开放数据集",
+    "badgeEstimate": "估算",
+    "badgeVerify": "到店核实",
+    "storeDisclaimer": "购买植物、重材料或大批量前请先致电门店。这些只是搜索链接和价格估算，不代表库存、货架位置或最终价格。",
+    "timingTitle": "种植时机",
+    "cautionTitle": "生态提醒",
+    "careTitle": "养护提示",
+    "sourceLabel": "来源"
   }
 }

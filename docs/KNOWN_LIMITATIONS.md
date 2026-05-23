@@ -17,6 +17,17 @@ All prices are **ranges**, never exact, and are broken down by category (plants 
 edging / soil / lighting) with an Expected DIY total. There is no live retailer pricing or inventory
 in V1; ranges reflect typical retail spans, not a quote.
 
+## Live Data Layer (price estimates, weather, plant facts, invasive caution)
+The optional Live Data Layer makes results *feel* current without faking certainty (see
+docs/LIVE_DATA_LAYER.md). It **enriches and annotates** the deterministic plan; it never overrides
+plants, prices, hardiness, toxicity, invasive status, quantities, spacing, or labor. By default it
+runs **mock-only** (no API keys): retailer "price estimates" are the plan's own ranges re-labeled as
+estimates, not live or final prices; availability is always hedged ("verify locally" / "appears
+available"), **never** "in stock" or guaranteed. Every live fact carries a source, a confidence
+label, and a "last checked" time. If the layer is slow, disabled, or fails, the deterministic plan
+renders fully on its own. Real retailer/plant/weather/invasive providers are deferred and drop in
+behind the same interface without changing the engine.
+
 ## Plant / material data
 The seed catalog is the **"Bloomprint Core Library"** — a curated starter set (≥25 plants, ≥12
 materials, etc.), not a comprehensive database. Regions or species outside coverage fall back to

@@ -9,6 +9,10 @@ export const LIVE_DATA_CACHE_POLICY: Record<LiveDataKind, CachePolicy> = {
   gbif: { ttlMs: 30 * DAY },
   "store-search": { ttlMs: 7 * DAY },
   "source-snapshot": { ttlMs: 30 * DAY },
+  // Retailer prices move fastest; plant facts and invasive context are stable.
+  "retailer-products": { ttlMs: 12 * HOUR },
+  "plant-facts": { ttlMs: 60 * DAY },
+  invasive: { ttlMs: 30 * DAY },
 };
 
 export function getCachePolicy(kind: LiveDataKind): CachePolicy {
