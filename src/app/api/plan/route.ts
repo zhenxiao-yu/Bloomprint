@@ -10,6 +10,9 @@ import { buildBloomprintPlan } from "@/lib/buildPlan";
 import { clientIp, rateLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
+// LLM enhancement can be slow; give the function room (and never block the
+// deterministic plan, which is returned even if enhancement times out).
+export const maxDuration = 30;
 
 const RequestBody = z
   .object({
