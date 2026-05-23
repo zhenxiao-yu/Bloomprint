@@ -7,7 +7,7 @@ env vars at all** — see [DECISIONS.md](DECISIONS.md) D10/D12/D15.
 
 ## Project
 
-- **Project ref:** `xbbmllchylhfwfmcwnle`
+- **Project ref:** `qojtvpkzwufqxzpnatha`
 - Storage bucket: `project-photos` (private)
 - Tables: `profiles`, `properties`, `projects`, `plan_versions`, `project_photos`,
   `source_registry`, `live_data_cache`, `ai_prompt_cache`
@@ -78,7 +78,7 @@ happens at save time. This keeps the on-screen promise truthful in both modes.
 Replace it with the canonical generated output once you have the CLI/env:
 
 ```bash
-npx supabase gen types typescript --project-id xbbmllchylhfwfmcwnle > src/types/supabase.ts
+npx supabase gen types typescript --project-id qojtvpkzwufqxzpnatha > src/types/supabase.ts
 # or, logged in to the CLI:
 supabase gen types typescript --linked > src/types/supabase.ts
 ```
@@ -117,13 +117,13 @@ Auth uses `@supabase/ssr` (cookie sessions). Pieces:
 #    SUPABASE_ACCESS_TOKEN, SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID/SECRET
 # 2. Link + push schema + regenerate types:
 npx supabase login            # uses SUPABASE_ACCESS_TOKEN
-npx supabase link --project-ref xbbmllchylhfwfmcwnle
+npx supabase link --project-ref qojtvpkzwufqxzpnatha
 npm run db:push               # applies 0001_billing.sql + 0002_core_schema.sql
 npm run db:types              # regenerates src/types/supabase.ts from the linked project
 npm run typecheck
 # 3. Dashboard config (Auth → Providers / URL config):
 #    - Google: paste the OAuth client id/secret; add the Supabase callback
-#      https://xbbmllchylhfwfmcwnle.supabase.co/auth/v1/callback in Google Cloud Console.
+#      https://qojtvpkzwufqxzpnatha.supabase.co/auth/v1/callback in Google Cloud Console.
 #    - Site URL + Redirect URLs: add http://localhost:3000/auth/callback + /auth/confirm and prod.
 #    - Email: enable the email provider (OTP works out of the box).
 #    - Phone (optional, later): add an SMS provider (Twilio), then set NEXT_PUBLIC_ENABLE_PHONE_AUTH=true.
