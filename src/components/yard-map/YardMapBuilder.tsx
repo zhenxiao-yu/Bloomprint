@@ -26,9 +26,10 @@ import {
   Trash2,
   MousePointer2,
   SquarePen,
+  Wand2,
 } from "lucide-react";
 import { YardZoneType, createZone, polygonAreaNormalized } from "@/lib/yard-map/zoneModel";
-import type { YardZone } from "@/lib/yard-map/zoneModel";
+import type { YardZone, Point } from "@/lib/yard-map/zoneModel";
 import {
   MEASUREMENT_DISCLAIMER,
   estimateMaterialsFromArea,
@@ -48,6 +49,7 @@ import {
   type History,
 } from "@/lib/yard-map/editHistory";
 import { detectDraftZones } from "@/lib/vision/yardSegmenter";
+import { samSegmenter } from "@/lib/vision/samSegmenter";
 import { takeYardPhoto } from "@/lib/yard-map/handoff";
 import type { CalibrationLine, CanvasMode } from "./YardZoneCanvas";
 
@@ -99,6 +101,9 @@ export function YardMapBuilder({
 
   const [detecting, setDetecting] = useState(false);
   const [detectNote, setDetectNote] = useState<string | null>(null);
+  // SAM "tap to capture": which photo is currently embedded, + a busy state.
+  const [samStatus, setSamStatus] = useState<null | "preparing" | "picking">(null);
+  const [preparedPhoto, setPreparedPhoto] = useState<string | null>(null);
 
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -117,7 +122,11 @@ export function YardMapBuilder({
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => setPhotoUrl(reader.result as string);
+    reader.onload = () => {
+      setPhotoUrl(reader.result as string);
+      setPreparedPhoto(null);
+      samSegmenter.reset();
+    };
     reader.readAsDataURL(file);
   }
 
@@ -151,6 +160,55 @@ export function YardMapBuilder({
       );
     } finally {
       setDetecting(false);
+    }
+  }
+
+  // SAM "tap to capture": embed the photo once, then each tap decodes a region.
+  async function startPick() {
+    if (!photoUrl) return;
+    setMode("pick");
+    setDetectNote(null);
+    if (preparedPhoto === photoUrl) return; // already embedded this photo
+    setSamStatus("preparing");
+    try {
+      samSegmenter.reset();
+      const img = await loadImage(photoUrl);
+      const ok = await samSegmenter.prepare(img);
+      if (ok) {
+        setPreparedPhoto(photoUrl);
+      } else {
+        setDetectNote(t("samUnavailable"));
+        setMode("select");
+      }
+    } catch {
+      setDetectNote(t("samUnavailable"));
+      setMode("select");
+    } finally {
+      setSamStatus((s) => (s === "preparing" ? null : s));
+    }
+  }
+
+  async function handlePick(point: Point) {
+    if (preparedPhoto !== photoUrl || samStatus) return;
+    setSamStatus("picking");
+    setDetectNote(null);
+    try {
+      const draft = await samSegmenter.pickAt(point);
+      if (draft) {
+        const zone = createZone({
+          type: draft.type,
+          points: draft.points,
+          confidence: "low",
+          source: "ai-draft",
+          label: draft.label,
+        });
+        commit([...zones, zone]);
+        setSelectedIds([zone.id]); // stay in "pick" so they can grab more regions
+      } else {
+        setDetectNote(t("pickEmpty"));
+      }
+    } finally {
+      setSamStatus(null);
     }
   }
 
@@ -249,7 +307,15 @@ export function YardMapBuilder({
             {photoUrl ? t("changePhoto") : t("addPhoto")}
           </button>
           {photoUrl ? (
-            <button type="button" onClick={() => setPhotoUrl(null)} className="text-xs text-muted hover:text-foreground">
+            <button
+              type="button"
+              onClick={() => {
+                setPhotoUrl(null);
+                setPreparedPhoto(null);
+                samSegmenter.reset();
+              }}
+              className="text-xs text-muted hover:text-foreground"
+            >
               {t("removePhoto")}
             </button>
           ) : null}
@@ -269,10 +335,24 @@ export function YardMapBuilder({
             <LayoutTemplate className="size-3.5" aria-hidden />
             {t("startTemplate")}
           </button>
-          {detecting ? (
+          <button
+            type="button"
+            onClick={startPick}
+            disabled={!photoUrl || detecting || samStatus !== null}
+            className={mode === "pick" ? toolBtnActive : toolBtn}
+            title={!photoUrl ? t("pickNeedsPhoto") : undefined}
+          >
+            <Wand2 className="size-3.5" aria-hidden />
+            {samStatus === "preparing"
+              ? t("preparingModel")
+              : samStatus === "picking"
+                ? t("capturing")
+                : t("tapCapture")}
+          </button>
+          {detecting || samStatus ? (
             <span className="inline-flex items-center gap-2 text-xs text-muted">
               <span className="size-3 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-              {t("scanningNote")}
+              {detecting ? t("scanningNote") : samStatus === "preparing" ? t("preparingNote") : t("scanningNote")}
             </span>
           ) : null}
         </div>
@@ -333,7 +413,15 @@ export function YardMapBuilder({
             </div>
           </div>
         ) : null}
-        <p className="text-xs text-muted">{mode === "draw" ? t("drawHint") : mode === "calibrate" ? t("calibrateHint") : t("editHint")}</p>
+        <p className="text-xs text-muted">
+          {mode === "draw"
+            ? t("drawHint")
+            : mode === "calibrate"
+              ? t("calibrateHint")
+              : mode === "pick"
+                ? t("tapCaptureHint")
+                : t("editHint")}
+        </p>
       </div>
 
       <YardZoneCanvas
@@ -349,6 +437,7 @@ export function YardMapBuilder({
         onZonesChange={commit}
         onSelectionChange={setSelectedIds}
         onCalibrationLine={handleCalibrationLine}
+        onPickPoint={handlePick}
       />
 
       {/* Selection panel */}

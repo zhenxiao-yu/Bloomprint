@@ -262,7 +262,7 @@ export function PlanResult({
         <p className="mt-2 text-sm font-medium text-brand-strong">
           {plan.visualSummary.transformation.feeling}
         </p>
-        <ImaginedView prompt={enhancement?.imagePrompt} />
+        <ImaginedView prompt={enhancement?.imagePrompt} photoUrl={photoUrl} />
 
         <div className="mt-4 border-t border-border pt-4">
           {!arOpen ? (

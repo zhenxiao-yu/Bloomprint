@@ -53,7 +53,7 @@ export const ZONE_COLORS: Record<YardZoneType, string> = {
   remove: "#c2536b",
 };
 
-export type CanvasMode = "select" | "draw" | "calibrate";
+export type CanvasMode = "select" | "draw" | "calibrate" | "pick";
 
 export interface CalibrationLine {
   a: Point;
@@ -76,6 +76,8 @@ interface YardZoneCanvasProps {
   onZonesChange: (zones: YardZone[]) => void;
   onSelectionChange: (ids: string[]) => void;
   onCalibrationLine: (line: CalibrationLine) => void;
+  /** In "pick" mode, a tap emits its normalized point (SAM click-to-mask). */
+  onPickPoint?: (point: Point) => void;
 }
 
 const ASPECT = 3 / 5; // height / width — matches the concept board's 5:3.
@@ -155,6 +157,7 @@ export default function YardZoneCanvas({
   onZonesChange,
   onSelectionChange,
   onCalibrationLine,
+  onPickPoint,
 }: YardZoneCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -227,6 +230,10 @@ export default function YardZoneCanvas({
     }
     if (mode === "draw") {
       setGesture({ kind: "draw", start: p, now: p });
+      return;
+    }
+    if (mode === "pick") {
+      onPickPoint?.(p);
       return;
     }
     // select mode: empty press starts a marquee.
@@ -371,7 +378,10 @@ export default function YardZoneCanvas({
         onPointerDown={onStageDown}
         onPointerMove={onMove}
         onPointerUp={onUp}
-        style={{ cursor: mode === "calibrate" ? "crosshair" : mode === "draw" ? "copy" : "default" }}
+        style={{
+          cursor:
+            mode === "calibrate" || mode === "pick" ? "crosshair" : mode === "draw" ? "copy" : "default",
+        }}
       >
         <Layer listening={false}>
           {cover && photoImage ? (

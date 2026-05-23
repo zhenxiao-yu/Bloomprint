@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { initials, signOut, useAccount } from "@/lib/accountStore";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -19,18 +20,36 @@ export function SiteHeader() {
   const pathname = usePathname();
   const account = useAccount();
   const t = useTranslations("Nav");
+  const [scrolled, setScrolled] = useState(false);
+
+  // Scroll-aware elevation: the header firms up (more opaque + a soft shadow)
+  // once the page scrolls, the way native apps lift a top bar over content.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-surface/85 backdrop-blur">
+    <header
+      className={`sticky top-0 z-30 border-b backdrop-blur transition-[background-color,box-shadow,border-color] duration-300 ${
+        scrolled ? "border-border bg-surface/90 shadow-sm" : "border-transparent bg-surface/70"
+      }`}
+    >
       <div className="mx-auto flex h-14 w-full max-w-5xl items-center gap-3 px-4 sm:px-6">
-        <Link href="/" className="flex shrink-0 items-center gap-2 font-semibold text-brand">
+        <Link
+          href="/"
+          className="flex shrink-0 items-center gap-2 font-semibold text-brand transition active:scale-95"
+        >
           <span className="flex size-8 items-center justify-center rounded-full bg-brand-soft text-xs font-bold">
             BP
           </span>
-          <span className="hidden sm:inline">Bloomprint</span>
+          <span className="text-base">Bloomprint</span>
         </Link>
 
-        <nav className="ml-1 flex items-center gap-1 overflow-x-auto text-sm sm:ml-2">
+        {/* Primary nav is hidden on mobile — the fixed bottom MobileNav carries it there. */}
+        <nav className="ml-2 hidden items-center gap-1 text-sm sm:flex">
           {NAV.map((n) => {
             const href = n.href as string;
             const active = pathname === href || pathname.startsWith(`${href}/`);

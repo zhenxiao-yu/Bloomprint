@@ -39,6 +39,9 @@
   --input: #efe6d8;
   --ring: #5c8a6b;
   --radius-md: 0.75rem;
+
+  /* Soft, decelerating easing for entrance/expand motion */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* ===== Dark mode: "Night Garden Blueprint" (never pure black) ===== */
@@ -208,6 +211,37 @@ button:not(:disabled):active {
   border-radius: 0.5rem;
 }
 
+/* Scroll-reveal: fade + lift + un-blur as content enters the viewport */
+.reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  filter: blur(6px);
+  transition:
+    opacity 0.5s var(--ease-out-soft),
+    transform 0.5s var(--ease-out-soft),
+    filter 0.5s var(--ease-out-soft);
+}
+
+.reveal[data-revealed="true"] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* Base UI Collapsible panel: smooth height open/close.
+   Driven by the panel's --collapsible-panel-height var and its
+   data-starting-style / data-ending-style attributes. */
+.bp-collapsible-panel {
+  overflow: hidden;
+  height: var(--collapsible-panel-height);
+  transition: height 0.28s var(--ease-out-soft);
+}
+
+.bp-collapsible-panel[data-starting-style],
+.bp-collapsible-panel[data-ending-style] {
+  height: 0;
+}
+
 /* Honor user motion preferences */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -220,6 +254,15 @@ button:not(:disabled):active {
   }
   button:not(:disabled):active {
     transform: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+  .bp-collapsible-panel {
+    transition: none;
   }
 }
 

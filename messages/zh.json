@@ -252,6 +252,13 @@
       "average": "一般",
       "poor": "雨后会积水",
       "unknown": "我不确定"
+    },
+    "styles": {
+      "modern-minimal": "现代简约",
+      "warm-cottage": "温馨田园",
+      "clean-japanese": "清雅日式",
+      "layered-pollinator": "层次传粉花园",
+      "soft-prairie": "柔和草甸"
     }
   },
   "Intake": {
@@ -268,7 +275,26 @@
     "budgetQuestion": "大概预算？",
     "effortQuestion": "你想自己动手做多少？",
     "noPhotoNote": "不用照片也行 —— 你会得到一份能动手做的布置方案。之后再补细节会更准。",
-    "buildButton": "生成我的方案"
+    "buildButton": "生成我的方案",
+    "sharpenTitle": "让方案更精准",
+    "sharpenSummary": "可选信息——每填一项都会提高信心。都不是必填。",
+    "sharpenCount": "已填 {count} 项——方案会更精准。",
+    "sharpenHint": "有不清楚的？保留“不确定”即可——未知只会降低信心，绝不会卡住流程。",
+    "optionalBadge": "选填",
+    "sunQuestion": "这个位置能晒到多少太阳？",
+    "soilQuestion": "土壤是什么样的？",
+    "drainageQuestion": "排水情况如何？",
+    "styleQuestion": "偏好的风格",
+    "styleNoPref": "没有偏好——帮我推荐",
+    "helpersQuestion": "由谁来动手？",
+    "helpers": {
+      "0": "只有我",
+      "1": "我 + 1 个帮手",
+      "2": "我们几个人（2 人以上）"
+    },
+    "petsQuestion": "有宠物或小孩会用到这个院子",
+    "petsHint": "我们会避开对狗、猫或儿童有毒的植物。",
+    "confidenceUp": "已补充 {count} 项——信心更高。"
   },
   "Command": {
     "title": "告诉 Bloomprint 想改什么",
@@ -521,7 +547,15 @@
     "readingProgress": "阅读进度",
     "backToTop": "回到顶部",
     "readinessTitle": "方案完备度",
-    "readinessHint": "补全上方未填项，让方案更精准、信心更足。"
+    "readinessHint": "补全上方未填项，让方案更精准、信心更足。",
+    "imaginedButton": "✨ 生成想象效果图",
+    "imaginedBusy": "生成中…",
+    "restyleButton": "✨ 重塑我的照片（概念）",
+    "restyleBusy": "重塑中…",
+    "imaginedAlt": "规划后院子的 AI 想象插图",
+    "imaginedCaption": "AI 想象插图——并非你院子的真实照片。植物选择、数量与间距来自你的方案，而非这张图。",
+    "restyleCaption": "AI 概念重塑——布局与比例为近似值。植物、数量与间距来自你的方案，而非这张图。",
+    "imaginedError": "暂时无法生成图片，请重试。"
   },
   "YardMap": {
     "metaTitle": "院子地图（测试版）· Bloomprint",
@@ -532,6 +566,14 @@
     "scanAi": "用 AI 扫描照片",
     "scanning": "扫描中…",
     "scanningNote": "在本设备上读取照片，不会上传",
+    "tapCapture": "点选捕捉（AI）",
+    "tapCaptureHint": "点按照片中的任意区域——草坪、花床、小径——AI 会把它的形状描出来生成草稿区域。可继续点选添加。完成后切到“选择”进行调整或校准。",
+    "preparingModel": "准备中…",
+    "preparingNote": "正在加载捕捉模型（仅首次）——在你的设备上运行",
+    "capturing": "捕捉中…",
+    "pickNeedsPhoto": "添加照片后即可使用点选捕捉。",
+    "pickEmpty": "该处未找到清晰区域——试试点按区域中心。",
+    "samUnavailable": "此设备暂不支持本地捕捉。你仍可扫描、使用模板或手动绘制区域。",
     "startTemplate": "从模板开始",
     "aiNeedsPhoto": "添加照片后即可用 AI 扫描。",
     "detectedAi": "AI 从照片中提议了 {count} 个草稿区域。把它们拖到你真实的院子上，然后校准。",

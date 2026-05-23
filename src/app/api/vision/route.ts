@@ -7,6 +7,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { analyzeYardPhoto, isVisionEnabled } from "@/lib/visionProvider";
+import { clientIp, rateLimit } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -22,6 +23,14 @@ const Body = z.object({
 export async function POST(request: Request) {
   if (!isVisionEnabled()) {
     return NextResponse.json({ error: "Photo analysis isn't enabled on this deployment.", enabled: false }, { status: 503 });
+  }
+
+  const rl = rateLimit(`${clientIp(request)}:vision`, 8, 60_000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many photo requests — please wait a moment." },
+      { status: 429, headers: { "retry-after": String(rl.retryAfterSec) } },
+    );
   }
 
   let json: unknown;

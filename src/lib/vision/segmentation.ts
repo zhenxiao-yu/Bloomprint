@@ -39,6 +39,25 @@ export interface YardSegmenter {
 }
 
 /**
+ * Interactive, point-driven segmenter (SAM-style): the user taps a spot in the
+ * photo and gets back ONE draft zone for whatever object sits under the tap.
+ * Distinct from YardSegmenter's one-shot "detect everything" — here the heavy
+ * image embedding is computed once via prepare(), then each tap is a fast
+ * decode. Same honesty contract: proposals only, no real-world measurements,
+ * and every method is total (returns false/null on failure, never throws) so a
+ * blocked/missing model degrades gracefully.
+ */
+export interface PointSegmenter {
+  readonly name: string;
+  /** Embed an image once (cached). Returns false if the model can't load/run. */
+  prepare(image: HTMLImageElement | HTMLCanvasElement | ImageData): Promise<boolean>;
+  /** Decode a single draft zone for a normalized (0..1) tap point. null on miss/failure. */
+  pickAt(point: Point): Promise<DraftZone | null>;
+  /** Drop the cached embedding (e.g. when the photo changes). */
+  reset(): void;
+}
+
+/**
  * Map an ADE20K class label to a yard zone type, or null to ignore (sky,
  * people, vehicles, indoor classes). ADE20K labels are comma-joined synonym
  * lists (e.g. "grass", "tree", "path, way"), so we match by keyword substring
