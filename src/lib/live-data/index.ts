@@ -5,6 +5,7 @@ import { getStoreSearchTemplates } from "@/lib/live-data/storeSearch";
 import { getWeatherContext } from "@/lib/live-data/weather";
 
 export type { LiveDataGateway } from "@/lib/live-data/types";
+export { getLiveEnrichment, realProvidersConfigured } from "@/lib/live-data/enrich";
 
 export function liveDataEnabled(): boolean {
   return process.env.NEXT_PUBLIC_ENABLE_LIVE_DATA === "true";

@@ -21,6 +21,8 @@ import { FailurePointsCard } from "@/components/FailurePointsCard";
 import { StoreRealityCheck } from "@/components/StoreRealityCheck";
 import { trackEvent } from "@/lib/analytics";
 import { stashYardPhoto } from "@/lib/yard-map/handoff";
+import { LivePlanEnrichment } from "@/lib/live-data/schema";
+import { LiveBadge } from "@/components/live/LiveBadge";
 
 export type ViewMode = "simple" | "details" | "staff";
 
@@ -63,6 +65,7 @@ export function PlanResult({
   const t = useTranslations("Result");
   const tr = useTranslations("Refinements");
   const to = useTranslations("Options");
+  const tLive = useTranslations("Live");
   const { plan, enhancement } = result;
   const showNumbers = view !== "simple";
   const [boardView, setBoardView] = useState<"now" | "planned" | "overlay">("planned");
@@ -87,6 +90,47 @@ export function PlanResult({
   const activeSection = useActiveSection(navItems.map((n) => n.id));
   const rootRef = useRef<HTMLDivElement>(null);
   const progress = useReadingProgress(rootRef);
+
+  // Live enrichment is lazy + best-effort: the deterministic plan renders immediately
+  // and stands on its own if this is slow, disabled, or fails (docs/DECISIONS.md D1).
+  const [live, setLive] = useState<LivePlanEnrichment | null>(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    void (async () => {
+      try {
+        const res = await fetch("/api/live/enrich-plan", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          signal: controller.signal,
+          body: JSON.stringify({
+            region: plan.intake.locationQuery ?? plan.intake.regionId,
+            items: plan.shoppingList.map((it) => ({
+              id: it.name,
+              name: it.name,
+              category: it.category,
+              price: it.price,
+            })),
+            plants: plan.plants.map((p) => ({ plantId: p.plantId, commonName: p.commonName })),
+          }),
+        });
+        if (!res.ok) return;
+        const parsed = LivePlanEnrichment.safeParse(await res.json());
+        if (parsed.success) setLive(parsed.data);
+      } catch {
+        /* deterministic plan stands on its own */
+      }
+    })();
+    return () => controller.abort();
+  }, [plan]);
+
+  // Only flagged species raise a caution; non-flagged plants stay quiet (no false alarms).
+  const invasiveByName = new Map(
+    (live?.invasive ?? [])
+      .filter((x) => x.flagged)
+      .map((x) => [(x.commonName ?? x.scientificName).toLowerCase(), x]),
+  );
+  const weather = live?.weather ?? null;
+  const careFact = live?.plantFacts[0] ?? null;
 
   return (
     <div ref={rootRef} className="space-y-6">
@@ -432,6 +476,11 @@ export function PlanResult({
             </li>
           ))}
         </ol>
+        {weather ? (
+          <p className="mt-3 rounded-lg border border-blueprint/30 bg-blueprint-soft px-3 py-2 text-xs text-foreground">
+            <span className="font-semibold">{tLive("timingTitle")}:</span> {weather.plantingNote}
+          </p>
+        ) : null}
       </Section>
 
       {/* Plants */}
@@ -456,12 +505,25 @@ export function PlanResult({
               {p.fit.reasons[0] ? <p className="mt-1 text-xs text-brand-strong">✓ {p.fit.reasons[0]}</p> : null}
               {p.fit.warnings[0] ? <p className="mt-0.5 text-xs text-warn">⚠ {p.fit.warnings[0]}</p> : null}
               {(() => {
+                const inv = invasiveByName.get(p.commonName.toLowerCase());
+                return inv ? <p className="mt-0.5 text-xs text-warn">⚠ {inv.note}</p> : null;
+              })()}
+              {(() => {
                 const alt = plan.alternatives.find((a) => a.plantId === p.plantId);
                 return alt ? <AlternativeOptions alt={alt} /> : null;
               })()}
             </div>
           ))}
         </div>
+        {careFact?.careSummary ? (
+          <p className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted">
+            <span>
+              <span className="font-medium text-foreground">{tLive("careTitle")}:</span>{" "}
+              {careFact.careSummary}
+            </span>
+            <LiveBadge source={careFact.source} />
+          </p>
+        ) : null}
       </Section>
 
       {/* Risks */}
@@ -484,7 +546,7 @@ export function PlanResult({
       {/* Trust moat: what-if failures + honest store reality */}
       <FailurePointsCard points={plan.failurePoints} />
       <div id="store" className="scroll-mt-24">
-        <StoreRealityCheck searches={plan.storeSearches} />
+        <StoreRealityCheck searches={plan.storeSearches} live={live?.storeReality} />
       </div>
 
       <div id="evidence" className="scroll-mt-24">

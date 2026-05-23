@@ -1,6 +1,14 @@
 import type { CacheStatus, SourceRef } from "@/domain/models";
 
-export type LiveDataKind = "weather" | "geocode" | "gbif" | "store-search" | "source-snapshot";
+export type LiveDataKind =
+  | "weather"
+  | "geocode"
+  | "gbif"
+  | "store-search"
+  | "source-snapshot"
+  | "retailer-products"
+  | "plant-facts"
+  | "invasive";
 
 export interface CachePolicy {
   ttlMs: number;

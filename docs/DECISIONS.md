@@ -107,3 +107,16 @@ Save/history is `localStorage`; sharing encodes `{intake, adjustments}` into the
 recipient regenerates the plan deterministically. No database, no accounts, no stored user data —
 consistent with D5. Analytics is cookieless Vercel Web Analytics with custom events; if disabled,
 events are harmless no-ops. *Why:* validate whether users iterate before investing in any backend.
+
+## D17 — Live data enriches, never overrides
+The Live Data Layer (price estimates, planting timing, plant care, invasive caution) **annotates**
+the deterministic plan; it never changes plants, prices, hardiness, toxicity, invasive status,
+quantities, spacing, or labor. It runs **mock-first** (works with no API keys; `AI_PROVIDER=mock`
+unaffected), is fetched **lazily and best-effort** by the client (`POST /api/live/enrich-plan`) so
+the plan never waits on it, and is **Zod-validated** at the boundary (`LivePlanEnrichment`). Honesty
+is enforced in code and tests: prices are estimate ranges (in mock, the plan's own range), never a
+final price; availability is hedged ("verify locally"), never guaranteed stock; every fact has a
+source + confidence + `lastCheckedAt`. Real providers (SerpApi/Perenual/Open-Meteo/GBIF) drop in
+behind each module's seam without touching the engine. *Why:* feel current and grounded in the real
+world without the dangerous promise "this exact store has this exact plant at this exact price." See
+docs/LIVE_DATA_LAYER.md.
