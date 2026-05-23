@@ -141,3 +141,23 @@ applied to the remote project with `supabase config push` if you prefer config-a
 - `live_data_cache` / `source_registry` read-through is available (`cache.ts`) but not yet called
   from the live-data layer.
 - Phone SMS OTP is wired but dormant until an SMS provider is configured.
+
+## Power-ups enabled (migration 0003 — all free-tier safe)
+
+Applied to the live project and verified. All additive/idempotent; nothing here incurs cost.
+
+- **Search:** `pg_trgm` + `search_sources(q, max_results)` RPC (fuzzy source registry). Helper:
+  `src/lib/supabase/queries.ts → searchSources()`.
+- **Entitlement enforcement:** `check_and_increment_usage(metric, period, limit)` RPC (atomic, RLS-safe).
+  Helper: `src/lib/billing/usage.ts → checkAndIncrementUsage()` — call from a route before a metered
+  action (e.g. AI refinement) with the plan's limit.
+- **Plan sharing:** `projects.share_token` + `is_public` columns; permissive RLS for anonymous read of
+  public projects + their plan_versions. (Wire a `/shared/[token]` page next.)
+- **Realtime:** `projects` + `plan_versions` added to the `supabase_realtime` publication (subscribe client-side).
+- **pgvector:** `plant_embeddings(plant_id, embedding vector(384))` + `match_plants()` RPC (scaffold).
+  Populate embeddings later from an Edge Function using Supabase's free built-in `gte-small` model.
+- **Scheduled cleanup:** `pg_cron` job `bloomprint-prune-live-cache` (daily) prunes expired `live_data_cache`.
+
+Remaining (UI wiring): search box over sources, `/shared/[token]` route, realtime subscription in the
+plans list, embedding population + "similar plants" UI. All optional and key-free except embedding
+generation (free via Edge `gte-small`).

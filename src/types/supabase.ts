@@ -152,6 +152,21 @@ export type Database = {
           },
         ]
       }
+      plant_embeddings: {
+        Row: {
+          embedding: string | null
+          plant_id: string
+        }
+        Insert: {
+          embedding?: string | null
+          plant_id: string
+        }
+        Update: {
+          embedding?: string | null
+          plant_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -210,7 +225,9 @@ export type Database = {
           created_at: string
           current_version_id: string | null
           id: string
+          is_public: boolean
           label: string
+          share_token: string
           summary: Json
           updated_at: string
           user_id: string
@@ -219,7 +236,9 @@ export type Database = {
           created_at?: string
           current_version_id?: string | null
           id?: string
+          is_public?: boolean
           label: string
+          share_token?: string
           summary?: Json
           updated_at?: string
           user_id: string
@@ -228,7 +247,9 @@ export type Database = {
           created_at?: string
           current_version_id?: string | null
           id?: string
+          is_public?: boolean
           label?: string
+          share_token?: string
           summary?: Json
           updated_at?: string
           user_id?: string
@@ -359,7 +380,36 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_and_increment_usage: {
+        Args: { p_limit: number; p_metric: string; p_period: string }
+        Returns: boolean
+      }
+      match_plants: {
+        Args: { match_count?: number; query_embedding: string }
+        Returns: {
+          plant_id: string
+          similarity: number
+        }[]
+      }
+      search_sources: {
+        Args: { max_results?: number; q: string }
+        Returns: {
+          id: string
+          level: number
+          name: string
+          notes: string | null
+          source_type: string | null
+          url: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "source_registry"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       [_ in never]: never
