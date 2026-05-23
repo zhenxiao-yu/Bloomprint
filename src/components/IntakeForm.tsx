@@ -15,6 +15,8 @@ export interface IntakeValues {
   budgetStyle: "budget" | "balanced" | "premium";
   effortLevel: EffortLevel;
   areaType?: string;
+  /** Measured/known planting-bed area in sq ft — sharpens material + plant counts. */
+  areaSqft?: number;
   hasPhoto: boolean;
 }
 
@@ -23,6 +25,8 @@ export interface IntakeDefaults {
   goal?: ProjectGoal;
   budgetIndex?: number;
   effortLevel?: EffortLevel;
+  /** Prefill from the Yard Map's measured bed area. */
+  areaSqft?: number;
 }
 
 // Internal form shape (budget held as an index into BUDGETS until submit).
@@ -35,6 +39,8 @@ const formSchema = z.object({
   budgetIndex: z.number().int().min(0),
   effortLevel: z.string(),
   areaType: z.string().optional(),
+  // Held as a string in the form; coerced to a positive number on submit.
+  areaSqft: z.string().optional(),
 });
 type FormValues = z.infer<typeof formSchema>;
 
@@ -58,11 +64,13 @@ export function IntakeForm({
       budgetIndex: defaults?.budgetIndex ?? 1,
       effortLevel: defaults?.effortLevel ?? "moderate",
       areaType: "",
+      areaSqft: defaults?.areaSqft ? String(Math.round(defaults.areaSqft)) : "",
     },
   });
 
   function submit(values: FormValues) {
     const b = BUDGETS[values.budgetIndex];
+    const area = values.areaSqft ? Number(values.areaSqft) : NaN;
     onSubmit({
       regionId: values.regionId,
       locationQuery: values.locationQuery?.trim() || undefined,
@@ -71,6 +79,7 @@ export function IntakeForm({
       budgetStyle: b.budgetStyle,
       effortLevel: values.effortLevel as EffortLevel,
       areaType: values.areaType || undefined,
+      areaSqft: Number.isFinite(area) && area > 0 ? area : undefined,
       hasPhoto: false,
     });
   }
@@ -140,6 +149,24 @@ export function IntakeForm({
               </option>
             ))}
           </select>
+        </label>
+
+        <label className="block">
+          <span className="mb-1 block text-sm font-semibold text-foreground">
+            {t("areaSqftLabel")} <span className="font-normal text-muted">{t("areaOptional")}</span>
+          </span>
+          <input
+            type="number"
+            min={0}
+            step="any"
+            inputMode="decimal"
+            {...register("areaSqft")}
+            placeholder={t("areaSqftPlaceholder")}
+            className="card w-full p-2.5 text-sm"
+          />
+          {defaults?.areaSqft ? (
+            <span className="mt-1 block text-xs text-brand-strong">{t("areaSqftMeasured")}</span>
+          ) : null}
         </label>
       </div>
 

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { ArrowUp } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { BloomprintPlan, RefinementAdjustment, ShoppingPriority } from "@/domain/models";
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
@@ -19,6 +20,7 @@ import { AlternativeOptions } from "@/components/AlternativeOptions";
 import { FailurePointsCard } from "@/components/FailurePointsCard";
 import { StoreRealityCheck } from "@/components/StoreRealityCheck";
 import { trackEvent } from "@/lib/analytics";
+import { stashYardPhoto } from "@/lib/yard-map/handoff";
 
 export type ViewMode = "simple" | "details" | "staff";
 
@@ -83,30 +85,49 @@ export function PlanResult({
     ...(view === "staff" ? [{ id: "staff", label: t("navStaff") }] : []),
   ];
   const activeSection = useActiveSection(navItems.map((n) => n.id));
+  const rootRef = useRef<HTMLDivElement>(null);
+  const progress = useReadingProgress(rootRef);
 
   return (
-    <div className="space-y-5">
-      <nav className="sticky top-2 z-20 -mx-1 overflow-x-auto rounded-full border border-border bg-surface/95 p-1 shadow-sm backdrop-blur sm:top-4">
-        <div className="flex min-w-max gap-1">
-          {navItems.map((item) => {
-            const active = activeSection === item.id;
-            return (
-              <a
-                key={item.id}
-                href={`#${item.id}`}
-                aria-current={active ? "true" : undefined}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                  active
-                    ? "bg-brand text-on-strong"
-                    : "text-muted hover:bg-brand-soft hover:text-brand-strong"
-                }`}
-              >
-                {item.label}
-              </a>
-            );
-          })}
+    <div ref={rootRef} className="space-y-6">
+      {/* Sticky orientation: a slim reading-progress bar over the jump nav tells
+          the reader how far through a long plan they are (reduces length anxiety). */}
+      <div className="sticky top-2 z-20 space-y-1.5 sm:top-4">
+        <div
+          className="h-1 w-full overflow-hidden rounded-full bg-border/60"
+          role="progressbar"
+          aria-label={t("readingProgress")}
+          aria-valuenow={Math.round(progress * 100)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
+          <div
+            className="h-full rounded-full bg-brand transition-[width] duration-150 ease-out"
+            style={{ width: `${Math.round(progress * 100)}%` }}
+          />
         </div>
-      </nav>
+        <nav className="-mx-1 overflow-x-auto rounded-full border border-border bg-surface/95 p-1 shadow-sm backdrop-blur">
+          <div className="flex min-w-max gap-1">
+            {navItems.map((item) => {
+              const active = activeSection === item.id;
+              return (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  aria-current={active ? "true" : undefined}
+                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                    active
+                      ? "bg-brand text-on-strong"
+                      : "text-muted hover:bg-brand-soft hover:text-brand-strong"
+                  }`}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
+          </div>
+        </nav>
+      </div>
 
       {/* Hero moment — confidence sentence + visual summary, before any logistics */}
       <section id="summary" className="card scroll-mt-24 overflow-hidden">
@@ -175,7 +196,7 @@ export function PlanResult({
 
       <ReadinessMeter readiness={plan.readiness} />
 
-      <section className="grid gap-2 rounded-xl border border-brand/20 bg-surface p-3 shadow-sm sm:grid-cols-4">
+      <section className="grid grid-cols-2 gap-2 rounded-xl border border-brand/20 bg-surface p-3 shadow-sm sm:grid-cols-4">
         <MetricPill label={t("metricDiyRange")} value={<Money value={plan.budget.diyTotal} />} tone="brand" />
         <MetricPill
           label={t("metricInstall")}
@@ -194,7 +215,8 @@ export function PlanResult({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-base font-semibold text-foreground">{t("seeYard")}</h3>
           <Link
-            href="/plan/map"
+            href={`/plan/map?goal=${encodeURIComponent(plan.intake.goal)}`}
+            onClick={() => stashYardPhoto(photoUrl)}
             className="rounded-full border border-border px-3 py-1 text-xs font-medium text-foreground transition hover:border-brand"
           >
             {t("openYardMap")}
@@ -510,8 +532,62 @@ export function PlanResult({
           <span className="font-medium">{t("assumptionsLabel")}</span> {plan.site.assumptions.join(" ")}
         </p>
       ) : null}
+
+      <BackToTop label={t("backToTop")} />
     </div>
   );
+}
+
+/**
+ * Floating escape hatch for the long plan. Appears once the reader has scrolled
+ * past the hero; sits above the mobile bottom nav so it never overlaps it.
+ */
+function BackToTop({ label }: { label: string }) {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShow(window.scrollY > 600);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <button
+      type="button"
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      aria-label={label}
+      title={label}
+      className={`no-print fixed bottom-20 right-4 z-30 flex size-11 items-center justify-center rounded-full border border-border bg-surface/95 text-foreground shadow-lg backdrop-blur transition sm:bottom-6 ${
+        show ? "opacity-100" : "pointer-events-none translate-y-2 opacity-0"
+      }`}
+    >
+      <ArrowUp className="size-5" aria-hidden />
+    </button>
+  );
+}
+
+/**
+ * Fraction (0–1) the reader has scrolled through the report element, used to
+ * drive the slim progress bar in the sticky header.
+ */
+function useReadingProgress(ref: React.RefObject<HTMLElement | null>): number {
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => {
+      const total = el.offsetHeight - window.innerHeight;
+      const scrolled = -el.getBoundingClientRect().top;
+      setProgress(total > 0 ? Math.min(Math.max(scrolled / total, 0), 1) : 0);
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [ref]);
+  return progress;
 }
 
 /**

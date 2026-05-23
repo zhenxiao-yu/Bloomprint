@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { ArrowRight, CheckCircle2, ClipboardList, ShieldCheck, ShoppingBag } from "lucide-react";
+import { ArrowRight, Check, CheckCircle2, ClipboardList, ShieldCheck, ShoppingBag, X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
@@ -31,6 +31,15 @@ export default function Home() {
     { icon: ClipboardList, title: t("trust.notAiTitle"), body: t("trust.notAiBody") },
     { icon: ShieldCheck, title: t("trust.factsTitle"), body: t("trust.factsBody") },
     { icon: CheckCircle2, title: t("trust.honestTitle"), body: t("trust.honestBody") },
+  ];
+
+  // Direct, honest contrast with a general chatbot — the moat in five rows.
+  const compare: { label: string; them: string; us: string }[] = [
+    { label: t("compare.factsLabel"), them: t("compare.factsThem"), us: t("compare.factsUs") },
+    { label: t("compare.sizeLabel"), them: t("compare.sizeThem"), us: t("compare.sizeUs") },
+    { label: t("compare.outputLabel"), them: t("compare.outputThem"), us: t("compare.outputUs") },
+    { label: t("compare.unsureLabel"), them: t("compare.unsureThem"), us: t("compare.unsureUs") },
+    { label: t("compare.offlineLabel"), them: t("compare.offlineThem"), us: t("compare.offlineUs") },
   ];
 
   return (
@@ -105,6 +114,33 @@ export default function Home() {
             <p className="mt-1 text-sm text-muted">{body}</p>
           </div>
         ))}
+      </section>
+
+      {/* Why not just ask a chatbot? — the answer, honestly. */}
+      <section className="animate-fade-up">
+        <h2 className="text-xl font-semibold text-foreground sm:text-2xl">{t("compare.title")}</h2>
+        <p className="mt-1 max-w-2xl text-sm text-muted">{t("compare.subtitle")}</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {compare.map((row) => (
+            <div key={row.label} className="card flex flex-col gap-3 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">{row.label}</p>
+              <div className="flex items-start gap-2">
+                <X className="mt-0.5 size-4 shrink-0 text-[var(--danger)]" aria-hidden />
+                <p className="text-sm text-muted">
+                  <span className="sr-only">{t("compare.them")}: </span>
+                  {row.them}
+                </p>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="mt-0.5 size-4 shrink-0 text-trust" aria-hidden />
+                <p className="text-sm font-medium text-foreground">
+                  <span className="sr-only">{t("compare.us")}: </span>
+                  {row.us}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
       <p className="text-xs text-muted">{t("disclaimer")}</p>

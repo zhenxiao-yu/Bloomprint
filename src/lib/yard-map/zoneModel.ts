@@ -37,6 +37,14 @@ export type Point = z.infer<typeof Point>;
 export const ZoneConfidence = z.enum(["high", "medium", "low"]);
 export type ZoneConfidence = z.infer<typeof ZoneConfidence>;
 
+/**
+ * How a zone came to exist. "ai-draft" zones are proposals from the on-device
+ * segmenter that the user has not yet confirmed — the UI must label them as
+ * drafts and never treat them as ground truth (DECISIONS.md D2/D7).
+ */
+export const ZoneSource = z.enum(["manual", "ai-draft"]);
+export type ZoneSource = z.infer<typeof ZoneSource>;
+
 /** A single polygon zone the user has marked on the photo. */
 export const YardZone = z.object({
   id: z.string(),
@@ -44,6 +52,10 @@ export const YardZone = z.object({
   points: z.array(Point),
   notes: z.array(z.string()),
   confidence: ZoneConfidence,
+  /** Defaults to "manual" for older saved maps that predate AI drafts. */
+  source: ZoneSource.optional().default("manual"),
+  /** Optional human label, e.g. the source class "grass" for an AI draft. */
+  label: z.string().optional(),
 });
 export type YardZone = z.infer<typeof YardZone>;
 
@@ -95,6 +107,8 @@ export function createZone(partial: Partial<Omit<YardZone, "id">> = {}): YardZon
     points: partial.points ?? [],
     notes: partial.notes ?? [],
     confidence: partial.confidence ?? "medium",
+    source: partial.source ?? "manual",
+    label: partial.label,
   };
 }
 

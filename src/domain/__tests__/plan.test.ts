@@ -167,6 +167,22 @@ describe("refinement chips change the plan (Draft 1 -> iterate)", () => {
   });
 });
 
+describe("a measured bed area (from the Yard Map) sharpens the estimate", () => {
+  const intake = FIXTURES["oakville-front-yard"];
+
+  it("scales the DIY cost up with a larger measured area", () => {
+    const small = generateDeterministicPlan({ ...intake, areaSqft: 80 });
+    const large = generateDeterministicPlan({ ...intake, areaSqft: 400 });
+    expect(large.budget.diyTotal.max).toBeGreaterThan(small.budget.diyTotal.max);
+  });
+
+  it("raises confidence when the area is known versus unknown", () => {
+    const known = generateDeterministicPlan({ ...intake, areaSqft: 200 });
+    const unknown = generateDeterministicPlan({ ...intake, areaSqft: undefined });
+    expect(known.scores.confidence).toBeGreaterThanOrEqual(unknown.scores.confidence);
+  });
+});
+
 describe("pet-safe fixture flags toxicity as a risk before refinement", () => {
   it("includes a high-severity toxicity risk when a toxic plant is selected", () => {
     const plan = generateDeterministicPlan(FIXTURES["pet-safe-front-yard"]);

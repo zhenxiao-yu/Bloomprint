@@ -50,6 +50,8 @@ interface SavedProfile {
   budget: number;
   /** Tweaks the user last leaned on — so the next plan feels remembered. */
   rememberedTweaks?: RefinementAdjustment[];
+  /** Measured bed area carried over from the Yard Map. */
+  areaSqft?: number;
 }
 
 function parseSavedProfile(raw: string | null): SavedProfile | null {
@@ -77,6 +79,9 @@ export function PlanExperience() {
   const isDemo = params.get("demo") === "1";
   const staffParam = params.get("mode") === "staff";
   const sharedParam = params.get(SHARE_PARAM);
+  // A measured bed area handed back from the Yard Map (sharpens the next plan).
+  const areaParamRaw = Number(params.get("area"));
+  const measuredArea = Number.isFinite(areaParamRaw) && areaParamRaw > 0 ? areaParamRaw : null;
 
   // Compute the initial plan request from the URL once (shared link or demo). Done in render via
   // useMemo (not an effect) so we never call setState synchronously inside an effect.
@@ -180,6 +185,7 @@ export function PlanExperience() {
       goal: values.goal,
       effortLevel: values.effortLevel,
       budget: values.budget,
+      areaSqft: values.areaSqft,
     };
     saveProfile(next);
     const req: PlanRequest = { intake: values };
@@ -297,20 +303,21 @@ export function PlanExperience() {
     : "/plan";
   const today = new Date().toISOString().slice(0, 10);
 
-  const defaults: IntakeDefaults | undefined = profile
-    ? {
-        regionId: profile.regionId,
-        goal: profile.goal,
-        effortLevel: profile.effortLevel,
-        budgetIndex: Math.max(
-          0,
-          BUDGETS.findIndex((b) => b.budget === profile.budget),
-        ),
-      }
-    : undefined;
+  const defaults: IntakeDefaults | undefined =
+    profile || measuredArea
+      ? {
+          regionId: profile?.regionId,
+          goal: profile?.goal,
+          effortLevel: profile?.effortLevel,
+          budgetIndex: profile
+            ? Math.max(0, BUDGETS.findIndex((b) => b.budget === profile.budget))
+            : undefined,
+          areaSqft: measuredArea ?? profile?.areaSqft,
+        }
+      : undefined;
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
+    <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-28 pt-8 sm:px-6 sm:py-10">
       <div className="mb-6 flex items-center justify-between">
         <Link href="/" className="text-sm font-semibold text-brand">
           {t("back")}
@@ -342,6 +349,11 @@ export function PlanExperience() {
           ) : null}
           {profile ? <MemoryBanner profile={profile} t={t} /> : null}
           <h1 className="text-2xl font-semibold text-foreground">{t("intakeTitle")}</h1>
+          {measuredArea ? (
+            <div className="rounded-lg bg-brand-soft px-4 py-2 text-xs text-brand-strong">
+              {t("measuredAreaNote", { area: Math.round(measuredArea) })}
+            </div>
+          ) : null}
           <IntakeForm defaults={defaults} onSubmit={handleIntake} />
         </div>
       ) : null}

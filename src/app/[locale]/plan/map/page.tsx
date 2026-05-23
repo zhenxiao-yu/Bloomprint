@@ -11,15 +11,20 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function YardMapPage() {
+export default async function YardMapPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ goal?: string }>;
+}) {
   const t = await getTranslations("YardMap");
+  const { goal } = await searchParams;
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
+    <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-28 pt-8 sm:px-6 sm:py-10">
       <Link href="/plan" className="text-sm font-semibold text-brand">
         ← {t("backToPlan")}
       </Link>
       <div className="mt-4">
-        <YardMapBuilder />
+        <YardMapBuilder goal={goal} />
       </div>
     </main>
   );
