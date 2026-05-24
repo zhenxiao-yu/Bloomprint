@@ -1,9 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { mapPerenualToFacts } from "@/lib/live-data/plantFacts";
+import { baseSpecies, mapPerenualToFacts } from "@/lib/live-data/plantFacts";
 import { getLiveEnrichment } from "@/lib/live-data/enrich";
 import { EnrichPlanRequest, PlantFacts } from "@/lib/live-data/schema";
 
 const retrievedAt = "2026-05-24T00:00:00.000Z";
+
+describe("baseSpecies — cultivar fallback for gated Perenual details", () => {
+  it("strips the cultivar to the base 'Genus species'", () => {
+    expect(baseSpecies("Hydrangea paniculata 'Limelight'")).toBe("Hydrangea paniculata");
+    expect(baseSpecies("Thuja occidentalis 'Smaragd'")).toBe("Thuja occidentalis");
+  });
+
+  it("returns null when there is nothing to strip (already base, or genus-only)", () => {
+    expect(baseSpecies("Echinacea purpurea")).toBeNull(); // already base species
+    expect(baseSpecies("Rosa")).toBeNull(); // single token
+    expect(baseSpecies("Nepeta 'Walker's Low'")).toBeNull(); // genus + cultivar only
+  });
+});
 
 describe("mapPerenualToFacts — sourced bloom/care, never fabricated", () => {
   it("maps flowering_season -> bloom, joins sunlight, and attributes Perenual", () => {

@@ -67,7 +67,29 @@ export function mapPerenualToFacts(
   };
 }
 
-/** Live Perenual lookup: species search → details → mapped facts. Null on any failure. */
+/** Cap on `species/details` calls per lookup — bounds free-tier rate-limit usage. */
+const MAX_DETAIL_ATTEMPTS = 3;
+
+/**
+ * Drop the cultivar so we can fall back from a gated cultivar record to its base species.
+ * "Hydrangea paniculata 'Limelight'" → "Hydrangea paniculata". Returns null if unchanged.
+ */
+export function baseSpecies(scientificName: string): string | null {
+  const tokens = scientificName.trim().split(/\s+/);
+  // Need a genus + a species epithet. If the 2nd token is a quoted cultivar
+  // (e.g. "Nepeta 'Walker's Low'"), there's no species epithet to fall back to.
+  if (tokens.length < 2 || tokens[1].startsWith("'")) return null;
+  const base = `${tokens[0]} ${tokens[1]}`;
+  // Only a fallback if it actually drops something (a cultivar / extra qualifier).
+  return base.length < scientificName.trim().length ? base : null;
+}
+
+/**
+ * Live Perenual lookup: species search → details → mapped facts. Null on any failure.
+ * Perenual's free tier gates `species/details` for many cultivar IDs (HTTP 429 "upgrade"),
+ * so we try the exact name first and then the base species, taking the first record whose
+ * details actually resolve — capped at {@link MAX_DETAIL_ATTEMPTS} calls.
+ */
 async function fetchPerenualFacts(
   scientificName: string,
   commonName?: string,
@@ -77,23 +99,31 @@ async function fetchPerenualFacts(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
-    const listRes = await fetch(
-      `${PERENUAL_BASE}/species-list?key=${apiKey}&q=${encodeURIComponent(scientificName)}`,
-      { signal: controller.signal },
+    const queries = [scientificName, baseSpecies(scientificName)].filter(
+      (q): q is string => Boolean(q),
     );
-    if (!listRes.ok) return null;
-    const list = PerenualList.safeParse(await listRes.json());
-    const id = list.success ? list.data.data[0]?.id : undefined;
-    if (id == null) return null;
-
-    const detailRes = await fetch(`${PERENUAL_BASE}/species/details/${id}?key=${apiKey}`, {
-      signal: controller.signal,
-    });
-    if (!detailRes.ok) return null;
-    const details = PerenualDetails.safeParse(await detailRes.json());
-    if (!details.success) return null;
-
-    return mapPerenualToFacts(details.data, scientificName, commonName, new Date().toISOString());
+    let attempts = 0;
+    for (const query of queries) {
+      const listRes = await fetch(
+        `${PERENUAL_BASE}/species-list?key=${apiKey}&q=${encodeURIComponent(query)}`,
+        { signal: controller.signal },
+      );
+      if (!listRes.ok) continue;
+      const list = PerenualList.safeParse(await listRes.json());
+      const ids = list.success ? list.data.data.slice(0, 2).map((d) => d.id) : [];
+      for (const id of ids) {
+        if (attempts >= MAX_DETAIL_ATTEMPTS) return null;
+        attempts++;
+        const detailRes = await fetch(`${PERENUAL_BASE}/species/details/${id}?key=${apiKey}`, {
+          signal: controller.signal,
+        });
+        if (!detailRes.ok) continue; // gated/404 → try the next candidate
+        const details = PerenualDetails.safeParse(await detailRes.json());
+        if (!details.success) continue;
+        return mapPerenualToFacts(details.data, scientificName, commonName, new Date().toISOString());
+      }
+    }
+    return null;
   } catch {
     return null;
   } finally {
