@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { MobileNav } from "@/components/MobileNav";
+import { PwaClient } from "@/components/PwaClient";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
@@ -52,6 +53,13 @@ export async function generateMetadata({
     title: { default: t("title"), template: `%s · ${SITE_NAME}` },
     description: t("description"),
     applicationName: SITE_NAME,
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+      capable: true,
+      title: SITE_NAME,
+      statusBarStyle: "default",
+    },
+    formatDetection: { telephone: false },
     alternates: {
       canonical: path,
       languages: { en: "/", zh: "/zh", "x-default": "/" },
@@ -76,6 +84,7 @@ export async function generateMetadata({
 }
 
 export const viewport = {
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: BRAND_THEME_COLOR },
     { media: "(prefers-color-scheme: dark)", color: "#0e1511" },
@@ -102,6 +111,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <ThemeProvider>
             <SiteHeader />
+            <PwaClient />
             <div className="flex flex-1 flex-col">{children}</div>
             <SiteFooter />
             <MobileNav />

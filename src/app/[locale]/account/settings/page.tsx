@@ -9,6 +9,7 @@ import { Link } from "@/i18n/navigation";
 import { signOut, updateAccount, useAccount } from "@/lib/accountStore";
 import { accountSchema, type AccountFormValues } from "@/lib/accountForm";
 import { clearPlans, useSavedPlans } from "@/lib/plansStore";
+import { AccountAppSettings } from "@/components/AccountAppSettings";
 
 export default function SettingsPage() {
   const t = useTranslations("Settings");
@@ -47,13 +48,16 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 animate-fade-up px-4 py-8 sm:px-6 sm:py-10">
+    <main className="mx-auto w-full max-w-4xl flex-1 animate-fade-up px-4 py-8 sm:px-6 sm:py-10">
       <Link href="/account" className="text-sm font-semibold text-brand">
         {t("backToAccount")}
       </Link>
-      <h1 className="mt-2 text-2xl font-semibold text-foreground">{t("title")}</h1>
+      <div className="mt-2">
+        <h1 className="text-2xl font-semibold text-foreground">{t("title")}</h1>
+        <p className="mt-1 max-w-2xl text-sm text-muted">{t("subtitle")}</p>
+      </div>
 
-      <form onSubmit={handleSubmit(save)} className="card mt-5 space-y-4 p-5" noValidate>
+      <form onSubmit={handleSubmit(save)} className="card mt-5 flex flex-col gap-4 p-5" noValidate>
         <label className="block">
           <span className="mb-1 block text-sm font-semibold text-foreground">{t("nameLabel")}</span>
           <input
@@ -61,7 +65,9 @@ export default function SettingsPage() {
             aria-invalid={errors.name ? "true" : undefined}
             className="card w-full p-2.5 text-sm"
           />
-          {errors.name ? <span className="mt-1 block text-xs text-danger">{errors.name.message}</span> : null}
+          {errors.name ? (
+            <span className="mt-1 block text-xs text-danger">{errors.name.message}</span>
+          ) : null}
         </label>
         <label className="block">
           <span className="mb-1 block text-sm font-semibold text-foreground">
@@ -73,7 +79,9 @@ export default function SettingsPage() {
             aria-invalid={errors.email ? "true" : undefined}
             className="card w-full p-2.5 text-sm"
           />
-          {errors.email ? <span className="mt-1 block text-xs text-danger">{errors.email.message}</span> : null}
+          {errors.email ? (
+            <span className="mt-1 block text-xs text-danger">{errors.email.message}</span>
+          ) : null}
         </label>
         <div className="flex items-center gap-3">
           <button
@@ -82,11 +90,17 @@ export default function SettingsPage() {
           >
             {t("saveChanges")}
           </button>
-          {saved ? <span className="text-xs font-medium text-brand-strong">{t("savedConfirm")}</span> : null}
+          {saved ? (
+            <span className="text-xs font-medium text-brand-strong">{t("savedConfirm")}</span>
+          ) : null}
         </div>
       </form>
 
-      <div className="card mt-4 space-y-3 p-5">
+      <div className="mt-4">
+        <AccountAppSettings />
+      </div>
+
+      <div className="card mt-4 flex flex-col gap-3 p-5">
         <h2 className="text-base font-semibold text-foreground">{t("dataTitle")}</h2>
         <p className="text-sm text-muted">
           {plans.length === 1

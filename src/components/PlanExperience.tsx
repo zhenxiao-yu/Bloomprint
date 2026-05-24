@@ -9,6 +9,7 @@ import { IntakeForm, type IntakeDefaults, type IntakeValues } from "@/components
 import { PlanResult, type ViewMode } from "@/components/PlanResult";
 import { PhotoPanel } from "@/components/PhotoPanel";
 import { PhotoFirstPlanning } from "@/components/PhotoFirstPlanning";
+import { PlanBuildLoading } from "@/components/PlanBuildLoading";
 import { SyncStatusBadge } from "@/components/SyncStatusBadge";
 import { BUDGETS, REGION_OPTIONS } from "@/lib/uiOptions";
 import { saveProfile, useSavedProfileRaw } from "@/lib/profileStore";
@@ -49,7 +50,7 @@ const VERSION_LABELS: Partial<Record<RefinementAdjustment, string>> = {
 
 function versionLabel(adjustments: RefinementAdjustment[]): string {
   const last = adjustments.at(-1);
-  return last ? VERSION_LABELS[last] ?? `${last.replace(/-/g, " ")} version` : "Draft 1";
+  return last ? (VERSION_LABELS[last] ?? `${last.replace(/-/g, " ")} version`) : "Draft 1";
 }
 
 interface SavedProfile {
@@ -118,7 +119,12 @@ export function PlanExperience() {
       };
     }
     if (isDemo) {
-      return { request: { fixtureKey: "oakville-front-yard" }, adjustments: [], source: "demo", error: null };
+      return {
+        request: { fixtureKey: "oakville-front-yard" },
+        adjustments: [],
+        source: "demo",
+        error: null,
+      };
     }
     return { request: null, adjustments: [], source: null, error: null };
   }, [sharedParam, isDemo, t]);
@@ -137,14 +143,15 @@ export function PlanExperience() {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [prepComplete, setPrepComplete] = useState(Boolean(boot.request));
-  const [draft, setDraft] = useState<PlanningDraftSnapshot>(() => createPlanningDraft(staffParam ? "store_customer" : "my_home"));
-  const [recoveryDraft, setRecoveryDraft] = useState<PlanningDraftSnapshot | null>(null);
-  const [autosaveState, setAutosaveState] = useState<"idle" | "saving" | "saved" | "unsaved">("idle");
-  const profileRaw = useSavedProfileRaw();
-  const profile = useMemo<SavedProfile | null>(
-    () => parseSavedProfile(profileRaw),
-    [profileRaw],
+  const [draft, setDraft] = useState<PlanningDraftSnapshot>(() =>
+    createPlanningDraft(staffParam ? "store_customer" : "my_home"),
   );
+  const [recoveryDraft, setRecoveryDraft] = useState<PlanningDraftSnapshot | null>(null);
+  const [autosaveState, setAutosaveState] = useState<"idle" | "saving" | "saved" | "unsaved">(
+    "idle",
+  );
+  const profileRaw = useSavedProfileRaw();
+  const profile = useMemo<SavedProfile | null>(() => parseSavedProfile(profileRaw), [profileRaw]);
   const stores = useStores();
   const started = useRef(false);
 
@@ -198,7 +205,12 @@ export function PlanExperience() {
     updateDraft((current) => ({
       ...current,
       photos,
-      session: { ...current.session, photoIds: photos.map((p) => p.id), currentStep: "photos", updatedAt: Date.now() },
+      session: {
+        ...current.session,
+        photoIds: photos.map((p) => p.id),
+        currentStep: "photos",
+        updatedAt: Date.now(),
+      },
     }));
     const first = photos[0]?.previewUrl ?? null;
     if (first) setPhotoUrl(first);
@@ -221,7 +233,9 @@ export function PlanExperience() {
   function resumeDraft(snapshot: PlanningDraftSnapshot) {
     setDraft(snapshot);
     setPhotoUrl(snapshot.photos[0]?.previewUrl ?? null);
-    setPrepComplete(snapshot.session.currentStep === "details" || snapshot.session.currentStep === "plan");
+    setPrepComplete(
+      snapshot.session.currentStep === "details" || snapshot.session.currentStep === "plan",
+    );
     setRecoveryDraft(null);
     setAutosaveState("saved");
   }
@@ -339,13 +353,16 @@ export function PlanExperience() {
       confidence: p.confidence,
       plantCount: p.plants.length,
       laborHours: p.labor.totalHours,
-      privacy: p.plants.some((plant) => plant.role === "screen") ? "screening included" : "not privacy-led",
+      privacy: p.plants.some((plant) => plant.role === "screen")
+        ? "screening included"
+        : "not privacy-led",
       maintenance: p.plants.some((plant) => plant.maintenance === "high")
         ? "higher touch"
         : p.plants.every((plant) => plant.maintenance === "low")
           ? "low"
           : "medium",
-      heavyWorkWarning: p.equipment.length > 0 || p.storeSearches.some((s) => s.deliveryRecommended),
+      heavyWorkWarning:
+        p.equipment.length > 0 || p.storeSearches.some((s) => s.deliveryRecommended),
       versionLabel: vLabel,
     };
 
@@ -373,7 +390,8 @@ export function PlanExperience() {
           evidence: p.evidence,
         })
         .then((project) => {
-          if (photoUrl) return stores.photos.saveProjectPhoto(project.id, photoUrl).then(() => undefined);
+          if (photoUrl)
+            return stores.photos.saveProjectPhoto(project.id, photoUrl).then(() => undefined);
         })
         .catch(() => {
           /* hybrid store already fell back to local + flagged a warning */
@@ -423,7 +441,10 @@ export function PlanExperience() {
           goal: profile?.goal,
           effortLevel: profile?.effortLevel,
           budgetIndex: profile
-            ? Math.max(0, BUDGETS.findIndex((b) => b.budget === profile.budget))
+            ? Math.max(
+                0,
+                BUDGETS.findIndex((b) => b.budget === profile.budget),
+              )
             : undefined,
           areaSqft: measuredArea ?? profile?.areaSqft,
         }
@@ -457,16 +478,35 @@ export function PlanExperience() {
         <div className="space-y-5">
           {recoveryDraft && !prepComplete ? (
             <div className="rounded-xl border border-brand/25 bg-brand-soft p-4 text-sm text-brand-strong">
-              <p className="font-semibold">We found an unsaved plan from {new Date(recoveryDraft.session.updatedAt).toLocaleTimeString()}.</p>
-              <p className="mt-1">Resume your photos and assumptions, save it as a project, or discard it.</p>
+              <p className="font-semibold">
+                We found an unsaved plan from{" "}
+                {new Date(recoveryDraft.session.updatedAt).toLocaleTimeString()}.
+              </p>
+              <p className="mt-1">
+                Resume your photos and assumptions, save it as a project, or discard it.
+              </p>
               <div className="mt-3 flex flex-wrap gap-2">
-                <button onClick={() => resumeDraft(recoveryDraft)} className="rounded-full bg-brand px-4 py-1.5 text-xs font-semibold text-on-strong">
+                <button
+                  onClick={() => resumeDraft(recoveryDraft)}
+                  className="rounded-full bg-brand px-4 py-1.5 text-xs font-semibold text-on-strong"
+                >
                   Resume plan
                 </button>
-                <button onClick={() => resumeDraft({ ...recoveryDraft, session: { ...recoveryDraft.session, id: crypto.randomUUID() } })} className="rounded-full border border-brand px-4 py-1.5 text-xs font-semibold">
+                <button
+                  onClick={() =>
+                    resumeDraft({
+                      ...recoveryDraft,
+                      session: { ...recoveryDraft.session, id: crypto.randomUUID() },
+                    })
+                  }
+                  className="rounded-full border border-brand px-4 py-1.5 text-xs font-semibold"
+                >
                   Save as new project
                 </button>
-                <button onClick={discardDraft} className="rounded-full border border-border px-4 py-1.5 text-xs font-semibold text-muted">
+                <button
+                  onClick={discardDraft}
+                  className="rounded-full border border-border px-4 py-1.5 text-xs font-semibold text-muted"
+                >
                   Discard
                 </button>
               </div>
@@ -514,7 +554,9 @@ export function PlanExperience() {
             <>
               {profile ? <MemoryBanner profile={profile} t={t} /> : null}
               <div className="rounded-xl border border-border bg-surface p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-brand">Confirmed photos and assumptions</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand">
+                  Confirmed photos and assumptions
+                </p>
                 <p className="mt-1 text-sm text-muted">
                   {draft.photos.length > 0
                     ? `${draft.photos.length} photo(s) attached. ${draft.analysis?.zones.length ?? 0} planning zone(s) estimated.`
@@ -542,19 +584,7 @@ export function PlanExperience() {
 
       {step === "loading" ? (
         <div className="space-y-4" aria-live="polite" aria-busy="true">
-          <p className="flex items-center gap-2 text-sm text-muted">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-            {t("building")}
-          </p>
-          <div className="card overflow-hidden p-6">
-            <div className="skeleton h-6 w-2/3" />
-            <div className="skeleton mt-3 h-4 w-full" />
-            <div className="skeleton mt-2 h-4 w-5/6" />
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <div className="skeleton h-20" />
-              <div className="skeleton h-20" />
-            </div>
-          </div>
+          <PlanBuildLoading />
           <div className="card p-5">
             <div className="skeleton h-4 w-1/3" />
             <div className="mt-3 flex gap-2">
@@ -639,10 +669,10 @@ export function PlanExperience() {
             <span className="ml-auto">
               <SyncStatusBadge />
             </span>
-            {savedNote ? <span className="text-xs font-medium text-brand-strong">{t("savedConfirm")}</span> : null}
-            {shareUrl ? (
-              <span className="text-xs text-muted">{t("linkCopied")}</span>
+            {savedNote ? (
+              <span className="text-xs font-medium text-brand-strong">{t("savedConfirm")}</span>
             ) : null}
+            {shareUrl ? <span className="text-xs text-muted">{t("linkCopied")}</span> : null}
           </div>
           {calendarOpen ? (
             <div className="card mb-4 flex flex-wrap items-center gap-3 p-3">
@@ -658,7 +688,8 @@ export function PlanExperience() {
               <button
                 onClick={() =>
                   handleCalendar(
-                    (document.getElementById("care-start") as HTMLInputElement | null)?.value ?? today,
+                    (document.getElementById("care-start") as HTMLInputElement | null)?.value ??
+                      today,
                   )
                 }
                 className="rounded-full bg-brand px-4 py-1.5 text-sm font-semibold text-on-strong hover:bg-brand-strong"
@@ -732,7 +763,8 @@ function MemoryBanner({
   className?: string;
   t: ReturnType<typeof useTranslations<"Plan">>;
 }) {
-  const region = REGION_OPTIONS.find((r) => r.value === profile.regionId)?.label ?? profile.regionId;
+  const region =
+    REGION_OPTIONS.find((r) => r.value === profile.regionId)?.label ?? profile.regionId;
   const prefs = [
     GOAL_PREF[profile.goal] ?? "a good plan",
     EFFORT_PREF[profile.effortLevel] ?? "moderate effort",
@@ -745,7 +777,9 @@ function MemoryBanner({
       <span className="font-semibold">{t("savedPrefsTitle")}</span>
       <span className="ml-1">{prefs.map((p) => `✓ ${p}`).join("  ·  ")}</span>
       {tweaks.length > 0 ? (
-        <span className="mt-1 block opacity-80">{t("remembersTweaks", { tweaks: tweaks.join(", ") })}</span>
+        <span className="mt-1 block opacity-80">
+          {t("remembersTweaks", { tweaks: tweaks.join(", ") })}
+        </span>
       ) : null}
     </div>
   );

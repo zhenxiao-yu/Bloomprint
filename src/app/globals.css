@@ -107,22 +107,24 @@
   --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
   --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
   @keyframes shimmer-slide {
-  to {
-    transform: translate(calc(100cqw - 100%), 0);
+    to {
+      transform: translate(calc(100cqw - 100%), 0);
     }
   }
   @keyframes spin-around {
-  0% {
-    transform: translateZ(0) rotate(0);
+    0% {
+      transform: translateZ(0) rotate(0);
     }
-  15%, 35% {
-    transform: translateZ(0) rotate(90deg);
+    15%,
+    35% {
+      transform: translateZ(0) rotate(90deg);
     }
-  65%, 85% {
-    transform: translateZ(0) rotate(270deg);
+    65%,
+    85% {
+      transform: translateZ(0) rotate(270deg);
     }
-  100% {
-    transform: translateZ(0) rotate(360deg);
+    100% {
+      transform: translateZ(0) rotate(360deg);
     }
   }
 }
@@ -157,6 +159,13 @@ h4 {
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  background: var(--background);
+}
+
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+  }
 }
 
 button {
@@ -205,7 +214,12 @@ button:not(:disabled):active {
 }
 
 .skeleton {
-  background: linear-gradient(90deg, var(--border) 25%, var(--surface-muted) 37%, var(--border) 63%);
+  background: linear-gradient(
+    90deg,
+    var(--border) 25%,
+    var(--surface-muted) 37%,
+    var(--border) 63%
+  );
   background-size: 200% 100%;
   animation: bp-shimmer 1.3s ease-in-out infinite;
   border-radius: 0.5rem;
