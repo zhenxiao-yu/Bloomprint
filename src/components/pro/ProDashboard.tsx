@@ -23,6 +23,7 @@ import {
   X,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { Photo } from "@/components/ui/photo";
 import { generateDeterministicPlan } from "@/domain/plan";
 import { getSavedPlan, useSavedPlans } from "@/lib/plansStore";
 import { encodeShare, SHARE_PARAM } from "@/lib/shareLink";
@@ -52,7 +53,7 @@ type View = "pipeline" | "clients" | "buylist";
 
 const STATUS_TONE: Record<ProStatus, string> = {
   lead: "bg-border/60 text-muted",
-  quoted: "bg-[var(--warn)]/15 text-[var(--warn)]",
+  quoted: "bg-warn/15 text-warn",
   approved: "bg-brand-soft text-brand-strong",
   scheduled: "bg-sky-500/15 text-sky-700 dark:text-sky-300",
   in_progress: "bg-brand-soft text-brand-strong",
@@ -90,7 +91,7 @@ export function ProDashboard() {
 
   if (isEmpty) {
     return (
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-12 sm:px-6">
+      <main className="aurora mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-12 sm:px-6">
         <ProHeader onNewProject={() => setEditing("new")} />
         <div className="card flex flex-col items-center gap-4 p-8 text-center">
           <BriefcaseBusiness className="size-10 text-brand" aria-hidden />
@@ -197,26 +198,35 @@ export function ProDashboard() {
 
 function ProHeader({ onNewProject }: { onNewProject: () => void }) {
   return (
-    <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <p className="text-sm font-semibold uppercase tracking-wide text-brand">Pro workspace</p>
-        <h1 className="mt-1 text-3xl font-semibold text-foreground sm:text-4xl">
-          Organize jobs, plans, and shopping lists
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted">
-          A lightweight operations board for landscapers — clients, a job pipeline, and one buy list
-          across every linked plan.
-        </p>
-      </div>
-      <button
-        type="button"
-        onClick={onNewProject}
-        className="inline-flex shrink-0 items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
-      >
-        <Plus className="size-4" aria-hidden />
-        New project
-      </button>
-    </header>
+    <Photo
+      src="/photos/yard-lawn.jpg"
+      alt="A manicured lawn bordered by a modern fence"
+      priority
+      scrim
+      sizes="(max-width: 1152px) 100vw, 1152px"
+      className="flex min-h-52 rounded-3xl ring-1 ring-foreground/10"
+    >
+      <header className="mt-auto flex flex-col gap-3 p-5 sm:flex-row sm:items-end sm:justify-between sm:p-7">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-wide text-white/80">Pro workspace</p>
+          <h1 className="mt-1 text-3xl font-semibold text-white drop-shadow-sm sm:text-4xl">
+            Organize jobs, plans, and shopping lists
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm text-white/85">
+            A lightweight operations board for landscapers — clients, a job pipeline, and one buy
+            list across every linked plan.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onNewProject}
+          className="inline-flex shrink-0 items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
+        >
+          <Plus className="size-4" aria-hidden />
+          New project
+        </button>
+      </header>
+    </Photo>
   );
 }
 
@@ -230,8 +240,10 @@ function StatCard({
   value: string;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-surface p-4">
-      <Icon className="mb-2 size-5 text-brand" aria-hidden />
+    <div className="card hover-lift p-4">
+      <span className="mb-2 flex size-9 items-center justify-center rounded-full bg-brand-soft text-brand">
+        <Icon className="size-5" aria-hidden />
+      </span>
       <p className="text-xs font-semibold uppercase tracking-wide text-muted">{label}</p>
       <p className="mt-1 text-2xl font-semibold text-foreground">{value}</p>
     </div>
@@ -290,7 +302,7 @@ function ProjectCard({
   onOpen: () => void;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-surface p-3 text-left shadow-sm">
+    <div className="card hover-lift p-3 text-left shadow-sm">
       <button type="button" onClick={onOpen} className="block w-full text-left">
         <p className="text-sm font-semibold text-foreground">{project.title}</p>
         {clientName ? <p className="mt-0.5 text-xs text-muted">{clientName}</p> : null}
@@ -368,7 +380,7 @@ function ClientsView({ clients, projects }: { clients: ProClient[]; projects: Pr
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {clients.map((client) => (
-            <div key={client.id} className="rounded-xl border border-border bg-surface p-4">
+            <div key={client.id} className="card hover-lift p-4">
               <p className="text-sm font-semibold text-foreground">{client.name}</p>
               {client.email ? <p className="mt-0.5 text-xs text-muted">{client.email}</p> : null}
               {client.phone ? <p className="text-xs text-muted">{client.phone}</p> : null}
@@ -547,14 +559,14 @@ function ProjectDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-label={project ? "Edit project" : "New project"}
       onClick={onClose}
     >
       <div
-        className="flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl bg-surface shadow-2xl sm:rounded-2xl"
+        className="animate-fade-up flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl bg-surface shadow-2xl sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 border-b border-border p-4">
