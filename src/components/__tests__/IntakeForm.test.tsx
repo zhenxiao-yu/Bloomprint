@@ -78,11 +78,57 @@ describe("IntakeForm", () => {
     const onSubmit = vi.fn();
     renderWithIntl(<IntakeForm onSubmit={onSubmit} />, { locale: "en" });
 
+    await user.click(screen.getByRole("button", { name: /3\. Accuracy/ }));
     await user.type(screen.getByLabelText("Length"), "20");
     await user.type(screen.getByLabelText("Width"), "4");
     await user.click(screen.getByRole("button", { name: "Build my plan" }));
 
     const values = onSubmit.mock.calls[0][0] as IntakeValues;
-    expect(values.measurement).toMatchObject({ length: 20, width: 4, unit: "ft", source: "manual" });
+    expect(values.measurement).toMatchObject({
+      length: 20,
+      width: 4,
+      unit: "ft",
+      source: "manual",
+    });
+  });
+
+  it("uses confirmable photo context without blocking form submission", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    renderWithIntl(
+      <IntakeForm
+        onSubmit={onSubmit}
+        photoCount={1}
+        photoAnalysis={{
+          zones: [
+            { id: "front-bed", label: "Front planting bed", type: "planting_bed", confidence: 0.7 },
+          ],
+          detectedObjects: ["photo ML observation: front bed visible"],
+          assumptions: [
+            {
+              id: "sun",
+              label: "Sun exposure",
+              value: "Photo ML estimates some sun. Please confirm before buying plants.",
+              confidence: "medium",
+              editable: true,
+            },
+          ],
+          missingInfo: [],
+          risks: [],
+          confidence: 0.7,
+          generatedAt: Date.now(),
+        }}
+      />,
+      { locale: "en" },
+    );
+
+    expect(screen.getByText("Photo intelligence")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Apply photo hints" }));
+    await user.click(screen.getByRole("button", { name: "Build my plan" }));
+
+    const values = onSubmit.mock.calls[0][0] as IntakeValues;
+    expect(values.hasPhoto).toBe(true);
+    expect(values.sun).toBe("part-sun");
+    expect(values.areaType).toBe("foundation-bed");
   });
 });

@@ -576,7 +576,13 @@ export function PlanExperience() {
                   {t("measuredAreaNote", { area: Math.round(measuredArea) })}
                 </div>
               ) : null}
-              <IntakeForm defaults={defaults} onSubmit={handleIntake} />
+              <IntakeForm
+                defaults={defaults}
+                onSubmit={handleIntake}
+                photoAnalysis={draft.analysis}
+                photoPreviewUrl={photoUrl ?? draft.photos[0]?.previewUrl ?? null}
+                photoCount={draft.photos.filter((photo) => photo.quality !== "unusable").length}
+              />
             </>
           )}
         </div>

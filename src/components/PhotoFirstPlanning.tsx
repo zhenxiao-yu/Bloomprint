@@ -148,6 +148,12 @@ type FrameSignal = {
   lowDetail: boolean;
 };
 
+type VisionSuggestion = {
+  sun?: string;
+  observations?: string[];
+  note?: string;
+};
+
 function qualityLabel(quality: PhotoQuality | undefined): string {
   if (quality === "unusable") return "Retake";
   if (quality === "needs_review") return "Needs review";
@@ -164,6 +170,67 @@ function qualityClass(quality: PhotoQuality | undefined): string {
 function activeStep(photos: PhotoAsset[], analysis: PhotoAnalysisResult | null) {
   if (analysis || photos.length > 0) return "confirm";
   return "photos";
+}
+
+function sunLabel(value: string): string {
+  if (value === "full-sun") return "lots of sun";
+  if (value === "part-sun") return "some sun";
+  if (value === "shade") return "mostly shade";
+  return "unknown sun";
+}
+
+function dataUrlParts(
+  dataUrl: string,
+): { mediaType: "image/jpeg" | "image/png" | "image/webp"; base64: string } | null {
+  const match = dataUrl.match(/^data:(image\/(?:jpeg|png|webp));base64,(.+)$/);
+  if (!match) return null;
+  return { mediaType: match[1] as "image/jpeg" | "image/png" | "image/webp", base64: match[2] };
+}
+
+async function readVisionSuggestion(photos: PhotoAsset[]): Promise<VisionSuggestion | null> {
+  const photo = photos.find((item) => item.quality !== "unusable" && item.previewUrl);
+  const parts = photo?.previewUrl ? dataUrlParts(photo.previewUrl) : null;
+  if (!parts) return null;
+  try {
+    const enabled = (await fetch("/api/vision").then((res) => res.json())) as { enabled?: boolean };
+    if (!enabled.enabled) return null;
+    const res = await fetch("/api/vision", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ imageBase64: parts.base64, mediaType: parts.mediaType }),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { suggestion?: VisionSuggestion };
+    return data.suggestion ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function mergeVisionSuggestion(
+  analysis: PhotoAnalysisResult,
+  suggestion: VisionSuggestion | null,
+): PhotoAnalysisResult {
+  if (!suggestion) return analysis;
+  const observations = (suggestion.observations ?? []).slice(0, 4);
+  return {
+    ...analysis,
+    detectedObjects: [
+      ...analysis.detectedObjects,
+      ...observations.map((item) => `photo ML observation: ${item}`),
+    ],
+    assumptions: analysis.assumptions.map((item) =>
+      item.id === "sun" && suggestion.sun && suggestion.sun !== "unknown"
+        ? {
+            ...item,
+            value: `Photo ML estimates ${sunLabel(suggestion.sun)}. Please confirm before buying plants.`,
+            confidence: "medium",
+          }
+        : item,
+    ),
+    risks: [...analysis.risks, ...(suggestion.note ? [`Photo ML note: ${suggestion.note}`] : [])],
+    confidence: Math.min(0.82, analysis.confidence + (observations.length > 0 ? 0.04 : 0)),
+  };
 }
 
 function sampleCanvas(canvas: HTMLCanvasElement): FrameSignal {
@@ -380,7 +447,10 @@ export function PhotoFirstPlanning({
       }, 450);
     }, 0);
     const timer = window.setTimeout(() => {
-      void analyzeYardPhotos(photos).then((next) => {
+      void analyzeYardPhotos(photos).then(async (base) => {
+        if (!active) return;
+        setStatus("Checking optional photo ML...");
+        const next = mergeVisionSuggestion(base, await readVisionSuggestion(photos));
         if (!active) return;
         onAnalysis(next);
         setAssumptionEdits((current) => {

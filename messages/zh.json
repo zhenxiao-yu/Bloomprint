@@ -334,7 +334,52 @@
     },
     "petsQuestion": "有宠物或小孩会用到这个院子",
     "petsHint": "我们会避开对狗、猫或儿童有毒的植物。",
-    "confidenceUp": "已补充 {count} 项——信心更高。"
+    "confidenceUp": "已补充 {count} 项，信心更高。",
+    "detailsKicker": "方案信息",
+    "stepDone": "已完成",
+    "stepActive": "当前",
+    "stepNext": "下一步",
+    "previousStep": "返回",
+    "nextStep": "下一步",
+    "buildAnytime": "现在就能生成，也可以继续补充细节。",
+    "unknownsNote": "选最接近的答案，或者保留未知。Bloomprint 会如实标注信心。",
+    "photoContextTitle": "照片智能判断",
+    "photoContextCount": "{count} 张可用照片正在辅助这一步。",
+    "photoContextEmpty": "还没有照片。只根据你的回答也能生成方案。",
+    "photoContextNoMl": "暂无机器学习信号",
+    "photoContextConfidence": "照片信心 {confidence}%",
+    "applyPhotoHints": "应用照片提示",
+    "steps": {
+      "goal": {
+        "short": "目标",
+        "title": "先说清真实问题。",
+        "body": "选择你想达成的效果，或直接选择最接近的院子问题。"
+      },
+      "basics": {
+        "short": "基础",
+        "title": "设定预算和施工边界。",
+        "body": "地区、预算和动手强度会决定什么方案真正能落地。"
+      },
+      "accuracy": {
+        "short": "精准",
+        "title": "只补充你知道的信息。",
+        "body": "日照、尺寸、排水和安全信息会提高信心。不确定也没关系。"
+      }
+    },
+    "tips": {
+      "goal": {
+        "title": "如何选目标",
+        "body": "需要高度遮挡就选隐私；想改善门面就选门面提升；想少打理就选低维护；不确定时选通用，让 Bloomprint 平衡方案。"
+      },
+      "budget": {
+        "title": "预算提示",
+        "body": "预算可以理解为植物、边界、覆盖物或石材，以及小工具的总花费。Bloomprint 使用区间，不会假装给精确价格。"
+      },
+      "accuracy": {
+        "title": "精准度提示",
+        "body": "最有用的三项是花床尺寸、日照和排水。不知道也可以继续，只是方案信心会更低。"
+      }
+    }
   },
   "Command": {
     "title": "告诉 Bloomprint 想改什么",

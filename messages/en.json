@@ -334,7 +334,52 @@
     },
     "petsQuestion": "Pets or young kids use this yard",
     "petsHint": "We'll avoid plants that are toxic to dogs, cats, or children.",
-    "confidenceUp": "{count} details added — higher confidence."
+    "confidenceUp": "{count} details added — higher confidence.",
+    "detailsKicker": "Plan details",
+    "stepDone": "Done",
+    "stepActive": "Now",
+    "stepNext": "Next",
+    "previousStep": "Back",
+    "nextStep": "Next",
+    "buildAnytime": "You can build now or add more detail.",
+    "unknownsNote": "Choose the closest answer, or leave it unknown. Bloomprint will label the confidence honestly.",
+    "photoContextTitle": "Photo intelligence",
+    "photoContextCount": "{count} usable photo(s) are guiding this step.",
+    "photoContextEmpty": "No photo attached. The plan still works from your answers.",
+    "photoContextNoMl": "No ML signal yet",
+    "photoContextConfidence": "{confidence}% photo confidence",
+    "applyPhotoHints": "Apply photo hints",
+    "steps": {
+      "goal": {
+        "short": "Goal",
+        "title": "Start with the real yard problem.",
+        "body": "Pick the outcome or problem language that matches what you are trying to fix."
+      },
+      "basics": {
+        "short": "Basics",
+        "title": "Set the buying and labor boundaries.",
+        "body": "Region, budget, and effort shape what can be built without wasting time."
+      },
+      "accuracy": {
+        "short": "Accuracy",
+        "title": "Add only the details you know.",
+        "body": "Sun, measurements, drainage, and safety notes raise confidence. Unknown is allowed."
+      }
+    },
+    "tips": {
+      "goal": {
+        "title": "How to choose the best goal",
+        "body": "Choose privacy when height matters, curb appeal when the front view matters, low maintenance when you want fewer chores, and general when you want Bloomprint to balance the plan."
+      },
+      "budget": {
+        "title": "Budget tip",
+        "body": "Use the amount you are comfortable spending on plants, edging, mulch or stone, and small tools. Bloomprint uses ranges, not exact prices."
+      },
+      "accuracy": {
+        "title": "Accuracy tip",
+        "body": "The best three details are bed size, sun exposure, and drainage. If you do not know them, the plan will still build, but confidence will be lower."
+      }
+    }
   },
   "Command": {
     "title": "Tell Bloomprint what to change",
