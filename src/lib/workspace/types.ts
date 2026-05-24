@@ -19,6 +19,7 @@ export type PhotoAssetType =
   | "soil_drainage"
   | "measurement"
   | "inspiration";
+export type PhotoQuality = "good" | "needs_review" | "unusable";
 
 export interface Workspace {
   id: string;
@@ -64,7 +65,14 @@ export interface PhotoAssumption {
 export interface DetectedZone {
   id: string;
   label: string;
-  type: "planting_bed" | "lawn" | "walkway" | "driveway" | "foundation" | "privacy_gap" | "problem_area";
+  type:
+    | "planting_bed"
+    | "lawn"
+    | "walkway"
+    | "driveway"
+    | "foundation"
+    | "privacy_gap"
+    | "problem_area";
   confidence: number;
   note?: string;
 }
@@ -87,6 +95,10 @@ export interface PhotoAsset {
   localBlobId: string;
   fileName?: string;
   previewUrl?: string;
+  width?: number;
+  height?: number;
+  quality?: PhotoQuality;
+  warnings?: string[];
   aiAnalysis?: PhotoAnalysisResult;
   createdAt: number;
   updatedAt: number;

@@ -4,6 +4,7 @@ import type {
   PhotoAnalysisResult,
   PhotoAsset,
   PhotoAssetType,
+  PhotoQuality,
   PlanningSession,
   ProjectKind,
 } from "@/lib/workspace/types";
@@ -25,6 +26,10 @@ export interface DraftPhotoInput {
   dataUrl: string;
   fileName?: string;
   sessionId: string;
+  width?: number;
+  height?: number;
+  quality?: PhotoQuality;
+  warnings?: string[];
 }
 
 function now() {
@@ -123,6 +128,10 @@ export async function saveDraftPhoto(input: DraftPhotoInput): Promise<PhotoAsset
     localBlobId,
     fileName: input.fileName,
     previewUrl: input.dataUrl,
+    width: input.width,
+    height: input.height,
+    quality: input.quality,
+    warnings: input.warnings,
     createdAt: timestamp,
     updatedAt: timestamp,
   };

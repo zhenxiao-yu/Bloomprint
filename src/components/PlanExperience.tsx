@@ -280,18 +280,27 @@ export function PlanExperience() {
   }, [savedNote]);
 
   function handleIntake(values: IntakeValues) {
+    const intakeValues: IntakeValues = {
+      ...values,
+      hasPhoto: values.hasPhoto || draft.photos.some((photo) => photo.quality !== "unusable"),
+    };
     const next: SavedProfile = {
-      regionId: values.regionId,
-      goal: values.goal,
-      effortLevel: values.effortLevel,
-      budget: values.budget,
-      areaSqft: values.areaSqft,
+      regionId: intakeValues.regionId,
+      goal: intakeValues.goal,
+      effortLevel: intakeValues.effortLevel,
+      budget: intakeValues.budget,
+      areaSqft: intakeValues.areaSqft,
     };
     saveProfile(next);
-    const req: PlanRequest = { intake: values };
+    const req: PlanRequest = { intake: intakeValues };
     updateDraft((current) => ({
       ...current,
-      session: { ...current.session, currentStep: "plan", autosaveData: { intake: values }, updatedAt: Date.now() },
+      session: {
+        ...current.session,
+        currentStep: "plan",
+        autosaveData: { intake: intakeValues },
+        updatedAt: Date.now(),
+      },
     }));
     setRequest(req);
     setAdjustments([]);
