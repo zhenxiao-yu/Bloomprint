@@ -704,7 +704,12 @@
     "imaginedError": "Couldn't generate an image — try again.",
     "badgeToxic": "Toxic if chewed",
     "badgeInvasive": "Invasive — check local list",
-    "bloomsLabel": "Blooms"
+    "bloomsLabel": "Blooms",
+    "aiPresentation": "AI-written presentation",
+    "aiHidden": "Showing the raw plan",
+    "aiHide": "Hide AI wording",
+    "aiShow": "Show AI wording",
+    "aiNote": "AI only writes the wording. Plants, prices, quantities, and risks come from Bloomprint’s engine and never change."
   },
   "YardMap": {
     "metaTitle": "Yard Map (beta) · Bloomprint",

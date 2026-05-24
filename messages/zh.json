@@ -704,7 +704,12 @@
     "imaginedError": "暂时无法生成图片，请重试。",
     "badgeToxic": "误食有毒",
     "badgeInvasive": "入侵物种 — 请查本地名录",
-    "bloomsLabel": "花期"
+    "bloomsLabel": "花期",
+    "aiPresentation": "AI 撰写的呈现",
+    "aiHidden": "正在显示原始方案",
+    "aiHide": "隐藏 AI 文案",
+    "aiShow": "显示 AI 文案",
+    "aiNote": "AI 只负责文案措辞。植物、价格、用量与风险均来自 Bloomprint 引擎，不会改变。"
   },
   "YardMap": {
     "metaTitle": "院子地图（测试版）· Bloomprint",

@@ -96,6 +96,15 @@ Verified against the code before building (avoided duplicating shipped work):
   care-enrichment `PlantFacts` schema, mapped from `flowering_season`, surfaced per-plant in
   `PlanResult` behind a `LiveBadge`. The mock stays bloom-free (no fabrication); offline/mock
   degrades to quiet. The pure mapper is unit-tested; the live HTTP path is untested (needs a key).
+  **Verified live** against a real Perenual key: free tier gates many cultivar `details` (429),
+  so a bounded `baseSpecies()` fallback (exact → `Genus species`) was added.
+- **BP-4 (provenance/trust): shipped (the high-value slice).** Added an **"AI presentation"
+  on/off toggle** in the plan hero — off collapses to the pure deterministic plan (every
+  `enhancement?.x` already falls back to the engine), proving completeness without AI — plus a
+  visible AI-wording badge and an honest note ("AI only writes the wording; plants, prices,
+  quantities, and risks come from the engine and never change"). The *editable-assumptions*
+  part of BP-4 was already served by the existing **Accuracy Upgrade card** (answering
+  sun/soil/drainage re-runs the plan), so it wasn't rebuilt. No engine/scoring change.
 
 ## Part 2 — Build specs (the "do-next" subset)
 

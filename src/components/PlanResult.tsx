@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { BloomprintPlan, RefinementAdjustment, ShoppingPriority } from "@/domain/models";
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
@@ -85,10 +85,16 @@ export function PlanResult({
   const tr = useTranslations("Refinements");
   const to = useTranslations("Options");
   const tLive = useTranslations("Live");
-  const { plan, enhancement } = result;
+  const { plan } = result;
   const showNumbers = view !== "simple";
   const [boardView, setBoardView] = useState<"now" | "planned" | "overlay">("planned");
   const [arOpen, setArOpen] = useState(false);
+  // AI only *presents* (narrative, concept name, talking points) — it never changes the
+  // deterministic facts. This toggle lets the reader collapse to the raw engine plan and
+  // see that for themselves; every `enhancement?.x` below already falls back to the engine.
+  const [showAi, setShowAi] = useState(true);
+  const hasAi = Boolean(result.enhancement);
+  const enhancement = showAi ? result.enhancement : null;
 
   const heroDescription =
     enhancement?.homeownerExplanation ?? `${plan.narrative} ${plan.insight}`;
@@ -201,6 +207,24 @@ export function PlanResult({
       {/* Hero moment — confidence sentence + visual summary, before any logistics */}
       <section id="summary" className="card scroll-mt-24 overflow-hidden">
         <div className="bg-brand-soft p-6">
+          {/* Honesty control: AI only writes the wording. Collapse it to see the raw engine plan. */}
+          {hasAi ? (
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1 rounded-full bg-surface/70 px-2 py-0.5 text-[11px] font-medium text-muted">
+                <Sparkles className="size-3" aria-hidden />
+                {showAi ? t("aiPresentation") : t("aiHidden")}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowAi((v) => !v)}
+                aria-pressed={!showAi}
+                className="rounded-full border border-border px-2.5 py-0.5 text-[11px] font-semibold text-foreground transition hover:border-brand"
+              >
+                {showAi ? t("aiHide") : t("aiShow")}
+              </button>
+              <span className="basis-full text-[11px] text-muted">{t("aiNote")}</span>
+            </div>
+          ) : null}
           {enhancement?.conceptName ? (
             <p className="text-xs font-semibold uppercase tracking-wide text-brand-strong">
               {enhancement.conceptName}
