@@ -7,6 +7,7 @@
  * their saved intake, so shopping numbers are real engine output, never faked.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   BriefcaseBusiness,
   CalendarDays,
@@ -39,7 +40,6 @@ import {
   PRO_STATUSES,
   proStats,
   seedSampleWorkspace,
-  STATUS_LABEL,
   updateProject,
   useProClients,
   useProProjects,
@@ -81,6 +81,7 @@ function planShareHref(savedPlanId?: string): string | null {
 }
 
 export function ProDashboard() {
+  const t = useTranslations("Pro");
   const clients = useProClients();
   const projects = useProProjects();
   const [view, setView] = useState<View>("pipeline");
@@ -96,11 +97,8 @@ export function ProDashboard() {
         <div className="card flex flex-col items-center gap-4 p-8 text-center">
           <BriefcaseBusiness className="size-10 text-brand" aria-hidden />
           <div>
-            <h2 className="text-xl font-semibold text-foreground">Your project workspace is empty</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-muted">
-              Track client jobs from lead to done, link each to a buildable Bloomprint plan, and pull
-              one consolidated shopping list across jobs. Everything stays on this device.
-            </p>
+            <h2 className="text-xl font-semibold text-foreground">{t("emptyTitle")}</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted">{t("emptyBody")}</p>
           </div>
           <div className="flex flex-wrap justify-center gap-2">
             <button
@@ -109,14 +107,14 @@ export function ProDashboard() {
               className="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
             >
               <Plus className="size-4" aria-hidden />
-              Add your first project
+              {t("addFirst")}
             </button>
             <button
               type="button"
               onClick={() => seedSampleWorkspace()}
               className="rounded-full border border-border px-5 py-2.5 text-sm font-semibold transition hover:border-brand"
             >
-              Load sample workspace
+              {t("loadSample")}
             </button>
           </div>
         </div>
@@ -136,18 +134,18 @@ export function ProDashboard() {
       <ProHeader onNewProject={() => setEditing("new")} />
 
       <section className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={Layers} label="Active projects" value={String(stats.active)} />
-        <StatCard icon={FileCheck2} label="Awaiting approval" value={String(stats.awaitingApproval)} />
-        <StatCard icon={CalendarDays} label="Scheduled this week" value={String(stats.scheduledSoon)} />
-        <StatCard icon={DollarSign} label="Pipeline value" value={money(stats.pipelineValue)} />
+        <StatCard icon={Layers} label={t("statActive")} value={String(stats.active)} />
+        <StatCard icon={FileCheck2} label={t("statAwaiting")} value={String(stats.awaitingApproval)} />
+        <StatCard icon={CalendarDays} label={t("statScheduled")} value={String(stats.scheduledSoon)} />
+        <StatCard icon={DollarSign} label={t("statPipeline")} value={money(stats.pipelineValue)} />
       </section>
 
       <div className="flex flex-wrap gap-1 rounded-full border border-border bg-surface p-1 text-sm">
         {(
           [
-            ["pipeline", "Pipeline", BriefcaseBusiness],
-            ["clients", "Clients", Users],
-            ["buylist", "Buy list", ClipboardList],
+            ["pipeline", t("tabPipeline"), BriefcaseBusiness],
+            ["clients", t("tabClients"), Users],
+            ["buylist", t("tabBuylist"), ClipboardList],
           ] as [View, string, typeof Users][]
         ).map(([key, label, Icon]) => (
           <button
@@ -172,16 +170,15 @@ export function ProDashboard() {
 
       <p className="flex items-center gap-2 text-xs text-muted">
         <CheckCircle2 className="size-3.5 text-brand" aria-hidden />
-        Saved on this device. Prices are estimate ranges from the Bloomprint engine — confirm local
-        availability before buying.
+        {t("footerNote")}
         <button
           type="button"
           onClick={() => {
-            if (confirm("Clear all pro projects and clients on this device?")) clearProWorkspace();
+            if (confirm(t("clearConfirm"))) clearProWorkspace();
           }}
           className="ml-auto rounded-full border border-border px-2 py-1 font-semibold text-muted transition hover:border-danger/40 hover:text-danger"
         >
-          Clear workspace
+          {t("clearWorkspace")}
         </button>
       </p>
 
@@ -197,6 +194,7 @@ export function ProDashboard() {
 }
 
 function ProHeader({ onNewProject }: { onNewProject: () => void }) {
+  const t = useTranslations("Pro");
   return (
     <Photo
       src="/photos/yard-lawn.jpg"
@@ -208,14 +206,11 @@ function ProHeader({ onNewProject }: { onNewProject: () => void }) {
     >
       <header className="mt-auto flex flex-col gap-3 p-5 sm:flex-row sm:items-end sm:justify-between sm:p-7">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-white/80">Pro workspace</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-white/80">{t("eyebrow")}</p>
           <h1 className="mt-1 text-3xl font-semibold text-white drop-shadow-sm sm:text-4xl">
-            Organize jobs, plans, and shopping lists
+            {t("title")}
           </h1>
-          <p className="mt-2 max-w-2xl text-sm text-white/85">
-            A lightweight operations board for landscapers — clients, a job pipeline, and one buy
-            list across every linked plan.
-          </p>
+          <p className="mt-2 max-w-2xl text-sm text-white/85">{t("subtitle")}</p>
         </div>
         <button
           type="button"
@@ -223,7 +218,7 @@ function ProHeader({ onNewProject }: { onNewProject: () => void }) {
           className="inline-flex shrink-0 items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
         >
           <Plus className="size-4" aria-hidden />
-          New project
+          {t("newProject")}
         </button>
       </header>
     </Photo>
@@ -259,6 +254,7 @@ function PipelineBoard({
   clients: ProClient[];
   onOpen: (p: ProProject) => void;
 }) {
+  const t = useTranslations("Pro");
   const groups = useMemo(() => groupByStatus(projects), [projects]);
   const clientName = (id?: string) => clients.find((c) => c.id === id)?.name;
   return (
@@ -267,7 +263,7 @@ function PipelineBoard({
         <div key={status} className="flex min-w-[230px] flex-1 flex-col gap-2">
           <div className="flex items-center justify-between px-1">
             <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_TONE[status]}`}>
-              {STATUS_LABEL[status]}
+              {t(`status.${status}`)}
             </span>
             <span className="text-xs text-muted">{groups[status].length}</span>
           </div>
@@ -282,7 +278,7 @@ function PipelineBoard({
             ))}
             {groups[status].length === 0 ? (
               <div className="rounded-xl border border-dashed border-border p-3 text-center text-xs text-muted">
-                Nothing here
+                {t("nothingHere")}
               </div>
             ) : null}
           </div>
@@ -301,6 +297,7 @@ function ProjectCard({
   clientName?: string;
   onOpen: () => void;
 }) {
+  const t = useTranslations("Pro");
   return (
     <div className="card hover-lift p-3 text-left shadow-sm">
       <button type="button" onClick={onOpen} className="block w-full text-left">
@@ -310,10 +307,10 @@ function ProjectCard({
           {project.savedPlanId ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-semibold text-brand-strong">
               <CheckCircle2 className="size-3" aria-hidden />
-              Plan linked
+              {t("planLinked")}
             </span>
           ) : (
-            <span className="rounded-full border border-border px-2 py-0.5 text-muted">No plan yet</span>
+            <span className="rounded-full border border-border px-2 py-0.5 text-muted">{t("noPlanYet")}</span>
           )}
           {typeof project.priceQuoted === "number" && project.priceQuoted > 0 ? (
             <span className="text-muted">{money(project.priceQuoted)}</span>
@@ -327,7 +324,7 @@ function ProjectCard({
         </div>
       </button>
       <label className="mt-2 block">
-        <span className="sr-only">Move {project.title} to another stage</span>
+        <span className="sr-only">{t("moveStage", { title: project.title })}</span>
         <select
           value={project.status}
           onChange={(e) => moveProject(project.id, e.target.value as ProStatus)}
@@ -335,7 +332,7 @@ function ProjectCard({
         >
           {PRO_STATUSES.map((s) => (
             <option key={s} value={s}>
-              {STATUS_LABEL[s]}
+              {t(`status.${s}`)}
             </option>
           ))}
         </select>
@@ -345,6 +342,7 @@ function ProjectCard({
 }
 
 function ClientsView({ clients, projects }: { clients: ProClient[]; projects: ProProject[] }) {
+  const t = useTranslations("Pro");
   const [name, setName] = useState("");
   const countFor = (id: string) => projects.filter((p) => p.clientId === id).length;
   return (
@@ -362,8 +360,8 @@ function ClientsView({ clients, projects }: { clients: ProClient[]; projects: Pr
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Add a client by name"
-          aria-label="Add a client by name"
+          placeholder={t("addClientPlaceholder")}
+          aria-label={t("addClientPlaceholder")}
           className="min-w-0 flex-1 rounded-full border border-border bg-surface px-4 py-2 text-sm text-foreground"
         />
         <button
@@ -371,12 +369,12 @@ function ClientsView({ clients, projects }: { clients: ProClient[]; projects: Pr
           className="inline-flex items-center gap-1 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
         >
           <Plus className="size-4" aria-hidden />
-          Add
+          {t("addClientBtn")}
         </button>
       </form>
       {clients.length === 0 ? (
         <p className="rounded-xl border border-dashed border-border p-4 text-center text-sm text-muted">
-          No clients yet. Add one above, or attach clients when you create projects.
+          {t("noClients")}
         </p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -386,7 +384,7 @@ function ClientsView({ clients, projects }: { clients: ProClient[]; projects: Pr
               {client.email ? <p className="mt-0.5 text-xs text-muted">{client.email}</p> : null}
               {client.phone ? <p className="text-xs text-muted">{client.phone}</p> : null}
               <p className="mt-2 text-xs font-medium text-brand-strong">
-                {countFor(client.id)} project{countFor(client.id) === 1 ? "" : "s"}
+                {t("clientProjects", { count: countFor(client.id) })}
               </p>
             </div>
           ))}
@@ -397,6 +395,7 @@ function ClientsView({ clients, projects }: { clients: ProClient[]; projects: Pr
 }
 
 function BuyListView({ projects }: { projects: ProProject[] }) {
+  const t = useTranslations("Pro");
   // Regenerate each linked, non-done project's plan and consolidate the shopping lists.
   const { items, projectCount, missing } = useMemo(() => {
     const perProject: { projectId: string; items: ReturnType<typeof generateDeterministicPlan>["shoppingList"] }[] = [];
@@ -432,10 +431,10 @@ function BuyListView({ projects }: { projects: ProProject[] }) {
     return (
       <section className="card p-6 text-center">
         <ClipboardList className="mx-auto mb-2 size-7 text-brand" aria-hidden />
-        <p className="text-sm font-semibold text-foreground">No materials to consolidate yet</p>
+        <p className="text-sm font-semibold text-foreground">{t("buyEmptyTitle")}</p>
         <p className="mx-auto mt-1 max-w-md text-sm text-muted">
-          Link a saved Bloomprint plan to your active projects and their shopping lists merge into one
-          buy list here.{missing > 0 ? ` ${missing} active project(s) have no linked plan.` : ""}
+          {t("buyEmptyBody")}
+          {missing > 0 ? ` ${t("buyMissingShort", { count: missing })}` : ""}
         </p>
       </section>
     );
@@ -445,25 +444,25 @@ function BuyListView({ projects }: { projects: ProProject[] }) {
     <section className="card p-4 sm:p-5">
       <div className="flex flex-wrap items-center gap-2">
         <ClipboardList className="size-5 text-brand" aria-hidden />
-        <h2 className="text-lg font-semibold text-foreground">Consolidated buy list</h2>
-        <span className="text-xs text-muted">across {projectCount} project(s)</span>
+        <h2 className="text-lg font-semibold text-foreground">{t("buyTitle")}</h2>
+        <span className="text-xs text-muted">{t("buyAcross", { count: projectCount })}</span>
         <button
           type="button"
           onClick={copyList}
           className="ml-auto inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-semibold transition hover:border-brand"
         >
           <Copy className="size-3.5" aria-hidden />
-          Copy
+          {t("copy")}
         </button>
       </div>
       <div className="mt-3 overflow-x-auto">
         <table className="w-full min-w-[520px] text-left text-sm">
           <thead className="text-xs uppercase tracking-wide text-muted">
             <tr>
-              <th className="py-2">Item</th>
-              <th className="py-2">Qty</th>
-              <th className="py-2">Est. range</th>
-              <th className="py-2">Jobs</th>
+              <th className="py-2">{t("thItem")}</th>
+              <th className="py-2">{t("thQty")}</th>
+              <th className="py-2">{t("thRange")}</th>
+              <th className="py-2">{t("thJobs")}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -474,7 +473,7 @@ function BuyListView({ projects }: { projects: ProProject[] }) {
           <tfoot>
             <tr className="border-t border-border font-semibold text-foreground">
               <td className="py-2" colSpan={2}>
-                Estimated total
+                {t("estTotal")}
               </td>
               <td className="py-2">
                 {money(totalMin)}–{money(totalMax)}
@@ -485,22 +484,21 @@ function BuyListView({ projects }: { projects: ProProject[] }) {
         </table>
       </div>
       {missing > 0 ? (
-        <p className="mt-3 text-xs text-muted">
-          {missing} active project(s) have no linked plan and aren&apos;t included.
-        </p>
+        <p className="mt-3 text-xs text-muted">{t("buyMissing", { count: missing })}</p>
       ) : null}
     </section>
   );
 }
 
 function BuyRow({ item }: { item: ConsolidatedItem }) {
+  const t = useTranslations("Pro");
   return (
     <tr>
       <td className="py-2">
         <span className="font-medium text-foreground">{item.name}</span>
         {item.priority === "buy-first" ? (
           <span className="ml-2 rounded-full bg-brand-soft px-1.5 py-0.5 text-[10px] font-semibold text-brand-strong">
-            buy first
+            {t("buyFirst")}
           </span>
         ) : null}
         <span className="block text-[11px] text-muted">{item.category}</span>
@@ -525,6 +523,7 @@ function ProjectDialog({
   clients: ProClient[];
   onClose: () => void;
 }) {
+  const t = useTranslations("Pro");
   const savedPlans = useSavedPlans();
   const [title, setTitle] = useState(project?.title ?? "");
   const [clientId, setClientId] = useState(project?.clientId ?? "");
@@ -549,12 +548,13 @@ function ProjectDialog({
   }, [onClose]);
 
   const linkedHref = planShareHref(savedPlanId || undefined);
+  const dialogTitle = project ? t("dialogEdit") : t("dialogNew");
 
   function save() {
     let resolvedClientId = clientId || undefined;
     if (!resolvedClientId && newClient.trim()) resolvedClientId = addClient({ name: newClient }).id;
     const payload = {
-      title: title.trim() || "Untitled project",
+      title: title.trim() || t("untitled"),
       clientId: resolvedClientId,
       address: address.trim() || undefined,
       regionId: regionId || undefined,
@@ -574,7 +574,7 @@ function ProjectDialog({
       className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
-      aria-label={project ? "Edit project" : "New project"}
+      aria-label={dialogTitle}
       onClick={onClose}
     >
       <div
@@ -584,27 +584,25 @@ function ProjectDialog({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 border-b border-border p-4">
-          <h2 className="text-base font-semibold text-foreground">
-            {project ? "Edit project" : "New project"}
-          </h2>
+          <h2 className="text-base font-semibold text-foreground">{dialogTitle}</h2>
           <button
             type="button"
             onClick={onClose}
             className="ml-auto rounded-full border border-border p-2 text-muted transition hover:text-foreground"
-            aria-label="Close"
+            aria-label={t("close")}
           >
             <X className="size-4" aria-hidden />
           </button>
         </div>
 
         <div className="flex flex-col gap-3 overflow-y-auto p-4 text-sm">
-          <Field label="Project title">
-            <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputCls} placeholder="e.g. Front-yard privacy screen" />
+          <Field label={t("fTitle")}>
+            <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputCls} placeholder={t("phTitle")} />
           </Field>
 
-          <Field label="Client">
+          <Field label={t("fClient")}>
             <select value={clientId} onChange={(e) => setClientId(e.target.value)} className={inputCls}>
-              <option value="">— No client —</option>
+              <option value="">{t("optNoClient")}</option>
               {clients.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -616,40 +614,40 @@ function ProjectDialog({
                 value={newClient}
                 onChange={(e) => setNewClient(e.target.value)}
                 className={`${inputCls} mt-2`}
-                placeholder="…or type a new client name"
+                placeholder={t("phNewClient")}
               />
             ) : null}
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Status">
+            <Field label={t("fStatus")}>
               <select value={status} onChange={(e) => setStatus(e.target.value as ProStatus)} className={inputCls}>
                 {PRO_STATUSES.map((s) => (
                   <option key={s} value={s}>
-                    {STATUS_LABEL[s]}
+                    {t(`status.${s}`)}
                   </option>
                 ))}
               </select>
             </Field>
-            <Field label="Install date">
+            <Field label={t("fInstallDate")}>
               <input type="date" value={scheduled} onChange={(e) => setScheduled(e.target.value)} className={inputCls} />
             </Field>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Quoted price ($)">
+            <Field label={t("fPrice")}>
               <input
                 type="number"
                 inputMode="numeric"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 className={inputCls}
-                placeholder="Your quote"
+                placeholder={t("phPrice")}
               />
             </Field>
-            <Field label="Region">
+            <Field label={t("fRegion")}>
               <select value={regionId} onChange={(e) => setRegionId(e.target.value)} className={inputCls}>
-                <option value="">— Optional —</option>
+                <option value="">{t("optOptional")}</option>
                 {REGION_OPTIONS.map((r) => (
                   <option key={r.value} value={r.value}>
                     {r.label}
@@ -659,13 +657,13 @@ function ProjectDialog({
             </Field>
           </div>
 
-          <Field label="Property address">
-            <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputCls} placeholder="Optional" />
+          <Field label={t("fAddress")}>
+            <input value={address} onChange={(e) => setAddress(e.target.value)} className={inputCls} placeholder={t("phOptional")} />
           </Field>
 
-          <Field label="Linked Bloomprint plan">
+          <Field label={t("fLinkedPlan")}>
             <select value={savedPlanId} onChange={(e) => setSavedPlanId(e.target.value)} className={inputCls}>
-              <option value="">— None —</option>
+              <option value="">{t("optNone")}</option>
               {savedPlans.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.label} · {money(p.summary.diyMin)}–{money(p.summary.diyMax)}
@@ -674,19 +672,23 @@ function ProjectDialog({
             </select>
             {savedPlans.length === 0 ? (
               <p className="mt-1 text-xs text-muted">
-                No saved plans yet. <Link href="/plan" className="font-semibold text-brand">Build one</Link> and save it to link here.
+                {t("noSavedPlans")}{" "}
+                <Link href="/plan" className="font-semibold text-brand">
+                  {t("buildOne")}
+                </Link>{" "}
+                {t("andSave")}
               </p>
             ) : null}
             {linkedHref ? (
               <Link href={linkedHref} className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-brand">
                 <ExternalLink className="size-3.5" aria-hidden />
-                Open the linked plan
+                {t("openLinkedPlan")}
               </Link>
             ) : null}
           </Field>
 
-          <Field label="Notes">
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className={`${inputCls} min-h-20`} placeholder="Site notes, access, follow-ups…" />
+          <Field label={t("fNotes")}>
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className={`${inputCls} min-h-20`} placeholder={t("phNotes")} />
           </Field>
         </div>
 
@@ -701,7 +703,7 @@ function ProjectDialog({
               className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-2 text-sm font-semibold text-danger transition hover:border-danger/40"
             >
               <Trash2 className="size-4" aria-hidden />
-              Delete
+              {t("deleteBtn")}
             </button>
           ) : null}
           <button
@@ -709,7 +711,7 @@ function ProjectDialog({
             onClick={save}
             className="ml-auto rounded-full bg-brand px-6 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
           >
-            {project ? "Save changes" : "Create project"}
+            {project ? t("saveChanges") : t("createProject")}
           </button>
         </div>
       </div>
