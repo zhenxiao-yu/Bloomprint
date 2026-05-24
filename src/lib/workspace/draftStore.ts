@@ -74,7 +74,7 @@ export function clearActiveSession(): void {
   }
 }
 
-export function savePlanningDraft(snapshot: PlanningDraftSnapshot): void {
+export function savePlanningDraft(snapshot: PlanningDraftSnapshot): boolean {
   const updated = {
     ...snapshot,
     session: {
@@ -83,13 +83,37 @@ export function savePlanningDraft(snapshot: PlanningDraftSnapshot): void {
       lastSavedAt: now(),
       updatedAt: now(),
     },
+    // A base64 previewUrl can be megabytes per photo; persisting several into one
+    // localStorage key reliably blows the ~5MB quota and the whole draft fails to
+    // save. Keep only metadata here — the image bytes already live in IndexedDB
+    // keyed by localBlobId (see saveDraftPhoto) and are restored by rehydrateDraftPhotos.
+    photos: snapshot.photos.map((p) => (p.localBlobId ? { ...p, previewUrl: "" } : p)),
   };
   try {
     localStorage.setItem(POINTER_KEY, updated.session.id);
     localStorage.setItem(SESSION_PREFIX + updated.session.id, JSON.stringify(updated));
+    return true;
   } catch {
-    // Autosave is best effort; UI still shows unsaved changes.
+    // Autosave is best effort; the caller surfaces an "unsaved" state on failure.
+    return false;
   }
+}
+
+/**
+ * Restore the base64 previews that savePlanningDraft strips out, reading the image
+ * bytes back from IndexedDB. Call after loading a persisted draft before display.
+ */
+export async function rehydrateDraftPhotos(
+  snapshot: PlanningDraftSnapshot,
+): Promise<PlanningDraftSnapshot> {
+  const photos = await Promise.all(
+    snapshot.photos.map(async (photo) => {
+      if (photo.previewUrl || !photo.localBlobId) return photo;
+      const url = await getDraftPhotoUrl(photo.localBlobId);
+      return url ? { ...photo, previewUrl: url } : photo;
+    }),
+  );
+  return { ...snapshot, photos };
 }
 
 export function loadPlanningDraft(sessionId = getActiveSessionId()): PlanningDraftSnapshot | null {

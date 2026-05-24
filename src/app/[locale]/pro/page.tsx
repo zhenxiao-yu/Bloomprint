@@ -12,12 +12,15 @@ export default function ProPage() {
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-7 px-4 py-8 sm:px-6 sm:py-12">
       <header className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-brand">Landscaper / Pro Mode</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-brand">
+            Landscaper / Pro Mode <span className="ml-1 rounded-full bg-border px-2 py-0.5 text-[10px] font-semibold text-muted">Preview</span>
+          </p>
           <h1 className="mt-2 text-3xl font-semibold text-foreground sm:text-5xl">
             Manage clients, properties, plan versions, photos, and material lists.
           </h1>
           <p className="mt-3 max-w-2xl text-sm text-muted">
-            This is the operational workspace for quote-ready summaries and multiple parallel yard projects.
+            A preview of the operational workspace for quote-ready summaries and multiple parallel yard
+            projects. The clients, counts, and projects shown below are sample data.
           </p>
         </div>
         <Link href="/plan?mode=staff" className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong">

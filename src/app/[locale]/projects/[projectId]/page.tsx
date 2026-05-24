@@ -1,12 +1,33 @@
 "use client";
 
-import { useMemo } from "react";
+import { use, useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { getSavedPlan, type SavedPlan } from "@/lib/plansStore";
 import { encodeShare, SHARE_PARAM } from "@/lib/shareLink";
 
-export default function ProjectPage({ params }: { params: { projectId: string } }) {
-  const plan = useMemo<SavedPlan | null>(() => getSavedPlan(params.projectId), [params.projectId]);
+export default function ProjectPage({ params }: { params: Promise<{ projectId: string }> }) {
+  const { projectId } = use(params);
+  const [plan, setPlan] = useState<SavedPlan | null>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  // Saved plans live in localStorage; read after mount so server and first client
+  // render agree (no hydration flip) and `projectId` is resolved from the params promise.
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setPlan(getSavedPlan(projectId));
+      setLoaded(true);
+    }, 0);
+    return () => clearTimeout(id);
+  }, [projectId]);
+
+  if (!loaded) {
+    return (
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-4 py-10">
+        <div className="h-9 w-56 animate-pulse rounded bg-border" />
+        <div className="h-28 w-full animate-pulse rounded-xl bg-border" />
+      </main>
+    );
+  }
 
   if (!plan) {
     return (

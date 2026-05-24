@@ -191,19 +191,27 @@ async function readVisionSuggestion(photos: PhotoAsset[]): Promise<VisionSuggest
   const photo = photos.find((item) => item.quality !== "unusable" && item.previewUrl);
   const parts = photo?.previewUrl ? dataUrlParts(photo.previewUrl) : null;
   if (!parts) return null;
+  // Optional enrichment — cap it so a slow/hung /api/vision never stalls the flow.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
   try {
-    const enabled = (await fetch("/api/vision").then((res) => res.json())) as { enabled?: boolean };
+    const enabled = (await fetch("/api/vision", { signal: controller.signal }).then((res) =>
+      res.json(),
+    )) as { enabled?: boolean };
     if (!enabled.enabled) return null;
     const res = await fetch("/api/vision", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ imageBase64: parts.base64, mediaType: parts.mediaType }),
+      signal: controller.signal,
     });
     if (!res.ok) return null;
     const data = (await res.json()) as { suggestion?: VisionSuggestion };
     return data.suggestion ?? null;
   } catch {
     return null;
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
@@ -447,21 +455,28 @@ export function PhotoFirstPlanning({
       }, 450);
     }, 0);
     const timer = window.setTimeout(() => {
-      void analyzeYardPhotos(photos).then(async (base) => {
-        if (!active) return;
-        setStatus("Checking optional photo ML...");
-        const next = mergeVisionSuggestion(base, await readVisionSuggestion(photos));
-        if (!active) return;
-        onAnalysis(next);
-        setAssumptionEdits((current) => {
-          const merged = { ...current };
-          for (const item of next.assumptions) merged[item.id] = merged[item.id] ?? item.value;
-          return merged;
-        });
-        setStatus("Photo assumptions ready to confirm");
-        setBusy(false);
-        if (stageTimer) window.clearInterval(stageTimer);
-      });
+      void (async () => {
+        try {
+          const base = await analyzeYardPhotos(photos);
+          if (!active) return;
+          setStatus("Checking optional photo ML...");
+          const next = mergeVisionSuggestion(base, await readVisionSuggestion(photos));
+          if (!active) return;
+          onAnalysis(next);
+          setAssumptionEdits((current) => {
+            const merged = { ...current };
+            for (const item of next.assumptions) merged[item.id] = merged[item.id] ?? item.value;
+            return merged;
+          });
+          setStatus("Photo assumptions ready to confirm");
+        } catch {
+          // Analysis is optional — never strand the user on a spinner; let them continue manually.
+          if (active) setStatus("Couldn't read that photo automatically — you can still continue.");
+        } finally {
+          if (active) setBusy(false);
+          if (stageTimer) window.clearInterval(stageTimer);
+        }
+      })();
     }, 500);
     return () => {
       active = false;
@@ -855,6 +870,7 @@ export function PhotoFirstPlanning({
               capture="environment"
               multiple
               className="hidden"
+              suppressHydrationWarning
               onChange={(e) => e.target.files && void addFiles(e.target.files)}
             />
 

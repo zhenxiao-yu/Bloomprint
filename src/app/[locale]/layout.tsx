@@ -107,7 +107,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className={`${fontVars} h-full antialiased`} suppressHydrationWarning>
-      <body className="flex min-h-full flex-col pb-16 sm:pb-0">
+      <body className="flex min-h-full flex-col pb-16 sm:pb-0" suppressHydrationWarning>
         <NextIntlClientProvider>
           <ThemeProvider>
             <SiteHeader />

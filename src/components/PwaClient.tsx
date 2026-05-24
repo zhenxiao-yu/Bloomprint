@@ -24,7 +24,9 @@ export function PwaClient() {
   const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
+    // Only register in production — a SW in dev caches localhost assets and causes
+    // confusing stale-state during local development.
+    if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         void navigator.serviceWorker.register("/sw.js").catch(() => undefined);
       });

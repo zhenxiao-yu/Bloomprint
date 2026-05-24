@@ -23,6 +23,7 @@ import {
   clearActiveSession,
   createPlanningDraft,
   loadPlanningDraft,
+  rehydrateDraftPhotos,
   savePlanningDraft,
   type PlanningDraftSnapshot,
 } from "@/lib/workspace/draftStore";
@@ -167,8 +168,7 @@ export function PlanExperience() {
   useEffect(() => {
     if (boot.request) return;
     const id = setTimeout(() => {
-      savePlanningDraft(draft);
-      setAutosaveState("saved");
+      setAutosaveState(savePlanningDraft(draft) ? "saved" : "unsaved");
     }, 450);
     return () => {
       clearTimeout(id);
@@ -238,6 +238,12 @@ export function PlanExperience() {
     );
     setRecoveryDraft(null);
     setAutosaveState("saved");
+    // Photo previews are stripped from the persisted snapshot to stay under quota;
+    // pull them back from IndexedDB so the resumed draft shows its images.
+    void rehydrateDraftPhotos(snapshot).then((full) => {
+      setDraft(full);
+      setPhotoUrl((current) => current ?? full.photos[0]?.previewUrl ?? null);
+    });
   }
 
   function discardDraft() {
@@ -263,6 +269,7 @@ export function PlanExperience() {
         });
         if (!res.ok) throw new Error(await readApiError(res, t("buildError")));
         const data: BloomprintPlan = await res.json();
+        if (!data?.plan) throw new Error(t("buildError"));
         setResult(data);
         setStep("result");
         if (source === "form" || source === "demo" || source === "shared") {
