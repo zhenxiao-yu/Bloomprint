@@ -5,6 +5,7 @@ import { BriefcaseBusiness, Clock, FileText, Home, Images, Store } from "lucide-
 import { Link } from "@/i18n/navigation";
 import { useSavedPlans } from "@/lib/plansStore";
 import { loadPlanningDraft, type PlanningDraftSnapshot } from "@/lib/workspace/draftStore";
+import { Photo } from "@/components/ui/photo";
 
 export function DashboardWorkspace() {
   const plans = useSavedPlans();
@@ -24,28 +25,39 @@ export function DashboardWorkspace() {
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-7 px-4 py-8 sm:px-6 sm:py-12">
-      <header className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-brand">Command center</p>
-          <h1 className="mt-2 text-3xl font-semibold text-foreground sm:text-5xl">Welcome back to your yard workspace.</h1>
-          <p className="mt-3 max-w-2xl text-sm text-muted">
-            Continue drafts, compare versions, manage photos, or switch into pro and store workflows
-            without losing progress.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/plan" className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong">
-            New project
-          </Link>
-          <Link href="/pro" className="rounded-full border border-border px-5 py-2 text-sm font-semibold">
-            Pro dashboard
-          </Link>
-        </div>
-      </header>
+      <Photo
+        src="/photos/house-exterior.jpg"
+        alt="A home exterior framed by a green lawn and trees"
+        priority
+        scrim
+        sizes="(max-width: 1152px) 100vw, 1152px"
+        className="flex min-h-64 rounded-3xl ring-1 ring-foreground/10"
+      >
+        <header className="mt-auto grid gap-5 p-5 sm:p-8 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide text-white/80">Command center</p>
+            <h1 className="mt-2 text-3xl font-semibold text-white drop-shadow-sm sm:text-5xl">
+              Welcome back to your yard workspace.
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm text-white/85">
+              Continue drafts, compare versions, manage photos, or switch into pro and store workflows
+              without losing progress.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/plan" className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong">
+              New project
+            </Link>
+            <Link href="/pro" className="glass-chip rounded-full px-5 py-2 text-sm font-semibold text-white transition hover:bg-white/15">
+              Pro dashboard
+            </Link>
+          </div>
+        </header>
+      </Photo>
 
       <section className="grid gap-3 sm:grid-cols-4">
         {stats.map(({ label, value, icon: Icon }) => (
-          <div key={label} className="rounded-xl border border-border bg-surface p-4">
+          <div key={label} className="card hover-lift p-4">
             <Icon className="mb-2 size-5 text-brand" aria-hidden />
             <p className="text-xs font-semibold uppercase tracking-wide text-muted">{label}</p>
             <p className="mt-1 text-2xl font-semibold text-foreground">{value}</p>
@@ -67,7 +79,7 @@ export function DashboardWorkspace() {
       ) : null}
 
       <section className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-xl border border-border bg-surface p-5">
+        <div className="card hover-lift p-5">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-lg font-semibold text-foreground">Recent projects</h2>
             <Link href="/plans" className="text-sm font-semibold text-brand">
@@ -90,7 +102,7 @@ export function DashboardWorkspace() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-surface p-5">
+        <div className="card hover-lift p-5">
           <h2 className="text-lg font-semibold text-foreground">Modes</h2>
           <div className="mt-4 flex flex-col gap-3">
             <ModeLink icon={Home} href="/plan" title="Homeowner" body="Fix your own yard, save versions, continue later." />

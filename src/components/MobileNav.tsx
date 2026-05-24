@@ -22,7 +22,7 @@ export function MobileNav() {
 
   return (
     <nav
-      className="no-print fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 backdrop-blur sm:hidden"
+      className="no-print fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/75 backdrop-blur-xl sm:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-label="Primary"
     >
@@ -35,11 +35,17 @@ export function MobileNav() {
               key={href}
               href={href}
               aria-current={active ? "page" : undefined}
-              className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[0.68rem] font-medium transition ${
+              className={`flex min-h-14 flex-1 flex-col items-center justify-center gap-1 text-[0.68rem] font-medium transition ${
                 active ? "text-brand" : "text-muted hover:text-foreground"
               }`}
             >
-              <Icon className="size-5" aria-hidden />
+              <span
+                className={`flex h-7 w-10 items-center justify-center rounded-full transition ${
+                  active ? "bg-brand-soft" : "bg-transparent"
+                }`}
+              >
+                <Icon className="size-5" aria-hidden />
+              </span>
               {t(key)}
             </Link>
           );

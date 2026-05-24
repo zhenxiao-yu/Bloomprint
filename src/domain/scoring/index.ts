@@ -188,7 +188,14 @@ export function scoreConfidence(
   if (intake.sun !== "unknown") v += 0.15;
   if (intake.soil !== "unknown") v += 0.1;
   if (intake.drainage !== "unknown") v += 0.1;
-  if (intake.areaSqft !== undefined) v += 0.05;
+  // A confidence-bearing measurement (e.g. a calibrated Yard Map) earns more than a typed
+  // guess; a low-confidence one earns less. Plain typed area keeps the flat credit.
+  if (intake.measurement) {
+    const c = intake.measurement.confidence;
+    v += c === "high" ? 0.1 : c === "good" ? 0.08 : c === "medium" ? 0.06 : 0.03;
+  } else if (intake.areaSqft !== undefined) {
+    v += 0.05;
+  }
   if (regionRecognized) {
     v += regionConfidence === "high" ? 0.15 : regionConfidence === "good" ? 0.12 : regionConfidence === "medium" ? 0.1 : 0;
   }

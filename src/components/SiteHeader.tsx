@@ -35,8 +35,10 @@ export function SiteHeader() {
 
   return (
     <header
-      className={`sticky top-0 z-30 border-b backdrop-blur transition-[background-color,box-shadow,border-color] duration-300 ${
-        scrolled ? "border-border bg-surface/90 shadow-sm" : "border-transparent bg-surface/70"
+      className={`sticky top-0 z-30 border-b backdrop-blur-xl transition-[background-color,box-shadow,border-color] duration-300 ${
+        scrolled
+          ? "border-border bg-surface/80 shadow-[0_8px_30px_-18px_rgba(0,0,0,0.45)]"
+          : "border-transparent bg-surface/60"
       }`}
     >
       <div className="mx-auto flex h-14 w-full max-w-5xl items-center gap-3 px-4 sm:px-6">
@@ -44,7 +46,7 @@ export function SiteHeader() {
           href="/"
           className="flex shrink-0 items-center gap-2 font-semibold text-brand transition active:scale-95"
         >
-          <span className="flex size-8 items-center justify-center rounded-full bg-brand-soft text-xs font-bold">
+          <span className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-strong text-xs font-bold text-on-strong shadow-sm">
             BP
           </span>
           <span className="text-base">Bloomprint</span>

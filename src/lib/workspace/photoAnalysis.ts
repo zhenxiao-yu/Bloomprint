@@ -1,4 +1,60 @@
-import type { PhotoAnalysisResult, PhotoAsset, PhotoAssumption } from "@/lib/workspace/types";
+import type {
+  PhotoAnalysisResult,
+  PhotoAsset,
+  PhotoAssetType,
+  PhotoAssumption,
+  PhotoDerivedIntake,
+} from "@/lib/workspace/types";
+
+/**
+ * Suggest survey answers from honest, photo-grounded signals. Conservative by
+ * design: it only sets a field when there's a real, user-confirmable signal
+ * (the photo type the user chose, the vision model's sun estimate, or a coarse
+ * pixel read), and never invents measurements. Everything here is a draft the
+ * user confirms in the intake — it never feeds the plan directly.
+ */
+export function derivePhotoIntake(args: {
+  photoTypes: PhotoAssetType[];
+  region?: { greenRatio: number; hardscapeRatio: number; skyRatio: number; shadowRatio: number } | null;
+  visionSun?: string;
+}): PhotoDerivedIntake {
+  const types = new Set(args.photoTypes);
+  const derived: PhotoDerivedIntake = {};
+
+  // Area type — from the shot the user labelled.
+  if (types.has("front_yard")) derived.areaType = "foundation-bed";
+  else if (types.has("side_yard")) derived.areaType = "fence-line";
+  else if (types.has("backyard")) derived.areaType = "lawn-corner";
+
+  // Problem type — only where the user's own labelling signals it (not guessed from pixels).
+  if (types.has("side_yard")) derived.problemType = "privacy_gap";
+  else if (types.has("soil_drainage")) derived.problemType = "muddy_erosion";
+
+  // Drainage — only when the user explicitly flagged a drainage shot.
+  if (types.has("soil_drainage")) derived.drainage = "poor";
+
+  // Scope — from how much of the yard the photos cover.
+  const usableTypeCount = types.size;
+  if ((types.has("front_yard") && types.has("backyard")) || usableTypeCount >= 3) {
+    derived.scope = "whole_area_plan";
+  } else if (types.has("problem_area") && usableTypeCount === 1) {
+    derived.scope = "spot_fix";
+  } else {
+    derived.scope = "section_plan";
+  }
+
+  // Sun — trust only the vision model's estimate; a single photo's shadows are unreliable.
+  if (args.visionSun === "full-sun" || args.visionSun === "part-sun" || args.visionSun === "shade") {
+    derived.sun = args.visionSun;
+  }
+
+  if (args.region) {
+    derived.greeneryRatio = args.region.greenRatio;
+    derived.hardscapeRatio = args.region.hardscapeRatio;
+  }
+
+  return derived;
+}
 
 function confidenceFor(count: number): number {
   if (count >= 3) return 0.72;

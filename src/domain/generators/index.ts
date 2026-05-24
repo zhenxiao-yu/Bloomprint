@@ -17,6 +17,7 @@ import type {
   Readiness,
   ReadinessFactor,
   RiskWarning,
+  SeasonalInterest,
   ShoppingItem,
   SiteCondition,
   StaffNotes,
@@ -47,6 +48,23 @@ const CM_PER_FT = 30.48;
 
 function footprintSqft(spacingCm: number): number {
   return Math.max(0.25, (spacingCm / CM_PER_FT) ** 2);
+}
+
+/**
+ * How fully the bed's canopies cover it at MATURE width (vs at planting spacing).
+ * ~1 = "just fills in"; ≳2 = a dense look that will want thinning/dividing in a few years.
+ * Area-independent by construction (quantities are spacing-derived), so it reflects the
+ * palette's mature size relative to its spacing — a plant-choice property, not bed size.
+ */
+export function maturityFill(placements: PlantPlacement[], areaSqft: number): number {
+  if (areaSqft <= 0) return 0;
+  const canopySqft = placements.reduce((sum, p) => {
+    const rec = getPlant(p.plantId);
+    if (!rec) return sum;
+    const widthFt = rec.matureWidthCm / CM_PER_FT;
+    return sum + p.quantity * widthFt * widthFt;
+  }, 0);
+  return canopySqft / areaSqft;
 }
 
 function spacingNote(spacingCm: number): string {
@@ -139,6 +157,7 @@ export function composePalette(
         matureSize: matureSize(plant.matureHeightCm, plant.matureWidthCm),
         sunLabel: sunLabel(plant.sun),
         maintenance: plant.maintenance,
+        safety: { toxic: plant.toxicToPetsOrKids, invasive: plant.invasive },
       });
     }
   }
@@ -285,6 +304,45 @@ export function generateRiskWarnings(
     }
   }
 
+  // Invasive status comes straight from the Core Library flag, so the caution holds
+  // even when the optional live invasive-species check is off or unavailable.
+  const invasive = plants.filter((p) => p.invasive);
+  if (invasive.length > 0) {
+    risks.push({
+      id: "invasive",
+      severity: "high",
+      message: `${invasive.map((p) => p.commonName).join(", ")} is considered invasive in many regions and can spread aggressively.`,
+      mitigation: "Check your local invasive-species list before planting, or ask staff for a well-behaved substitute.",
+    });
+  }
+
+  // Maturity forecast: only when the canopies will be genuinely dense (≥2× fill). Honest
+  // expectation-setting, not an error — and goal-aware: for privacy, a dense fill IS the goal
+  // (a solid hedge), so it's framed as a heads-up to expect, not something to thin away.
+  const fill = maturityFill(placements, site.areaSqft);
+  if (fill >= 2) {
+    const pct = Math.round(fill * 100);
+    if (intake.goal === "privacy") {
+      risks.push({
+        id: "crowding",
+        severity: "low",
+        message: `Planted at the spacing shown, this screen fills in to a solid, private hedge within a few years (mature spread ≈ ${pct}% of the bed).`,
+        mitigation: "Expect a sparse first season; keep the spacing for a continuous screen rather than thinning.",
+      });
+    } else {
+      const widest = [...plants].sort((a, b) => b.matureWidthCm - a.matureWidthCm)[0];
+      risks.push({
+        id: "crowding",
+        severity: "medium",
+        message: `At mature size these plantings cover roughly ${pct}% of the bed${
+          widest ? ` (${widest.commonName} spreads widest)` : ""
+        }, so it will look full within a few years.`,
+        mitigation:
+          "Plant at the spacing shown and expect a sparse first season; thin or divide as they fill in, or drop a few for a more open look.",
+      });
+    }
+  }
+
   if (site.drainage === "poor") {
     risks.push({
       id: "drainage",
@@ -307,6 +365,44 @@ export function generateRiskWarnings(
   }
 
   return risks;
+}
+
+/* ----------------------------- seasonal interest ------------------------- */
+
+/**
+ * Season-by-season interest, read from each plant's Core Library `seasonInterest` note and
+ * type. We only flag a season the note explicitly names — no inference of exact timing — and
+ * mark evergreens/grasses as year-round structure. Empty seasons are honest gaps, left empty.
+ */
+export function buildSeasonalInterest(placements: PlantPlacement[]): SeasonalInterest {
+  const spring: string[] = [];
+  const summer: string[] = [];
+  const fall: string[] = [];
+  const winter: string[] = [];
+  const evergreenStructure: string[] = [];
+
+  for (const p of placements) {
+    const rec = getPlant(p.plantId);
+    if (!rec) continue;
+    const name = rec.commonName;
+    const text = rec.seasonInterest.toLowerCase();
+    if (/spring/.test(text)) spring.push(name);
+    if (/summer/.test(text)) summer.push(name);
+    if (/fall|autumn/.test(text)) fall.push(name);
+    if (/winter/.test(text)) winter.push(name);
+    if (rec.type === "evergreen" || rec.type === "grass" || /year-round|evergreen/.test(text)) {
+      evergreenStructure.push(name);
+    }
+  }
+
+  const dedupe = (xs: string[]) => [...new Set(xs)];
+  return {
+    spring: dedupe(spring),
+    summer: dedupe(summer),
+    fall: dedupe(fall),
+    winter: dedupe(winter),
+    evergreenStructure: dedupe(evergreenStructure),
+  };
 }
 
 /* ----------------------------- narrative & insight ----------------------- */

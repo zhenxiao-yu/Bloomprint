@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { DeterministicPlan, type YardIntake } from "@/domain/models";
+import { DeterministicPlan, type PlantPlacement, type YardIntake } from "@/domain/models";
 import { generateDeterministicPlan, refinePlan } from "@/domain/plan";
+import { buildSeasonalInterest, maturityFill } from "@/domain/generators";
 import { FIXTURES } from "@/domain/fixtures";
 import { getPlant } from "@/domain/data";
+
+const placementFor = (plantId: string) => ({ plantId }) as unknown as PlantPlacement;
 
 const fixtureEntries = Object.entries(FIXTURES);
 
@@ -180,6 +183,121 @@ describe("a measured bed area (from the Yard Map) sharpens the estimate", () => 
     const known = generateDeterministicPlan({ ...intake, areaSqft: 200 });
     const unknown = generateDeterministicPlan({ ...intake, areaSqft: undefined });
     expect(known.scores.confidence).toBeGreaterThanOrEqual(unknown.scores.confidence);
+  });
+});
+
+describe("Tier-3 — a calibrated Yard Map measurement is credited as a real measurement", () => {
+  // Mid-range base with headroom (sun known, soil/drainage unknown) so the small credit shows.
+  const baseIntake: YardIntake = {
+    regionId: "gta-ontario",
+    goal: "general",
+    effortLevel: "moderate",
+    hasPhoto: false,
+    sun: "full-sun",
+    soil: "unknown",
+    drainage: "unknown",
+  };
+
+  it("a measurement beats a plain typed area, which beats no area", () => {
+    const measured = generateDeterministicPlan({
+      ...baseIntake,
+      areaSqft: 150,
+      measurement: { area: 150, unit: "ft", source: "photo", confidence: "medium" },
+    });
+    const typed = generateDeterministicPlan({ ...baseIntake, areaSqft: 150 });
+    const none = generateDeterministicPlan({ ...baseIntake, areaSqft: undefined });
+    expect(measured.scores.confidence).toBeGreaterThan(typed.scores.confidence);
+    expect(typed.scores.confidence).toBeGreaterThan(none.scores.confidence);
+  });
+
+  it("a low-confidence measurement is honestly discounted below a typed area", () => {
+    const low = generateDeterministicPlan({
+      ...baseIntake,
+      areaSqft: 150,
+      measurement: { area: 150, unit: "ft", source: "photo", confidence: "low" },
+    });
+    const typed = generateDeterministicPlan({ ...baseIntake, areaSqft: 150 });
+    expect(low.scores.confidence).toBeLessThan(typed.scores.confidence);
+  });
+
+  it("surfaces the measurement (with source + confidence) in the plan evidence", () => {
+    const plan = generateDeterministicPlan({
+      ...baseIntake,
+      areaSqft: 150,
+      measurement: { area: 150, unit: "ft", source: "photo", confidence: "medium" },
+    });
+    expect(plan.evidence.inputs.some((i) => /measured:/i.test(i))).toBe(true);
+  });
+});
+
+describe("BP-2 — honest safety facts surfaced at the point of decision", () => {
+  it("mirrors the Core Library toxic/invasive flags onto every plant placement", () => {
+    const plan = generateDeterministicPlan(FIXTURES["oakville-front-yard"]);
+    expect(plan.plants.length).toBeGreaterThan(0);
+    for (const p of plan.plants) {
+      const rec = getPlant(p.plantId);
+      expect(p.safety.toxic).toBe(rec?.toxicToPetsOrKids ?? false);
+      expect(p.safety.invasive).toBe(rec?.invasive ?? false);
+    }
+  });
+
+  it("raises a high-severity 'invasive' risk exactly when an invasive plant is placed", () => {
+    // Invariant, not a tautology: it must hold the moment an invasive species enters
+    // the catalog/selection, and the warning must NOT depend on pets/kids or the
+    // optional live invasive check. The current seed catalog has none, so both sides
+    // are false today — and stay in lock-step as the library grows.
+    const plan = generateDeterministicPlan(FIXTURES["oakville-front-yard"]);
+    const anyInvasive = plan.plants.some((p) => p.safety.invasive);
+    const hasInvasiveRisk = plan.risks.some((r) => r.id === "invasive" && r.severity === "high");
+    expect(hasInvasiveRisk).toBe(anyInvasive);
+  });
+});
+
+describe("BP-3 — maturity / crowding forecast", () => {
+  it("maturityFill is 0 for a zero-area bed and positive otherwise", () => {
+    const plan = generateDeterministicPlan(FIXTURES["oakville-front-yard"]);
+    expect(maturityFill(plan.plants, 0)).toBe(0);
+    expect(maturityFill(plan.plants, plan.site.areaSqft)).toBeGreaterThan(0);
+  });
+
+  it("raises a 'crowding' risk exactly when mature canopy fill ≥ 2× the bed", () => {
+    for (const intake of Object.values(FIXTURES)) {
+      const plan = generateDeterministicPlan(intake);
+      const fill = maturityFill(plan.plants, plan.site.areaSqft);
+      const hasCrowding = plan.risks.some((r) => r.id === "crowding");
+      expect(hasCrowding).toBe(fill >= 2);
+    }
+  });
+
+  it("frames the maturity note by goal (privacy = solid hedge, else = thin/divide)", () => {
+    const privacy = generateDeterministicPlan(FIXTURES["privacy-side-yard"]);
+    const crowding = privacy.risks.find((r) => r.id === "crowding");
+    // privacy-side-yard fills densely (~2.4×), so it must carry the positive hedge framing.
+    expect(crowding?.severity).toBe("low");
+    expect(crowding?.message).toMatch(/hedge/i);
+  });
+});
+
+describe("BP-5 — seasonal interest read from Core Library notes (no invented months)", () => {
+  it("classifies a known summer→fall bloomer and an evergreen from the season note", () => {
+    const s = buildSeasonalInterest([
+      placementFor("limelight-hydrangea"), // "Lime-to-pink summer blooms, dries for fall"
+      placementFor("emerald-cedar"), // evergreen screening
+    ]);
+    expect(s.summer).toContain("Limelight Hydrangea");
+    expect(s.fall).toContain("Limelight Hydrangea");
+    expect(s.evergreenStructure).toContain("Emerald Cedar");
+    // No month-level claims exist on the shape — season granularity only.
+    expect(Object.keys(s).sort()).toEqual(["evergreenStructure", "fall", "spring", "summer", "winter"]);
+  });
+
+  it("only ever lists plants that are actually in the plan", () => {
+    const plan = generateDeterministicPlan(FIXTURES["oakville-front-yard"]);
+    const planNames = new Set(plan.plants.map((p) => getPlant(p.plantId)?.commonName));
+    const s = plan.seasonalInterest;
+    for (const bucket of [s.spring, s.summer, s.fall, s.winter, s.evergreenStructure]) {
+      for (const name of bucket) expect(planNames.has(name)).toBe(true);
+    }
   });
 });
 

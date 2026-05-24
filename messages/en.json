@@ -123,7 +123,23 @@
       "offlineThem": "Hit or miss.",
       "offlineUs": "Works fully — AI and the cloud are optional add-ons."
     },
-    "disclaimer": "Plans use the Bloomprint Core Library and approximate regional rules. Prices are ranges, not quotes — confirm local availability before buying."
+    "disclaimer": "Plans use the Bloomprint Core Library and approximate regional rules. Prices are ranges, not quotes — confirm local availability before buying.",
+    "showcase": {
+      "eyebrow": "The transformation",
+      "title": "From a photo to a plan you can build",
+      "subtitle": "Real materials, real quantities, in the right order — not a pretty render you can’t act on.",
+      "shotFrontTitle": "Curb appeal",
+      "shotFrontDesc": "Front-yard beds, spacing, and edging worked out for you.",
+      "shotBackTitle": "Backyard beds",
+      "shotBackDesc": "Raised beds and planting zones sized to your space.",
+      "shotPlantTitle": "Right plant, right spot",
+      "shotPlantDesc": "Sun, soil, and spacing checked before you buy."
+    },
+    "capture": {
+      "title": "Snap your yard. We’ll read it.",
+      "body": "Guided camera or upload — Bloomprint checks the photo, estimates planting zones, and turns uncertainty into questions you confirm before anything is generated.",
+      "cta": "Plan from a photo"
+    }
   },
   "Common": {
     "startPlan": "Start a plan",
@@ -349,6 +365,8 @@
     "photoContextNoMl": "No ML signal yet",
     "photoContextConfidence": "{confidence}% photo confidence",
     "applyPhotoHints": "Apply photo hints",
+    "photoAnswersTitle": "Answers from your photo",
+    "photoAnswersVerify": "Suggestions to confirm — verify on site before buying.",
     "steps": {
       "goal": {
         "short": "Goal",
@@ -527,9 +545,9 @@
     "backToPlanning": "← Back to planning",
     "home": "Home",
     "title": "Saved plans",
-    "subtitle": "Select two to compare. Open re-generates the exact plan.",
+    "subtitle": "Select 2–3 to compare. Open re-generates the exact plan.",
     "comparing": "Comparing…",
-    "compareSelected": "Compare selected ({count}/2)",
+    "compareSelected": "Compare selected ({count}/3)",
     "compareError": "Couldn't compare those plans.",
     "regenError": "Couldn't regenerate that saved plan.",
     "renamePrompt": "Rename this plan",
@@ -683,7 +701,25 @@
     "imaginedAlt": "AI-imagined illustration of the planned yard",
     "imaginedCaption": "AI-imagined illustration — not a photo of your yard. Plant choices, counts, and spacing come from your plan, not this image.",
     "restyleCaption": "AI concept restyle — layout and scale are approximate. Plants, counts, and spacing come from your plan, not this image.",
-    "imaginedError": "Couldn't generate an image — try again."
+    "imaginedError": "Couldn't generate an image — try again.",
+    "badgeToxic": "Toxic if chewed",
+    "badgeInvasive": "Invasive — check local list",
+    "bloomsLabel": "Blooms",
+    "aiPresentation": "AI-written presentation",
+    "aiHidden": "Showing the raw plan",
+    "aiHide": "Hide AI wording",
+    "aiShow": "Show AI wording",
+    "aiNote": "AI only writes the wording. Plants, prices, quantities, and risks come from Bloomprint’s engine and never change.",
+    "seasonsTitle": "Across the seasons",
+    "seasonsSubtitle": "What carries interest through the year — and where the quieter stretches are.",
+    "seasonSpring": "Spring",
+    "seasonSummer": "Summer",
+    "seasonFall": "Fall",
+    "seasonWinter": "Winter",
+    "seasonsEvergreen": "Evergreen structure holds it",
+    "seasonsQuiet": "Quieter — nothing specific noted",
+    "seasonsStructure": "Year-round structure: {plants}",
+    "seasonsNote": "Based on the Core Library’s noted season of interest; bloom timing varies by region and year — confirm locally."
   },
   "YardMap": {
     "metaTitle": "Yard Map (beta) · Bloomprint",

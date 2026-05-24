@@ -24,6 +24,7 @@ import {
 import {
   buildAccuracyUpgrades,
   buildConfidenceReasons,
+  buildSeasonalInterest,
   buildStaffNotes,
   buildTopActions,
   buildVisualSummary,
@@ -83,6 +84,7 @@ export function generateDeterministicPlan(intake: YardIntake, options: PlanOptio
         matureSize: matureSize(top.plant.matureHeightCm, top.plant.matureWidthCm),
         sunLabel: sunLabel(top.plant.sun),
         maintenance: top.plant.maintenance,
+        safety: { toxic: top.plant.toxicToPetsOrKids, invasive: top.plant.invasive },
       },
     ];
   }
@@ -145,6 +147,7 @@ export function generateDeterministicPlan(intake: YardIntake, options: PlanOptio
     storeSearches: buildStoreSearches(shoppingList),
     readiness: computeReadiness(intake),
     tiers: buildPlanTiers(intake, budget.diyTotal),
+    seasonalInterest: buildSeasonalInterest(placements),
   };
 }
 

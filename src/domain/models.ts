@@ -431,6 +431,12 @@ export const PlantPlacement = z.object({
   matureSize: z.string(),
   sunLabel: z.string(),
   maintenance: MaintenanceLevel,
+  // Honest safety facts from the Core Library, surfaced at the point of decision.
+  // Intrinsic plant properties only (site-dependent cautions like deer live in risks).
+  safety: z.object({
+    toxic: z.boolean(),
+    invasive: z.boolean(),
+  }),
 });
 export type PlantPlacement = z.infer<typeof PlantPlacement>;
 
@@ -706,6 +712,21 @@ export type FreeDataModeConfig = z.infer<typeof FreeDataModeConfig>;
 
 /* ------------------------------------------------------------------ */
 
+/**
+ * Season-by-season interest, derived deterministically from each plant's Core Library
+ * `seasonInterest` note and type. **Season granularity only** — the library does not encode
+ * exact bloom months, so Bloomprint never claims them. Arrays hold plant common names.
+ */
+export const SeasonalInterest = z.object({
+  spring: z.array(z.string()),
+  summer: z.array(z.string()),
+  fall: z.array(z.string()),
+  winter: z.array(z.string()),
+  /** Plants that hold structure year-round (evergreens / grasses) — a baseline every season. */
+  evergreenStructure: z.array(z.string()),
+});
+export type SeasonalInterest = z.infer<typeof SeasonalInterest>;
+
 export const DeterministicPlan = z.object({
   intake: YardIntake,
   site: SiteCondition,
@@ -741,6 +762,8 @@ export const DeterministicPlan = z.object({
   readiness: Readiness,
   /** Optional quick/better/best framings (additive; absent for spot fixes). */
   tiers: z.array(PlanTier).optional(),
+  /** Season-by-season interest from Core Library season notes (season granularity, not months). */
+  seasonalInterest: SeasonalInterest,
 });
 export type DeterministicPlan = z.infer<typeof DeterministicPlan>;
 
