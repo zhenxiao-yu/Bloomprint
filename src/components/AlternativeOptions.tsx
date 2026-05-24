@@ -1,20 +1,24 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import type { AlternativeKind, PlantAlternatives } from "@/domain/models";
 
-const KIND_LABEL: Record<AlternativeKind, string> = {
-  substitute: "If unavailable",
-  cheaper: "Cheaper",
-  "lower-maintenance": "Lower upkeep",
-  "pet-safer": "Pet-safer",
-  premium: "Premium",
-  avoid: "Avoid",
+const KIND_KEY: Record<AlternativeKind, string> = {
+  substitute: "altSubstitute",
+  cheaper: "altCheaper",
+  "lower-maintenance": "altLowerMaintenance",
+  "pet-safer": "altPetSafer",
+  premium: "altPremium",
+  avoid: "altAvoid",
 };
 
 /** Per-plant fallbacks so the user is never stuck at the store. */
 export function AlternativeOptions({ alt }: { alt: PlantAlternatives }) {
+  const t = useTranslations("Result");
   return (
     <details className="group mt-2">
       <summary className="cursor-pointer list-none text-xs font-medium text-brand">
-        Alternatives <span className="text-muted transition group-open:rotate-180">⌄</span>
+        {t("alternatives")} <span className="text-muted transition group-open:rotate-180">⌄</span>
       </summary>
       <ul className="mt-1 space-y-1 text-xs">
         {alt.options.map((o, i) => (
@@ -24,7 +28,7 @@ export function AlternativeOptions({ alt }: { alt: PlantAlternatives }) {
                 o.kind === "avoid" ? "bg-[var(--warn)]/10 text-[var(--warn)]" : "bg-brand-soft text-brand-strong"
               }`}
             >
-              {KIND_LABEL[o.kind]}
+              {t(KIND_KEY[o.kind])}
             </span>
             <span className="text-foreground">
               {o.label}
