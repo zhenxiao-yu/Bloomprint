@@ -105,6 +105,14 @@ Verified against the code before building (avoided duplicating shipped work):
   quantities, and risks come from the engine and never change"). The *editable-assumptions*
   part of BP-4 was already served by the existing **Accuracy Upgrade card** (answering
   sun/soil/drainage re-runs the plan), so it wasn't rebuilt. No engine/scoring change.
+- **BP-3 (crowding/maturity): shipped.** Calibration first showed the catalog is well-spaced
+  (mature-width÷spacing avg 1.24, max 1.67), so a naive "spacing < width" warning would be
+  noise. Instead added an exported `maturityFill()` (mature canopy ÷ bed area — area-independent,
+  a palette property) and a low-noise `crowding` risk that fires only at **≥2× fill**. It's
+  **goal-aware**: a privacy plan gets a positive "fills into a solid hedge" note (low severity),
+  others get a "will look full, thin/divide later" heads-up (medium). Of the fixtures, only the
+  privacy plan (2.42×) triggers it. The "fills in by year N" estimate is intentionally omitted —
+  it needs growth-rate data the static catalog doesn't have (no fabrication). Tests added.
 
 ## Part 2 — Build specs (the "do-next" subset)
 

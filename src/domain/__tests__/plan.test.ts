@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DeterministicPlan, type YardIntake } from "@/domain/models";
 import { generateDeterministicPlan, refinePlan } from "@/domain/plan";
+import { maturityFill } from "@/domain/generators";
 import { FIXTURES } from "@/domain/fixtures";
 import { getPlant } from "@/domain/data";
 
@@ -203,6 +204,31 @@ describe("BP-2 — honest safety facts surfaced at the point of decision", () =>
     const anyInvasive = plan.plants.some((p) => p.safety.invasive);
     const hasInvasiveRisk = plan.risks.some((r) => r.id === "invasive" && r.severity === "high");
     expect(hasInvasiveRisk).toBe(anyInvasive);
+  });
+});
+
+describe("BP-3 — maturity / crowding forecast", () => {
+  it("maturityFill is 0 for a zero-area bed and positive otherwise", () => {
+    const plan = generateDeterministicPlan(FIXTURES["oakville-front-yard"]);
+    expect(maturityFill(plan.plants, 0)).toBe(0);
+    expect(maturityFill(plan.plants, plan.site.areaSqft)).toBeGreaterThan(0);
+  });
+
+  it("raises a 'crowding' risk exactly when mature canopy fill ≥ 2× the bed", () => {
+    for (const intake of Object.values(FIXTURES)) {
+      const plan = generateDeterministicPlan(intake);
+      const fill = maturityFill(plan.plants, plan.site.areaSqft);
+      const hasCrowding = plan.risks.some((r) => r.id === "crowding");
+      expect(hasCrowding).toBe(fill >= 2);
+    }
+  });
+
+  it("frames the maturity note by goal (privacy = solid hedge, else = thin/divide)", () => {
+    const privacy = generateDeterministicPlan(FIXTURES["privacy-side-yard"]);
+    const crowding = privacy.risks.find((r) => r.id === "crowding");
+    // privacy-side-yard fills densely (~2.4×), so it must carry the positive hedge framing.
+    expect(crowding?.severity).toBe("low");
+    expect(crowding?.message).toMatch(/hedge/i);
   });
 });
 
