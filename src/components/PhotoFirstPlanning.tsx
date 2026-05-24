@@ -18,6 +18,7 @@ import {
   Sparkles,
   Store,
   Trash2,
+  Upload,
   Users,
   X,
 } from "lucide-react";
@@ -428,6 +429,8 @@ export function PhotoFirstPlanning({
   const [liveFill, setLiveFill] = useState(1);
   const [regionSummary, setRegionSummary] = useState<RegionSummary | null>(null);
   const [selectedCell, setSelectedCell] = useState<number | null>(null);
+  // Phones/tablets get the guided camera; desktop defaults shot actions to upload.
+  const [isMobile, setIsMobile] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -519,6 +522,11 @@ export function PhotoFirstPlanning({
     if (photos.length > 0) return "Photos saved. Preparing assumptions...";
     return "Upload photos or continue without them.";
   }, [analysis, busy, photos.length, status]);
+
+  useEffect(() => {
+    // Coarse pointer ≈ phone/tablet → guided camera is useful; otherwise prefer upload.
+    setIsMobile(window.matchMedia?.("(pointer: coarse)").matches ?? false);
+  }, []);
 
   useEffect(() => {
     if (photos.length === 0) {
@@ -850,9 +858,13 @@ export function PhotoFirstPlanning({
     void addCapturedPhoto(canvas.toDataURL("image/jpeg", 0.86));
   }
 
-  function openCameraFor(type: PhotoAssetType) {
+  // Add a shot of a given type from the best source for the device: the guided
+  // camera on phones/tablets, the file picker on desktop (where a webcam is no
+  // help for photographing a yard). Both feed the same review pipeline.
+  function addShotOfType(type: PhotoAssetType) {
     setPhotoType(type);
-    setCameraOpen(true);
+    if (isMobile) setCameraOpen(true);
+    else inputRef.current?.click();
   }
 
   function removePhoto(id: string) {
@@ -996,7 +1008,7 @@ export function PhotoFirstPlanning({
                 <button
                   key={shot.type}
                   type="button"
-                  onClick={() => openCameraFor(shot.type)}
+                  onClick={() => addShotOfType(shot.type)}
                   className={`flex flex-1 items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs transition ${
                     done
                       ? "border-brand/30 bg-brand-soft text-brand-strong"
@@ -1005,12 +1017,16 @@ export function PhotoFirstPlanning({
                 >
                   {done ? (
                     <CheckCircle2 className="size-4 shrink-0 text-brand" aria-hidden />
-                  ) : (
+                  ) : isMobile ? (
                     <Camera className="size-4 shrink-0 text-muted" aria-hidden />
+                  ) : (
+                    <Upload className="size-4 shrink-0 text-muted" aria-hidden />
                   )}
                   <span className="min-w-0">
                     <span className="block font-semibold">{shot.title}</span>
-                    <span className="block text-[11px] text-muted">{done ? "Captured" : "Tap to add"}</span>
+                    <span className="block text-[11px] text-muted">
+                      {done ? "Added" : isMobile ? "Tap to add" : "Upload"}
+                    </span>
                   </span>
                 </button>
               );
@@ -1080,27 +1096,29 @@ export function PhotoFirstPlanning({
                 <Camera className="mb-2 size-7 text-brand" aria-hidden />
               )}
               <span className="text-sm font-semibold text-foreground">
-                Take guided photos or upload existing images
+                {isMobile ? "Take guided photos or upload existing images" : "Drag photos here or upload to review"}
               </span>
               <span className="mt-1 max-w-md text-xs text-muted">
-                Camera mode adds gridlines, framing templates, and live lighting hints. Uploads use
-                the same local quality checks.
+                {isMobile
+                  ? "Camera mode adds gridlines, framing templates, and live lighting hints. Uploads use the same local quality checks and review."
+                  : "Upload one or more yard photos and Bloomprint reviews each one — quality, greenery, and suggested answers — right here. The guided camera is best on a phone."}
               </span>
               <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                 <button
                   type="button"
-                  onClick={() => setCameraOpen(true)}
+                  onClick={() => inputRef.current?.click()}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
                 >
-                  <Camera className="size-4" aria-hidden />
-                  Open guided camera
+                  <Upload className="size-4" aria-hidden />
+                  Upload photos
                 </button>
                 <button
                   type="button"
-                  onClick={() => inputRef.current?.click()}
-                  className="rounded-full border border-border px-4 py-2 text-sm font-semibold transition hover:border-brand"
+                  onClick={() => setCameraOpen(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold transition hover:border-brand"
                 >
-                  Upload photos
+                  <Camera className="size-4" aria-hidden />
+                  {isMobile ? "Open guided camera" : "Use camera"}
                 </button>
               </div>
             </div>
@@ -1242,15 +1260,19 @@ export function PhotoFirstPlanning({
                     </button>
                     <button
                       type="button"
-                      onClick={() => openCameraFor(photo.type)}
+                      onClick={() => addShotOfType(photo.type)}
                       className={`ml-auto inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold transition ${
                         photo.quality === "good"
                           ? "border-border text-muted hover:border-brand hover:text-foreground"
                           : "border-brand/40 bg-brand-soft text-brand-strong"
                       }`}
                     >
-                      <Camera className="size-3.5" aria-hidden />
-                      Retake
+                      {isMobile ? (
+                        <Camera className="size-3.5" aria-hidden />
+                      ) : (
+                        <Upload className="size-3.5" aria-hidden />
+                      )}
+                      {isMobile ? "Retake" : "Replace"}
                     </button>
                     <button
                       type="button"
