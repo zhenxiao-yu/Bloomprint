@@ -35,7 +35,7 @@ export default function ProPage() {
           { icon: FileCheck2, label: "Waiting approval", value: "2" },
           { icon: PackageCheck, label: "Material lists ready", value: "3" },
         ].map(({ icon: Icon, label, value }) => (
-          <div key={label} className="rounded-xl border border-border bg-surface p-4">
+          <div key={label} className="card hover-lift p-4">
             <Icon className="mb-2 size-5 text-brand" aria-hidden />
             <p className="text-xs font-semibold uppercase tracking-wide text-muted">{label}</p>
             <p className="mt-1 text-2xl font-semibold text-foreground">{value}</p>
@@ -51,7 +51,7 @@ export default function ProPage() {
             </span>
           ))}
         </nav>
-        <div className="rounded-xl border border-border bg-surface p-5">
+        <div className="card hover-lift p-5">
           <div className="flex items-center gap-2">
             <BriefcaseBusiness className="size-5 text-brand" aria-hidden />
             <h2 className="text-lg font-semibold text-foreground">Recent projects</h2>

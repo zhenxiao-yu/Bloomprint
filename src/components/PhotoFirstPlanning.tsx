@@ -28,7 +28,7 @@ import type {
   PhotoQuality,
   ProjectKind,
 } from "@/lib/workspace/types";
-import { analyzeYardPhotos } from "@/lib/workspace/photoAnalysis";
+import { analyzeYardPhotos, estimateConfidenceFromPhotoData } from "@/lib/workspace/photoAnalysis";
 import { saveDraftPhoto } from "@/lib/workspace/draftStore";
 import {
   areNearDuplicates,
@@ -251,35 +251,27 @@ function mergeVisionSuggestion(
   };
 }
 
-function sampleCanvas(canvas: HTMLCanvasElement): FrameSignal {
+/** Live-camera read: brightness/detail flags plus how much of the frame is yard. */
+function readLiveFrame(canvas: HTMLCanvasElement): { signal: FrameSignal; fill: number } {
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   if (!ctx) {
     return {
-      brightness: null,
-      contrast: null,
-      tooDark: false,
-      tooBright: false,
-      lowDetail: false,
+      signal: { brightness: null, contrast: null, tooDark: false, tooBright: false, lowDetail: false },
+      fill: 1,
     };
   }
-  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-  let brightnessTotal = 0;
-  const brightness: number[] = [];
-  for (let i = 0; i < data.length; i += 4) {
-    const value = (data[i] + data[i + 1] + data[i + 2]) / 3;
-    brightnessTotal += value;
-    brightness.push(value);
-  }
-  const avg = brightnessTotal / brightness.length;
-  const variance =
-    brightness.reduce((sum, value) => sum + Math.pow(value - avg, 2), 0) / brightness.length;
-  const contrast = Math.sqrt(variance);
+  const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const s = computeImageSignals(data, canvas.width, canvas.height);
   return {
-    brightness: avg,
-    contrast,
-    tooDark: avg < 38,
-    tooBright: avg > 238,
-    lowDetail: contrast < 9,
+    signal: {
+      brightness: s.brightness,
+      contrast: s.contrast,
+      tooDark: s.brightness < 38,
+      tooBright: s.brightness > 238,
+      lowDetail: s.contrast < 9,
+    },
+    // Vegetation + hardscape ≈ "actual yard content"; a near-empty frame trends to 0.
+    fill: s.greenRatio + s.hardscapeRatio,
   };
 }
 
@@ -388,6 +380,7 @@ export function PhotoFirstPlanning({
   });
   const [tipIndex, setTipIndex] = useState(0);
   const [tilted, setTilted] = useState(false);
+  const [liveFill, setLiveFill] = useState(1);
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -396,6 +389,11 @@ export function PhotoFirstPlanning({
   const usableCount = photos.filter((photo) => photo.quality !== "unusable").length;
   const reviewCount = photos.filter((photo) => photo.quality === "needs_review").length;
   const unusableCount = photos.filter((photo) => photo.quality === "unusable").length;
+  // Live "capture plan": which recommended shots are present, confidence so far,
+  // and the single best next shot to coach toward.
+  const presentTypes = new Set(photos.map((photo) => photo.type));
+  const liveConfidence = Math.round(estimateConfidenceFromPhotoData(photos) * 100);
+  const nextShot = EXAMPLE_SHOTS.find((shot) => !presentTypes.has(shot.type));
   const selectedType = PHOTO_TYPES.find((type) => type.value === photoType) ?? PHOTO_TYPES[0];
   const detailsDetected = Boolean(
     analysis && (analysis.zones.length > 0 || analysis.detectedObjects.length > 0),
@@ -414,7 +412,9 @@ export function PhotoFirstPlanning({
         ? "Low detail. Hold steady and step back."
         : tilted
           ? "Straighten your phone with the house or walkway."
-          : CAMERA_TIPS[tipIndex % CAMERA_TIPS.length];
+          : liveFill < 0.12
+            ? "Move closer so the bed or yard fills the frame."
+            : CAMERA_TIPS[tipIndex % CAMERA_TIPS.length];
   // Block capture only when light AND detail AND level are all bad — a frame this
   // poor would just be rejected on inspection, so stop it before the shutter.
   const captureBlocked =
@@ -550,7 +550,9 @@ export function PhotoFirstPlanning({
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
       if (!ctx) return;
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      setLiveSignal(sampleCanvas(canvas));
+      const { signal, fill } = readLiveFrame(canvas);
+      setLiveSignal(signal);
+      setLiveFill(fill);
     }, 600);
     return () => window.clearInterval(id);
   }, [cameraOpen, cameraReady]);
@@ -759,6 +761,11 @@ export function PhotoFirstPlanning({
     void addCapturedPhoto(canvas.toDataURL("image/jpeg", 0.86));
   }
 
+  function openCameraFor(type: PhotoAssetType) {
+    setPhotoType(type);
+    setCameraOpen(true);
+  }
+
   function removePhoto(id: string) {
     onPhotos(photos.filter((p) => p.id !== id));
   }
@@ -874,6 +881,51 @@ export function PhotoFirstPlanning({
           <div className="flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-2 text-xs text-muted">
             <ShieldCheck className="size-4 text-brand" aria-hidden />
             {usableCount} usable · {reviewCount} review · {unusableCount} retake
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-xl border border-border bg-background/60 p-3">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Capture plan</p>
+            <span className="text-xs font-semibold text-brand-strong">{liveConfidence}% photo confidence</span>
+          </div>
+          <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-border">
+            <div
+              className="h-full rounded-full bg-brand transition-all"
+              style={{ width: `${liveConfidence}%` }}
+            />
+          </div>
+          <p className="mt-2 text-xs text-muted">
+            {nextShot
+              ? `Next best shot: ${nextShot.title.toLowerCase()} — ${nextShot.desc}`
+              : "Great coverage. Add more angles or continue to confirm."}
+          </p>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            {EXAMPLE_SHOTS.map((shot) => {
+              const done = presentTypes.has(shot.type);
+              return (
+                <button
+                  key={shot.type}
+                  type="button"
+                  onClick={() => openCameraFor(shot.type)}
+                  className={`flex flex-1 items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs transition ${
+                    done
+                      ? "border-brand/30 bg-brand-soft text-brand-strong"
+                      : "border-border bg-surface text-foreground hover:border-brand"
+                  }`}
+                >
+                  {done ? (
+                    <CheckCircle2 className="size-4 shrink-0 text-brand" aria-hidden />
+                  ) : (
+                    <Camera className="size-4 shrink-0 text-muted" aria-hidden />
+                  )}
+                  <span className="min-w-0">
+                    <span className="block font-semibold">{shot.title}</span>
+                    <span className="block text-[11px] text-muted">{done ? "Captured" : "Tap to add"}</span>
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -1101,8 +1153,20 @@ export function PhotoFirstPlanning({
                     </button>
                     <button
                       type="button"
+                      onClick={() => openCameraFor(photo.type)}
+                      className={`ml-auto inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold transition ${
+                        photo.quality === "good"
+                          ? "border-border text-muted hover:border-brand hover:text-foreground"
+                          : "border-brand/40 bg-brand-soft text-brand-strong"
+                      }`}
+                    >
+                      <Camera className="size-3.5" aria-hidden />
+                      Retake
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => removePhoto(photo.id)}
-                      className="ml-auto inline-flex items-center gap-1 rounded-full border border-border px-2 py-1 text-[11px] font-semibold text-danger transition hover:border-danger/40"
+                      className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-1 text-[11px] font-semibold text-danger transition hover:border-danger/40"
                     >
                       <Trash2 className="size-3.5" aria-hidden />
                       Remove
@@ -1303,7 +1367,7 @@ export function PhotoFirstPlanning({
                 ))}
               </div>
 
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3">
                 <div
                   className={`border-2 border-dashed ${
                     photoType === "measurement"
@@ -1313,6 +1377,9 @@ export function PhotoFirstPlanning({
                         : "h-56 w-64 rounded-2xl border-yellow-300/80"
                   }`}
                 />
+                <span className="max-w-[18rem] rounded-lg bg-black/65 px-3 py-1 text-center text-[11px] text-white/90 backdrop-blur-sm">
+                  Frame the {selectedType.label.toLowerCase()}: {selectedType.hint}
+                </span>
               </div>
 
               <div className="pointer-events-none absolute left-0 right-0 top-3 flex justify-center px-3">
