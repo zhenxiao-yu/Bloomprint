@@ -95,7 +95,7 @@ export function SiteHeader() {
                 </Link>
                 <button
                   onClick={() => signOut()}
-                  className="block w-full px-4 py-2 text-left text-sm text-[var(--danger)] hover:bg-brand-soft"
+                  className="block w-full px-4 py-2 text-left text-sm text-danger hover:bg-brand-soft"
                 >
                   {t("signOut")}
                 </button>
