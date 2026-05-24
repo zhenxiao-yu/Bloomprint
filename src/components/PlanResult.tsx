@@ -217,7 +217,7 @@ export function PlanResult({
               <button
                 type="button"
                 onClick={() => setShowAi((v) => !v)}
-                aria-pressed={!showAi}
+                aria-pressed={showAi}
                 className="rounded-full border border-border px-2.5 py-0.5 text-[11px] font-semibold text-foreground transition hover:border-brand"
               >
                 {showAi ? t("aiHide") : t("aiShow")}

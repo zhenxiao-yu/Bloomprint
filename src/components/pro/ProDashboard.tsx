@@ -6,7 +6,7 @@
  * data lives in localStorage (proStore); plans regenerate deterministically from
  * their saved intake, so shopping numbers are real engine output, never faked.
  */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BriefcaseBusiness,
   CalendarDays,
@@ -363,6 +363,7 @@ function ClientsView({ clients, projects }: { clients: ProClient[]; projects: Pr
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Add a client by name"
+          aria-label="Add a client by name"
           className="min-w-0 flex-1 rounded-full border border-border bg-surface px-4 py-2 text-sm text-foreground"
         />
         <button
@@ -535,6 +536,17 @@ function ProjectDialog({
   const [price, setPrice] = useState(project?.priceQuoted ? String(project.priceQuoted) : "");
   const [savedPlanId, setSavedPlanId] = useState(project?.savedPlanId ?? "");
   const [notes, setNotes] = useState(project?.notes ?? "");
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Modal a11y: close on Escape and move focus into the dialog when it opens.
+  useEffect(() => {
+    panelRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   const linkedHref = planShareHref(savedPlanId || undefined);
 
@@ -566,7 +578,9 @@ function ProjectDialog({
       onClick={onClose}
     >
       <div
-        className="animate-fade-up flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl bg-surface shadow-2xl sm:rounded-2xl"
+        ref={panelRef}
+        tabIndex={-1}
+        className="animate-fade-up flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl bg-surface shadow-2xl outline-none sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 border-b border-border p-4">
