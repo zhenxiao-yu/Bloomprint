@@ -79,6 +79,9 @@ export const PlantFacts = z.object({
   careSummary: z.string().optional(),
   watering: z.string().optional(),
   sunlight: z.string().optional(),
+  /** Descriptive flowering season (e.g. "Spring to early summer"). Care-layer enrichment,
+   *  not a locked fact — only set from a real provider, never fabricated by the mock. */
+  bloom: z.string().optional(),
   imageUrl: z.string().optional(),
   source: SourceRef,
   lastCheckedAt: z.string(),

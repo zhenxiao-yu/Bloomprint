@@ -703,7 +703,8 @@
     "restyleCaption": "AI concept restyle — layout and scale are approximate. Plants, counts, and spacing come from your plan, not this image.",
     "imaginedError": "Couldn't generate an image — try again.",
     "badgeToxic": "Toxic if chewed",
-    "badgeInvasive": "Invasive — check local list"
+    "badgeInvasive": "Invasive — check local list",
+    "bloomsLabel": "Blooms"
   },
   "YardMap": {
     "metaTitle": "Yard Map (beta) · Bloomprint",

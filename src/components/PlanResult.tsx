@@ -150,6 +150,12 @@ export function PlanResult({
   );
   const weather = live?.weather ?? null;
   const careFact = live?.plantFacts[0] ?? null;
+  // Map live care facts to plants by name so per-plant bloom can show inline — only when a
+  // real provider supplied a flowering season (the mock never sets one, so this stays quiet
+  // offline / mock-only).
+  const factsByName = new Map(
+    (live?.plantFacts ?? []).map((f) => [(f.commonName ?? f.scientificName).toLowerCase(), f]),
+  );
 
   return (
     <div ref={rootRef} className="space-y-6">
@@ -579,6 +585,18 @@ export function PlanResult({
               {(() => {
                 const inv = invasiveByName.get(p.commonName.toLowerCase());
                 return inv ? <p className="mt-0.5 text-xs text-warn">⚠ {inv.note}</p> : null;
+              })()}
+              {(() => {
+                const facts = factsByName.get(p.commonName.toLowerCase());
+                return facts?.bloom ? (
+                  <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted">
+                    <span>
+                      <span className="font-medium text-foreground">{t("bloomsLabel")}:</span>{" "}
+                      {facts.bloom}
+                    </span>
+                    <LiveBadge source={facts.source} />
+                  </p>
+                ) : null;
               })()}
               {(() => {
                 const alt = plan.alternatives.find((a) => a.plantId === p.plantId);
