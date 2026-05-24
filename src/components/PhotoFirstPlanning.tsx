@@ -31,12 +31,15 @@ import type {
 import { analyzeYardPhotos, estimateConfidenceFromPhotoData } from "@/lib/workspace/photoAnalysis";
 import { saveDraftPhoto } from "@/lib/workspace/draftStore";
 import {
+  analyzeRegions,
   areNearDuplicates,
   computeImageSignals,
   gradeImageQuality,
   NEUTRAL_SIGNALS,
   perceptualHash,
   type ImageSignals,
+  type RegionClass,
+  type RegionSummary,
 } from "@/lib/workspace/imageSignals";
 
 const MAX_PHOTOS = 8;
@@ -225,6 +228,44 @@ async function readVisionSuggestion(photos: PhotoAsset[]): Promise<VisionSuggest
   }
 }
 
+const REGION_COLS = 6;
+const REGION_ROWS = 4;
+
+/** Decode the first usable photo and compute a pixel-grounded region read for the overlay. */
+async function analyzeFirstPhotoRegions(photos: PhotoAsset[]): Promise<RegionSummary | null> {
+  const photo = photos.find((item) => item.quality !== "unusable" && item.previewUrl);
+  if (!photo?.previewUrl) return null;
+  const src = photo.previewUrl;
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error("decode failed"));
+      image.src = src;
+    });
+    const cw = 96;
+    const ch = 64;
+    const canvas = document.createElement("canvas");
+    canvas.width = cw;
+    canvas.height = ch;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return null;
+    ctx.drawImage(img, 0, 0, cw, ch);
+    const { data } = ctx.getImageData(0, 0, cw, ch);
+    return analyzeRegions(data, cw, ch, REGION_COLS, REGION_ROWS);
+  } catch {
+    return null;
+  }
+}
+
+const REGION_STYLE: Record<RegionClass, { fill: string; label: string }> = {
+  greenery: { fill: "rgba(34,197,94,0.30)", label: "Greenery" },
+  hardscape: { fill: "rgba(148,163,184,0.34)", label: "Hard surface" },
+  sky: { fill: "rgba(56,189,248,0.26)", label: "Sky / open light" },
+  shadow: { fill: "rgba(30,41,59,0.40)", label: "Shade" },
+  mixed: { fill: "rgba(0,0,0,0)", label: "Mixed" },
+};
+
 function mergeVisionSuggestion(
   analysis: PhotoAnalysisResult,
   suggestion: VisionSuggestion | null,
@@ -381,6 +422,8 @@ export function PhotoFirstPlanning({
   const [tipIndex, setTipIndex] = useState(0);
   const [tilted, setTilted] = useState(false);
   const [liveFill, setLiveFill] = useState(1);
+  const [regionSummary, setRegionSummary] = useState<RegionSummary | null>(null);
+  const [selectedCell, setSelectedCell] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -394,6 +437,48 @@ export function PhotoFirstPlanning({
   const presentTypes = new Set(photos.map((photo) => photo.type));
   const liveConfidence = Math.round(estimateConfidenceFromPhotoData(photos) * 100);
   const nextShot = EXAMPLE_SHOTS.find((shot) => !presentTypes.has(shot.type));
+  const heroPhoto = photos.find((photo) => photo.quality !== "unusable" && photo.previewUrl) ?? null;
+
+  // Pixel-grounded "I can see…" chips: real ratios from the photo + any vision ML notes.
+  const sceneChips = useMemo(() => {
+    const chips: { label: string; tone: "green" | "neutral" | "sky" | "shade" }[] = [];
+    if (regionSummary) {
+      if (regionSummary.greenRatio > 0.18) chips.push({ label: "Greenery / planting", tone: "green" });
+      if (regionSummary.hardscapeRatio > 0.18)
+        chips.push({ label: "Paths / hard surfaces", tone: "neutral" });
+      if (regionSummary.skyRatio > 0.16) chips.push({ label: "Open sky · bright light", tone: "sky" });
+      if (regionSummary.shadowRatio > 0.28) chips.push({ label: "Shaded areas", tone: "shade" });
+    }
+    for (const obj of analysis?.detectedObjects ?? []) {
+      if (obj.toLowerCase().startsWith("photo ml observation")) {
+        chips.push({ label: obj.replace(/^photo ML observation:\s*/i, ""), tone: "neutral" });
+      }
+    }
+    return chips.slice(0, 6);
+  }, [regionSummary, analysis]);
+
+  const draftRead = useMemo(() => {
+    if (!analysis) return null;
+    const parts: string[] = [];
+    if (regionSummary) {
+      const { greenRatio: g, hardscapeRatio: h, skyRatio: s, shadowRatio: d } = regionSummary;
+      if (g > h && g > 0.2) parts.push("mostly greenery");
+      else if (h > g && h > 0.2) parts.push("a lot of hard surface");
+      else if (g > 0.1 || h > 0.1) parts.push("a mix of planting and paving");
+      if (s > 0.2) parts.push("bright open light");
+      else if (d > 0.3) parts.push("shadier light");
+    }
+    return `Draft read: ${parts.length ? parts.join(", ") : "your yard"}. Confirm the details below before planning.`;
+  }, [analysis, regionSummary]);
+
+  const coverageFor = (cls: RegionClass): number => {
+    if (!regionSummary) return 0;
+    if (cls === "greenery") return regionSummary.greenRatio;
+    if (cls === "hardscape") return regionSummary.hardscapeRatio;
+    if (cls === "sky") return regionSummary.skyRatio;
+    if (cls === "shadow") return regionSummary.shadowRatio;
+    return 0;
+  };
   const selectedType = PHOTO_TYPES.find((type) => type.value === photoType) ?? PHOTO_TYPES[0];
   const detailsDetected = Boolean(
     analysis && (analysis.zones.length > 0 || analysis.detectedObjects.length > 0),
@@ -434,32 +519,26 @@ export function PhotoFirstPlanning({
   useEffect(() => {
     if (photos.length === 0) {
       onAnalysis(null);
-      const reset = window.setTimeout(() => setAssumptionEdits({}), 0);
+      const reset = window.setTimeout(() => {
+        setAssumptionEdits({});
+        setRegionSummary(null);
+      }, 0);
       return () => window.clearTimeout(reset);
     }
     let active = true;
-    let stageTimer: number | null = null;
-    const stages = [
-      "Reading yard layout...",
-      "Checking photo quality...",
-      "Estimating planning zones...",
-      "Preparing editable assumptions...",
-    ];
-    let stageIndex = 0;
-    const setupTimer = window.setTimeout(() => {
-      if (!active) return;
-      setBusy(true);
-      setStatus(stages[stageIndex]);
-      stageTimer = window.setInterval(() => {
-        stageIndex = Math.min(stageIndex + 1, stages.length - 1);
-        setStatus(stages[stageIndex]);
-      }, 450);
-    }, 0);
+    // Short debounce so rapid reorders/type changes don't thrash the pipeline.
     const timer = window.setTimeout(() => {
       void (async () => {
+        setBusy(true);
         try {
+          // Each status reflects a real step, not a faked timer.
+          setStatus("Reading your photo...");
           const base = await analyzeYardPhotos(photos);
           if (!active) return;
+          setStatus("Mapping greenery and surfaces...");
+          const region = await analyzeFirstPhotoRegions(photos);
+          if (!active) return;
+          setRegionSummary(region);
           setStatus("Checking optional photo ML...");
           const next = mergeVisionSuggestion(base, await readVisionSuggestion(photos));
           if (!active) return;
@@ -475,15 +554,12 @@ export function PhotoFirstPlanning({
           if (active) setStatus("Couldn't read that photo automatically — you can still continue.");
         } finally {
           if (active) setBusy(false);
-          if (stageTimer) window.clearInterval(stageTimer);
         }
       })();
-    }, 500);
+    }, 450);
     return () => {
       active = false;
-      window.clearTimeout(setupTimer);
       window.clearTimeout(timer);
-      if (stageTimer) window.clearInterval(stageTimer);
     };
   }, [photos, onAnalysis]);
 
@@ -1194,6 +1270,105 @@ export function PhotoFirstPlanning({
 
         {analysis ? (
           <div className="mt-4 flex flex-col gap-4">
+            {draftRead ? (
+              <div className="flex items-start gap-2 rounded-xl border border-brand/25 bg-brand-soft p-3">
+                <Sparkles className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
+                <p className="text-sm font-medium text-brand-strong">{draftRead}</p>
+              </div>
+            ) : null}
+
+            {heroPhoto?.previewUrl && regionSummary ? (
+              <div className="rounded-xl border border-border bg-background/60 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                  What Bloomprint sees
+                </p>
+                <p className="mt-1 text-[11px] text-muted">
+                  A rough read of your photo — greenery, surfaces, and light. An estimate to confirm,
+                  not a measurement. Tap a tile for detail.
+                </p>
+                <div className="mt-2 grid gap-3 sm:grid-cols-[1.4fr_1fr]">
+                  <div className="relative overflow-hidden rounded-lg border border-border">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={heroPhoto.previewUrl}
+                      alt="Your yard with a rough greenery and surface read"
+                      className="aspect-[3/2] w-full object-cover"
+                    />
+                    <div
+                      className="absolute inset-0 grid"
+                      style={{
+                        gridTemplateColumns: `repeat(${regionSummary.cols}, 1fr)`,
+                        gridTemplateRows: `repeat(${regionSummary.rows}, 1fr)`,
+                      }}
+                    >
+                      {regionSummary.cells.map((cell, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setSelectedCell(selectedCell === i ? null : i)}
+                          className={`transition ${selectedCell === i ? "ring-2 ring-inset ring-white" : ""}`}
+                          style={{ backgroundColor: REGION_STYLE[cell.cls].fill }}
+                          aria-label={REGION_STYLE[cell.cls].label}
+                        />
+                      ))}
+                    </div>
+                    {selectedCell !== null && regionSummary.cells[selectedCell] ? (
+                      <div className="absolute inset-x-2 bottom-2 rounded-lg bg-black/75 px-3 py-1.5 text-xs text-white">
+                        {REGION_STYLE[regionSummary.cells[selectedCell].cls].label} — about{" "}
+                        {Math.round(coverageFor(regionSummary.cells[selectedCell].cls) * 100)}% of the
+                        photo
+                      </div>
+                    ) : null}
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-wrap gap-1.5">
+                      {sceneChips.length > 0 ? (
+                        sceneChips.map((chip, i) => (
+                          <span
+                            key={`${chip.label}-${i}`}
+                            className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                              chip.tone === "green"
+                                ? "bg-brand-soft text-brand-strong"
+                                : chip.tone === "sky"
+                                  ? "bg-sky-500/15 text-sky-700 dark:text-sky-300"
+                                  : chip.tone === "shade"
+                                    ? "bg-slate-500/15 text-slate-600 dark:text-slate-300"
+                                    : "bg-border/70 text-muted"
+                            }`}
+                          >
+                            {chip.label}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-xs text-muted">
+                          Not enough detail to read confidently — confirm below.
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                        Greenery vs. hard surfaces
+                      </p>
+                      <div className="mt-1 flex h-3 overflow-hidden rounded-full bg-border">
+                        <div
+                          className="bg-brand"
+                          style={{ width: `${Math.round(regionSummary.greenRatio * 100)}%` }}
+                        />
+                        <div
+                          className="bg-slate-400"
+                          style={{ width: `${Math.round(regionSummary.hardscapeRatio * 100)}%` }}
+                        />
+                      </div>
+                      <p className="mt-1 text-[11px] text-muted">
+                        ~{Math.round(regionSummary.greenRatio * 100)}% greenery · ~
+                        {Math.round(regionSummary.hardscapeRatio * 100)}% hard surface (estimate)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
             <div className="grid gap-3 sm:grid-cols-3">
               <ReadinessCheck
                 label="Details detected"

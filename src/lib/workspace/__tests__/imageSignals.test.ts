@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  analyzeRegions,
   areNearDuplicates,
   computeImageSignals,
   gradeImageQuality,
@@ -109,5 +110,30 @@ describe("perceptualHash + duplicates", () => {
 
   it("treats mismatched-length hashes as maximally distant", () => {
     expect(hammingDistance("abcd", "abcdef")).toBe(Number.MAX_SAFE_INTEGER);
+  });
+});
+
+describe("analyzeRegions", () => {
+  it("classifies a fully green frame as greenery", () => {
+    const green = buffer(W, H, () => [40, 160, 40]);
+    const summary = analyzeRegions(green, W, H, 4, 4);
+    expect(summary.cells).toHaveLength(16);
+    expect(summary.greenRatio).toBeGreaterThan(0.8);
+    expect(summary.cells.every((c) => c.cls === "greenery")).toBe(true);
+  });
+
+  it("separates a green top half from a paved bottom half", () => {
+    const split = buffer(W, H, (_x, y) =>
+      y < H / 2 ? [40, 160, 40] : [140, 140, 140],
+    );
+    const summary = analyzeRegions(split, W, H, 2, 2);
+    expect(summary.greenRatio).toBeGreaterThan(0.4);
+    expect(summary.hardscapeRatio).toBeGreaterThan(0.4);
+    expect(summary.cells.filter((c) => c.row === 0).every((c) => c.cls === "greenery")).toBe(true);
+    expect(summary.cells.filter((c) => c.row === 1).every((c) => c.cls === "hardscape")).toBe(true);
+  });
+
+  it("returns an empty summary for an invalid buffer", () => {
+    expect(analyzeRegions(new Uint8ClampedArray(0), 0, 0).cells).toHaveLength(0);
   });
 });

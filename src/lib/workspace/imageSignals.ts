@@ -226,3 +226,128 @@ export function hammingDistance(a: string, b: string): number {
 export function areNearDuplicates(a: string, b: string, threshold = 6): boolean {
   return hammingDistance(a, b) <= threshold;
 }
+
+export type RegionClass = "greenery" | "hardscape" | "sky" | "shadow" | "mixed";
+
+export interface RegionCell {
+  col: number;
+  row: number;
+  cls: RegionClass;
+}
+
+export interface RegionSummary {
+  cols: number;
+  rows: number;
+  cells: RegionCell[];
+  greenRatio: number;
+  hardscapeRatio: number;
+  skyRatio: number;
+  shadowRatio: number;
+}
+
+type PixelClass = "green" | "hard" | "sky" | "dark" | "other";
+
+/** Classify a single pixel into a coarse outdoor-scene bucket. */
+function classifyPixel(r: number, g: number, b: number): PixelClass {
+  const y = 0.299 * r + 0.587 * g + 0.114 * b;
+  if (y < 45) return "dark";
+  if (y > 235 || (y > 150 && b >= r - 5 && b >= g - 5)) return "sky";
+  if (g > r + 10 && g > b + 10 && y < 235) return "green";
+  if (Math.max(r, g, b) - Math.min(r, g, b) < 24 && y >= 50 && y <= 220) return "hard";
+  return "other";
+}
+
+/**
+ * A genuine (pixel-grounded, not templated) coarse read of the photo: split the
+ * frame into a cols×rows grid and classify each cell by its dominant content,
+ * plus overall greenery/hardscape/sky/shadow ratios. Honest enough to drive an
+ * "I can see…" overlay and a greenery-vs-hardscape bar — never a measurement.
+ */
+export function analyzeRegions(
+  data: Uint8ClampedArray | number[],
+  width: number,
+  height: number,
+  cols = 4,
+  rows = 4,
+): RegionSummary {
+  const empty: RegionSummary = {
+    cols,
+    rows,
+    cells: [],
+    greenRatio: 0,
+    hardscapeRatio: 0,
+    skyRatio: 0,
+    shadowRatio: 0,
+  };
+  const n = width * height;
+  if (!data || width <= 0 || height <= 0 || data.length < n * 4) return empty;
+
+  const cellCount = cols * rows;
+  // Per-cell tallies of each pixel class.
+  const tally = Array.from({ length: cellCount }, () => ({
+    green: 0,
+    hard: 0,
+    sky: 0,
+    dark: 0,
+    total: 0,
+  }));
+  let green = 0;
+  let hard = 0;
+  let sky = 0;
+  let dark = 0;
+  for (let y = 0; y < height; y++) {
+    const row = Math.min(rows - 1, Math.floor((y * rows) / height));
+    for (let x = 0; x < width; x++) {
+      const col = Math.min(cols - 1, Math.floor((x * cols) / width));
+      const i = (y * width + x) * 4;
+      const cls = classifyPixel(data[i], data[i + 1], data[i + 2]);
+      const cell = tally[row * cols + col];
+      cell.total++;
+      if (cls === "green") {
+        cell.green++;
+        green++;
+      } else if (cls === "hard") {
+        cell.hard++;
+        hard++;
+      } else if (cls === "sky") {
+        cell.sky++;
+        sky++;
+      } else if (cls === "dark") {
+        cell.dark++;
+        dark++;
+      }
+    }
+  }
+
+  const cells: RegionCell[] = tally.map((cell, idx) => {
+    const col = idx % cols;
+    const row = Math.floor(idx / cols);
+    const entries: [RegionClass, number][] = [
+      ["greenery", cell.green],
+      ["hardscape", cell.hard],
+      ["sky", cell.sky],
+      ["shadow", cell.dark],
+    ];
+    let best: RegionClass = "mixed";
+    let bestCount = 0;
+    for (const [cls, count] of entries) {
+      if (count > bestCount) {
+        bestCount = count;
+        best = cls;
+      }
+    }
+    // Require a real plurality, else the cell is genuinely mixed.
+    const cls = cell.total > 0 && bestCount / cell.total >= 0.35 ? best : "mixed";
+    return { col, row, cls };
+  });
+
+  return {
+    cols,
+    rows,
+    cells,
+    greenRatio: green / n,
+    hardscapeRatio: hard / n,
+    skyRatio: sky / n,
+    shadowRatio: dark / n,
+  };
+}
