@@ -365,6 +365,8 @@
     "photoContextNoMl": "暂无机器学习信号",
     "photoContextConfidence": "照片信心 {confidence}%",
     "applyPhotoHints": "应用照片提示",
+    "photoAnswersTitle": "照片得出的答案",
+    "photoAnswersVerify": "供确认的建议——购买前请实地核实。",
     "steps": {
       "goal": {
         "short": "目标",

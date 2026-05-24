@@ -365,6 +365,8 @@
     "photoContextNoMl": "No ML signal yet",
     "photoContextConfidence": "{confidence}% photo confidence",
     "applyPhotoHints": "Apply photo hints",
+    "photoAnswersTitle": "Answers from your photo",
+    "photoAnswersVerify": "Suggestions to confirm — verify on site before buying.",
     "steps": {
       "goal": {
         "short": "Goal",

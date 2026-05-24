@@ -28,7 +28,11 @@ import type {
   PhotoQuality,
   ProjectKind,
 } from "@/lib/workspace/types";
-import { analyzeYardPhotos, estimateConfidenceFromPhotoData } from "@/lib/workspace/photoAnalysis";
+import {
+  analyzeYardPhotos,
+  derivePhotoIntake,
+  estimateConfidenceFromPhotoData,
+} from "@/lib/workspace/photoAnalysis";
 import { saveDraftPhoto } from "@/lib/workspace/draftStore";
 import {
   analyzeRegions,
@@ -540,8 +544,17 @@ export function PhotoFirstPlanning({
           if (!active) return;
           setRegionSummary(region);
           setStatus("Checking optional photo ML...");
-          const next = mergeVisionSuggestion(base, await readVisionSuggestion(photos));
+          const suggestion = await readVisionSuggestion(photos);
           if (!active) return;
+          const merged = mergeVisionSuggestion(base, suggestion);
+          const next: PhotoAnalysisResult = {
+            ...merged,
+            derived: derivePhotoIntake({
+              photoTypes: photos.filter((p) => p.quality !== "unusable").map((p) => p.type),
+              region,
+              visionSun: suggestion?.sun,
+            }),
+          };
           onAnalysis(next);
           setAssumptionEdits((current) => {
             const merged = { ...current };

@@ -77,6 +77,22 @@ export interface DetectedZone {
   note?: string;
 }
 
+/**
+ * Survey answers a photo can suggest (confirm-first, never silently applied).
+ * Reuses the YardIntake field types so the values stay valid for the engine.
+ * Deliberately omits real measurements (areaSqft): a photo gives estimates, not
+ * dimensions (DECISIONS.md honesty contract).
+ */
+export interface PhotoDerivedIntake {
+  problemType?: NonNullable<YardIntake["problemType"]>;
+  scope?: NonNullable<YardIntake["scope"]>;
+  areaType?: NonNullable<YardIntake["areaType"]>;
+  sun?: NonNullable<YardIntake["sun"]>;
+  drainage?: NonNullable<YardIntake["drainage"]>;
+  greeneryRatio?: number;
+  hardscapeRatio?: number;
+}
+
 export interface PhotoAnalysisResult {
   zones: DetectedZone[];
   detectedObjects: string[];
@@ -85,6 +101,8 @@ export interface PhotoAnalysisResult {
   risks: string[];
   confidence: number;
   generatedAt: number;
+  /** Photo-suggested survey answers, surfaced for one-tap confirm in the intake. */
+  derived?: PhotoDerivedIntake;
 }
 
 export interface PhotoAsset {
