@@ -85,12 +85,17 @@ Verified against the code before building (avoided duplicating shipped work):
   check); (2) honest `safety: { toxic, invasive }` flags now ride on every `PlantPlacement`
   and render as **point-of-decision badges** in the plants grid. Tests added in
   `src/domain/__tests__/plan.test.ts`.
-- **BP-0 (data): intentionally NOT auto-populated.** Filling `bloomMonths`, `growthRate`,
-  `lifespanYears`, and per-plant citations for 34 species from the model's own knowledge
-  would violate the prime directive ("AI may not invent plants, prices, spacing,
-  toxicity…"). This needs a **sourced** data pass — either a reviewed CSV or wiring the
-  existing live plant-facts provider — not fabrication. Schema-only scaffolding was skipped
-  to avoid dead fields with no honest data behind them.
+- **BP-0 (static data): intentionally NOT auto-populated.** Filling `bloomMonths`,
+  `growthRate`, `lifespanYears`, and per-plant citations for 34 species from the model's own
+  knowledge would violate the prime directive ("AI may not invent plants, prices, spacing,
+  toxicity…"). The static-data variant still needs a **sourced** pass (a reviewed CSV), not
+  fabrication.
+- **BP-0 (live variant): shipped.** Instead of fabricating static data, bloom/care facts now
+  flow from a **real, sourced** Perenual adapter (`src/lib/live-data/plantFacts.ts`, behind
+  `LIVE_DATA_PROVIDER=perenual` + `PERENUAL_API_KEY`): an optional `bloom` on the
+  care-enrichment `PlantFacts` schema, mapped from `flowering_season`, surfaced per-plant in
+  `PlanResult` behind a `LiveBadge`. The mock stays bloom-free (no fabrication); offline/mock
+  degrades to quiet. The pure mapper is unit-tested; the live HTTP path is untested (needs a key).
 
 ## Part 2 — Build specs (the "do-next" subset)
 
