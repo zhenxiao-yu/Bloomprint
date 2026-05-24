@@ -129,6 +129,16 @@ Verified against the code before building (avoided duplicating shipped work):
   compared against the first, reusing the pure `diffPlans`). `/plans` now selects up to 3
   (FIFO past the cap) and enables compare at 2+. i18n hints updated to "2–3" (en/zh). UI-only,
   no engine change; the diff logic is unchanged and still covered by its tests.
+- **Tier-3 (yard-map→plan), first slice: shipped.** Audit found the map already calibrates
+  per-zone areas and hands the planting-bed sqft to the plan as `areaSqft` — but it dropped the
+  measurement's **confidence + source**, so a calibrated measurement was credited no more than a
+  typed guess and never shown as "measured" in evidence. Fix: `PlanExperience` now carries a real
+  `measurement` (area + `photo` source + `medium` confidence) when the submitted area still
+  matches the map's value, and `scoreConfidence` grades the area credit by measurement confidence
+  (high/good/medium/low → +0.10/0.08/0.06/0.03; plain typed area stays +0.05). So a calibrated
+  measurement honestly beats a guess and a low-confidence one is discounted; evidence now shows
+  its provenance. Tests added. Remaining Tier-3 (zone-type awareness in the engine, to-scale PDF,
+  pro approval flow) stays deferred.
 
 ## Part 2 — Build specs (the "do-next" subset)
 

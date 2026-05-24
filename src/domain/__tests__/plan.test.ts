@@ -186,6 +186,50 @@ describe("a measured bed area (from the Yard Map) sharpens the estimate", () => 
   });
 });
 
+describe("Tier-3 — a calibrated Yard Map measurement is credited as a real measurement", () => {
+  // Mid-range base with headroom (sun known, soil/drainage unknown) so the small credit shows.
+  const baseIntake: YardIntake = {
+    regionId: "gta-ontario",
+    goal: "general",
+    effortLevel: "moderate",
+    hasPhoto: false,
+    sun: "full-sun",
+    soil: "unknown",
+    drainage: "unknown",
+  };
+
+  it("a measurement beats a plain typed area, which beats no area", () => {
+    const measured = generateDeterministicPlan({
+      ...baseIntake,
+      areaSqft: 150,
+      measurement: { area: 150, unit: "ft", source: "photo", confidence: "medium" },
+    });
+    const typed = generateDeterministicPlan({ ...baseIntake, areaSqft: 150 });
+    const none = generateDeterministicPlan({ ...baseIntake, areaSqft: undefined });
+    expect(measured.scores.confidence).toBeGreaterThan(typed.scores.confidence);
+    expect(typed.scores.confidence).toBeGreaterThan(none.scores.confidence);
+  });
+
+  it("a low-confidence measurement is honestly discounted below a typed area", () => {
+    const low = generateDeterministicPlan({
+      ...baseIntake,
+      areaSqft: 150,
+      measurement: { area: 150, unit: "ft", source: "photo", confidence: "low" },
+    });
+    const typed = generateDeterministicPlan({ ...baseIntake, areaSqft: 150 });
+    expect(low.scores.confidence).toBeLessThan(typed.scores.confidence);
+  });
+
+  it("surfaces the measurement (with source + confidence) in the plan evidence", () => {
+    const plan = generateDeterministicPlan({
+      ...baseIntake,
+      areaSqft: 150,
+      measurement: { area: 150, unit: "ft", source: "photo", confidence: "medium" },
+    });
+    expect(plan.evidence.inputs.some((i) => /measured:/i.test(i))).toBe(true);
+  });
+});
+
 describe("BP-2 — honest safety facts surfaced at the point of decision", () => {
   it("mirrors the Core Library toxic/invasive flags onto every plant placement", () => {
     const plan = generateDeterministicPlan(FIXTURES["oakville-front-yard"]);
