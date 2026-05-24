@@ -1,8 +1,10 @@
 {
   "Nav": {
     "home": "首页",
+    "dashboard": "工作台",
     "plan": "做方案",
     "saved": "已保存",
+    "pro": "专业版",
     "pricing": "价格",
     "guide": "指南",
     "about": "关于",
@@ -130,6 +132,20 @@
     "dontKnow": "我不确定",
     "notSure": "还不确定",
     "optional": "（选填）"
+  },
+  "Workspace": {
+    "planningSession": "规划草稿",
+    "project": "项目",
+    "property": "房屋/庭院项目",
+    "planVersion": "方案版本",
+    "photoAnalysis": "照片分析",
+    "detectedZones": "识别区域",
+    "editableAssumptions": "可修改判断",
+    "autosaved": "已自动保存",
+    "synced": "已同步",
+    "resumeDraft": "继续上次草稿",
+    "landscaperMode": "园艺/景观专业模式",
+    "storeHelperMode": "门店协助模式"
   },
   "Form": {
     "nameRequired": "请填写你的名字。",

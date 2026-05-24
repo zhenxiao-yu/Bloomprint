@@ -9,8 +9,10 @@ import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { SyncStatusBadge } from "@/components/SyncStatusBadge";
 
 const NAV = [
+  { href: "/dashboard", key: "dashboard" },
   { href: "/plan", key: "plan" },
   { href: "/plans", key: "saved" },
+  { href: "/pro", key: "pro" },
   { href: "/pricing", key: "pricing" },
   { href: "/guide", key: "guide" },
   { href: "/about", key: "about" },

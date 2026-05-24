@@ -8,6 +8,7 @@ import type { BloomprintPlan, RefinementAdjustment } from "@/domain/models";
 import { IntakeForm, type IntakeDefaults, type IntakeValues } from "@/components/IntakeForm";
 import { PlanResult, type ViewMode } from "@/components/PlanResult";
 import { PhotoPanel } from "@/components/PhotoPanel";
+import { PhotoFirstPlanning } from "@/components/PhotoFirstPlanning";
 import { SyncStatusBadge } from "@/components/SyncStatusBadge";
 import { BUDGETS, REGION_OPTIONS } from "@/lib/uiOptions";
 import { saveProfile, useSavedProfileRaw } from "@/lib/profileStore";
@@ -17,6 +18,14 @@ import { buildShareUrl, decodeShare, encodeShare, SHARE_PARAM } from "@/lib/shar
 import { buildCareCalendar } from "@/lib/ics";
 import { trackEvent } from "@/lib/analytics";
 import { readApiError } from "@/lib/apiError";
+import {
+  clearActiveSession,
+  createPlanningDraft,
+  loadPlanningDraft,
+  savePlanningDraft,
+  type PlanningDraftSnapshot,
+} from "@/lib/workspace/draftStore";
+import type { PhotoAnalysisResult, PhotoAsset, ProjectKind } from "@/lib/workspace/types";
 
 type GenerateSource = "form" | "demo" | "shared" | "refine" | "accuracy";
 
@@ -127,6 +136,10 @@ export function PlanExperience() {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [prepComplete, setPrepComplete] = useState(Boolean(boot.request));
+  const [draft, setDraft] = useState<PlanningDraftSnapshot>(() => createPlanningDraft(staffParam ? "store_customer" : "my_home"));
+  const [recoveryDraft, setRecoveryDraft] = useState<PlanningDraftSnapshot | null>(null);
+  const [autosaveState, setAutosaveState] = useState<"idle" | "saving" | "saved" | "unsaved">("idle");
   const profileRaw = useSavedProfileRaw();
   const profile = useMemo<SavedProfile | null>(
     () => parseSavedProfile(profileRaw),
@@ -134,6 +147,93 @@ export function PlanExperience() {
   );
   const stores = useStores();
   const started = useRef(false);
+
+  useEffect(() => {
+    if (boot.request) return;
+    const existing = loadPlanningDraft();
+    if (existing && Date.now() - existing.session.updatedAt < 1000 * 60 * 60 * 24 * 14) {
+      const id = setTimeout(() => setRecoveryDraft(existing), 0);
+      return () => clearTimeout(id);
+    }
+  }, [boot.request]);
+
+  useEffect(() => {
+    if (boot.request) return;
+    const id = setTimeout(() => {
+      savePlanningDraft(draft);
+      setAutosaveState("saved");
+    }, 450);
+    return () => {
+      clearTimeout(id);
+      setAutosaveState("unsaved");
+    };
+  }, [boot.request, draft]);
+
+  useEffect(() => {
+    if (prepComplete && step === "intake") return;
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (autosaveState === "unsaved" || autosaveState === "saving") {
+        event.preventDefault();
+        event.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [autosaveState, prepComplete, step]);
+
+  function updateDraft(mutator: (current: PlanningDraftSnapshot) => PlanningDraftSnapshot) {
+    setAutosaveState("unsaved");
+    setDraft(mutator);
+  }
+
+  function handleProjectKind(kind: ProjectKind) {
+    updateDraft((current) => ({
+      ...current,
+      session: { ...current.session, projectKind: kind, updatedAt: Date.now() },
+    }));
+    if (kind === "store_customer") setView("staff");
+  }
+
+  function handleDraftPhotos(photos: PhotoAsset[]) {
+    updateDraft((current) => ({
+      ...current,
+      photos,
+      session: { ...current.session, photoIds: photos.map((p) => p.id), currentStep: "photos", updatedAt: Date.now() },
+    }));
+    const first = photos[0]?.previewUrl ?? null;
+    if (first) setPhotoUrl(first);
+  }
+
+  const handleDraftAnalysis = useCallback((analysis: PhotoAnalysisResult | null) => {
+    setDraft((current) => ({
+      ...current,
+      analysis,
+      session: {
+        ...current.session,
+        status: analysis ? "ready" : "draft",
+        currentStep: analysis ? "analysis" : current.session.currentStep,
+        updatedAt: Date.now(),
+      },
+    }));
+    setAutosaveState("unsaved");
+  }, []);
+
+  function resumeDraft(snapshot: PlanningDraftSnapshot) {
+    setDraft(snapshot);
+    setPhotoUrl(snapshot.photos[0]?.previewUrl ?? null);
+    setPrepComplete(snapshot.session.currentStep === "details" || snapshot.session.currentStep === "plan");
+    setRecoveryDraft(null);
+    setAutosaveState("saved");
+  }
+
+  function discardDraft() {
+    clearActiveSession();
+    const fresh = createPlanningDraft(staffParam ? "store_customer" : "my_home");
+    setDraft(fresh);
+    setRecoveryDraft(null);
+    setPrepComplete(false);
+    setPhotoUrl(null);
+  }
 
   const fetchPlan = useCallback(
     async (req: PlanRequest, adj: RefinementAdjustment[], source: GenerateSource) => {
@@ -189,6 +289,10 @@ export function PlanExperience() {
     };
     saveProfile(next);
     const req: PlanRequest = { intake: values };
+    updateDraft((current) => ({
+      ...current,
+      session: { ...current.session, currentStep: "plan", autosaveData: { intake: values }, updatedAt: Date.now() },
+    }));
     setRequest(req);
     setAdjustments([]);
     setStep("loading");
@@ -342,19 +446,88 @@ export function PlanExperience() {
 
       {step === "intake" ? (
         <div className="space-y-5">
+          {recoveryDraft && !prepComplete ? (
+            <div className="rounded-xl border border-brand/25 bg-brand-soft p-4 text-sm text-brand-strong">
+              <p className="font-semibold">We found an unsaved plan from {new Date(recoveryDraft.session.updatedAt).toLocaleTimeString()}.</p>
+              <p className="mt-1">Resume your photos and assumptions, save it as a project, or discard it.</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button onClick={() => resumeDraft(recoveryDraft)} className="rounded-full bg-brand px-4 py-1.5 text-xs font-semibold text-on-strong">
+                  Resume plan
+                </button>
+                <button onClick={() => resumeDraft({ ...recoveryDraft, session: { ...recoveryDraft.session, id: crypto.randomUUID() } })} className="rounded-full border border-brand px-4 py-1.5 text-xs font-semibold">
+                  Save as new project
+                </button>
+                <button onClick={discardDraft} className="rounded-full border border-border px-4 py-1.5 text-xs font-semibold text-muted">
+                  Discard
+                </button>
+              </div>
+            </div>
+          ) : null}
           {error ? (
             <div className="rounded-lg bg-[var(--warn)]/10 px-4 py-2 text-xs text-[var(--warn)]">
               {error}
             </div>
           ) : null}
-          {profile ? <MemoryBanner profile={profile} t={t} /> : null}
-          <h1 className="text-2xl font-semibold text-foreground">{t("intakeTitle")}</h1>
-          {measuredArea ? (
-            <div className="rounded-lg bg-brand-soft px-4 py-2 text-xs text-brand-strong">
-              {t("measuredAreaNote", { area: Math.round(measuredArea) })}
-            </div>
-          ) : null}
-          <IntakeForm defaults={defaults} onSubmit={handleIntake} />
+          {!prepComplete ? (
+            <>
+              <PhotoFirstPlanning
+                sessionId={draft.session.id}
+                projectKind={draft.session.projectKind}
+                photos={draft.photos}
+                analysis={draft.analysis}
+                onProjectKind={handleProjectKind}
+                onPhotos={handleDraftPhotos}
+                onAnalysis={handleDraftAnalysis}
+                onContinue={() => {
+                  updateDraft((current) => ({
+                    ...current,
+                    session: { ...current.session, currentStep: "details", updatedAt: Date.now() },
+                  }));
+                  setPrepComplete(true);
+                }}
+                onSkip={() => {
+                  updateDraft((current) => ({
+                    ...current,
+                    session: { ...current.session, currentStep: "details", updatedAt: Date.now() },
+                  }));
+                  setPrepComplete(true);
+                }}
+              />
+              <p className="px-1 text-xs text-muted">
+                {autosaveState === "saving"
+                  ? "Saving..."
+                  : autosaveState === "saved"
+                    ? "Draft saved locally. You can safely leave and continue later."
+                    : "Unsaved changes"}
+              </p>
+            </>
+          ) : (
+            <>
+              {profile ? <MemoryBanner profile={profile} t={t} /> : null}
+              <div className="rounded-xl border border-border bg-surface p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand">Confirmed photos and assumptions</p>
+                <p className="mt-1 text-sm text-muted">
+                  {draft.photos.length > 0
+                    ? `${draft.photos.length} photo(s) attached. ${draft.analysis?.zones.length ?? 0} planning zone(s) estimated.`
+                    : "Continuing without photos. You can still generate a buildable plan."}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setPrepComplete(false)}
+                  className="mt-3 rounded-full border border-border px-3 py-1 text-xs font-semibold"
+                >
+                  Edit photos
+                </button>
+              </div>
+              <h1 className="text-2xl font-semibold text-foreground">{t("intakeTitle")}</h1>
+              {measuredArea ? (
+                <div className="rounded-lg bg-brand-soft px-4 py-2 text-xs text-brand-strong">
+                  {t("measuredAreaNote", { area: Math.round(measuredArea) })}
+                </div>
+              ) : null}
+              <IntakeForm defaults={defaults} onSubmit={handleIntake} />
+            </>
+          )}
         </div>
       ) : null}
 

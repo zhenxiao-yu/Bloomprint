@@ -1,8 +1,10 @@
 {
   "Nav": {
     "home": "Home",
+    "dashboard": "Dashboard",
     "plan": "Plan",
     "saved": "Saved",
+    "pro": "Pro",
     "pricing": "Pricing",
     "guide": "Guide",
     "about": "About",
@@ -130,6 +132,20 @@
     "dontKnow": "I don't know",
     "notSure": "Not sure yet",
     "optional": "(optional)"
+  },
+  "Workspace": {
+    "planningSession": "Planning session",
+    "project": "Project",
+    "property": "Property",
+    "planVersion": "Plan version",
+    "photoAnalysis": "Photo analysis",
+    "detectedZones": "Detected zones",
+    "editableAssumptions": "Editable assumptions",
+    "autosaved": "Autosaved",
+    "synced": "Synced",
+    "resumeDraft": "Resume draft",
+    "landscaperMode": "Landscaper mode",
+    "storeHelperMode": "Store helper mode"
   },
   "Form": {
     "nameRequired": "Please enter your name.",

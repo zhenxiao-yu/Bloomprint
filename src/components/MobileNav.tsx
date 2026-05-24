@@ -1,11 +1,12 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Home, Sprout, Bookmark, User } from "lucide-react";
+import { Home, Sprout, Bookmark, User, LayoutDashboard } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 
 const ITEMS = [
   { href: "/", key: "home", icon: Home, exact: true },
+  { href: "/dashboard", key: "dashboard", icon: LayoutDashboard, exact: false },
   { href: "/plan", key: "plan", icon: Sprout, exact: false },
   { href: "/plans", key: "saved", icon: Bookmark, exact: false },
   { href: "/account", key: "account", icon: User, exact: false },
