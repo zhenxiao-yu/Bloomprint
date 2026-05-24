@@ -10,12 +10,16 @@ import {
   ClipboardEdit,
   Home,
   ImageOff,
+  Leaf,
   Loader2,
+  Maximize2,
+  Ruler,
   ShieldCheck,
   Sparkles,
   Store,
   Trash2,
   Users,
+  X,
 } from "lucide-react";
 import type {
   PhotoAnalysisResult,
@@ -88,6 +92,39 @@ const STEPS = [
   { key: "confirm", label: "Confirm" },
 ] as const;
 
+const CAMERA_TIPS = [
+  "Hold steady and include the bed edges.",
+  "Keep the house, walkway, or fence line level.",
+  "Use the center box for the main problem area.",
+  "Step back if plants or bed corners are cropped.",
+];
+
+const EXAMPLE_SHOTS: {
+  type: PhotoAssetType;
+  title: string;
+  desc: string;
+  overlay: "wide" | "plant" | "measure";
+}[] = [
+  {
+    type: "front_yard",
+    title: "Wide context",
+    desc: "House edge, walkway, and full planting bed visible.",
+    overlay: "wide",
+  },
+  {
+    type: "existing_plants",
+    title: "Plant close-up",
+    desc: "Leaves and branching clear enough for a cautious ID note.",
+    overlay: "plant",
+  },
+  {
+    type: "measurement",
+    title: "Measurement proof",
+    desc: "Tape, sketch, or known width visible before buying.",
+    overlay: "measure",
+  },
+];
+
 type PhotoIssue = {
   id: string;
   fileName: string;
@@ -101,6 +138,14 @@ type ImageInspection = {
   height: number;
   quality: PhotoQuality;
   warnings: string[];
+};
+
+type FrameSignal = {
+  brightness: number | null;
+  contrast: number | null;
+  tooDark: boolean;
+  tooBright: boolean;
+  lowDetail: boolean;
 };
 
 function qualityLabel(quality: PhotoQuality | undefined): string {
@@ -121,21 +166,39 @@ function activeStep(photos: PhotoAsset[], analysis: PhotoAnalysisResult | null) 
   return "photos";
 }
 
-async function inspectAndCompress(file: File): Promise<ImageInspection> {
-  if (!file.type.startsWith("image/")) {
-    throw new Error("This file is not an image. Upload a JPG, PNG, HEIC, or WebP photo.");
+function sampleCanvas(canvas: HTMLCanvasElement): FrameSignal {
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  if (!ctx) {
+    return {
+      brightness: null,
+      contrast: null,
+      tooDark: false,
+      tooBright: false,
+      lowDetail: false,
+    };
   }
-  if (file.size > MAX_FILE_MB * 1024 * 1024) {
-    throw new Error(`This photo is over ${MAX_FILE_MB}MB. Use a smaller image or retake it.`);
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  let brightnessTotal = 0;
+  const brightness: number[] = [];
+  for (let i = 0; i < data.length; i += 4) {
+    const value = (data[i] + data[i + 1] + data[i + 2]) / 3;
+    brightnessTotal += value;
+    brightness.push(value);
   }
+  const avg = brightnessTotal / brightness.length;
+  const variance =
+    brightness.reduce((sum, value) => sum + Math.pow(value - avg, 2), 0) / brightness.length;
+  const contrast = Math.sqrt(variance);
+  return {
+    brightness: avg,
+    contrast,
+    tooDark: avg < 38,
+    tooBright: avg > 238,
+    lowDetail: contrast < 9,
+  };
+}
 
-  const source = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error("Bloomprint could not read this photo."));
-    reader.readAsDataURL(file);
-  });
-
+async function inspectDataUrl(source: string): Promise<ImageInspection> {
   const img = await new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve(image);
@@ -165,28 +228,17 @@ async function inspectAndCompress(file: File): Promise<ImageInspection> {
   const sampleCtx = sample.getContext("2d", { willReadFrequently: true });
   if (sampleCtx) {
     sampleCtx.drawImage(img, 0, 0, sample.width, sample.height);
-    const data = sampleCtx.getImageData(0, 0, sample.width, sample.height).data;
-    let brightnessTotal = 0;
-    const brightness: number[] = [];
-    for (let i = 0; i < data.length; i += 4) {
-      const value = (data[i] + data[i + 1] + data[i + 2]) / 3;
-      brightnessTotal += value;
-      brightness.push(value);
-    }
-    const avg = brightnessTotal / brightness.length;
-    const variance =
-      brightness.reduce((sum, value) => sum + Math.pow(value - avg, 2), 0) / brightness.length;
-    const contrast = Math.sqrt(variance);
+    const signal = sampleCanvas(sample);
 
-    if (avg < 38) {
+    if (signal.tooDark) {
       quality = quality === "unusable" ? "unusable" : "needs_review";
       warnings.push("Photo looks very dark. Retake in daylight if possible.");
     }
-    if (avg > 238) {
+    if (signal.tooBright) {
       quality = quality === "unusable" ? "unusable" : "needs_review";
       warnings.push("Photo looks overexposed. Retake with less glare if possible.");
     }
-    if (contrast < 9) {
+    if (signal.lowDetail) {
       quality = quality === "unusable" ? "unusable" : "needs_review";
       warnings.push("Photo has low detail. A clearer wide shot will improve zone detection.");
     }
@@ -208,6 +260,24 @@ async function inspectAndCompress(file: File): Promise<ImageInspection> {
     quality,
     warnings,
   };
+}
+
+async function inspectAndCompress(file: File): Promise<ImageInspection> {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("This file is not an image. Upload a JPG, PNG, HEIC, or WebP photo.");
+  }
+  if (file.size > MAX_FILE_MB * 1024 * 1024) {
+    throw new Error(`This photo is over ${MAX_FILE_MB}MB. Use a smaller image or retake it.`);
+  }
+
+  const source = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error("Bloomprint could not read this photo."));
+    reader.readAsDataURL(file);
+  });
+
+  return inspectDataUrl(source);
 }
 
 export function PhotoFirstPlanning({
@@ -237,13 +307,45 @@ export function PhotoFirstPlanning({
   const [status, setStatus] = useState("Draft saved locally");
   const [issues, setIssues] = useState<PhotoIssue[]>([]);
   const [assumptionEdits, setAssumptionEdits] = useState<Record<string, string>>({});
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [liveSignal, setLiveSignal] = useState<FrameSignal>({
+    brightness: null,
+    contrast: null,
+    tooDark: false,
+    tooBright: false,
+    lowDetail: false,
+  });
+  const [tipIndex, setTipIndex] = useState(0);
+  const [tilted, setTilted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const currentStep = activeStep(photos, analysis);
   const usableCount = photos.filter((photo) => photo.quality !== "unusable").length;
   const reviewCount = photos.filter((photo) => photo.quality === "needs_review").length;
   const unusableCount = photos.filter((photo) => photo.quality === "unusable").length;
   const selectedType = PHOTO_TYPES.find((type) => type.value === photoType) ?? PHOTO_TYPES[0];
+  const detailsDetected = Boolean(
+    analysis && (analysis.zones.length > 0 || analysis.detectedObjects.length > 0),
+  );
+  const plantIdentified = Boolean(
+    analysis?.detectedObjects.some((item) => item.toLowerCase().includes("plant material")),
+  );
+  const measurementDetected = Boolean(
+    analysis?.detectedObjects.some((item) => item.toLowerCase().includes("measurement")),
+  );
+  const cameraTip = liveSignal.tooDark
+    ? "Too dark. Move closer to daylight."
+    : liveSignal.tooBright
+      ? "Too much glare. Tilt away from direct sun."
+      : liveSignal.lowDetail
+        ? "Low detail. Hold steady and step back."
+        : tilted
+          ? "Straighten your phone with the house or walkway."
+          : CAMERA_TIPS[tipIndex % CAMERA_TIPS.length];
 
   const analysisStatus = useMemo(() => {
     if (busy) return status;
@@ -298,6 +400,84 @@ export function PhotoFirstPlanning({
       if (stageTimer) window.clearInterval(stageTimer);
     };
   }, [photos, onAnalysis]);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setTipIndex((current) => current + 1), 3500);
+    return () => window.clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    if (!cameraOpen) return;
+    let active = true;
+    async function startCamera() {
+      setCameraError(null);
+      setCameraReady(false);
+      try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error(
+            "Camera capture is not available in this browser. Use photo upload instead.",
+          );
+        }
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
+        });
+        if (!active) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play();
+          setCameraReady(true);
+        }
+      } catch (error) {
+        setCameraError(
+          error instanceof Error
+            ? error.message
+            : "Bloomprint could not open the camera. You can still upload photos.",
+        );
+      }
+    }
+    void startCamera();
+    return () => {
+      active = false;
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+      setCameraReady(false);
+    };
+  }, [cameraOpen]);
+
+  useEffect(() => {
+    if (!cameraOpen || !cameraReady) return;
+    const id = window.setInterval(() => {
+      const video = videoRef.current;
+      if (!video || video.videoWidth === 0 || video.videoHeight === 0) return;
+      const canvas = document.createElement("canvas");
+      canvas.width = 40;
+      canvas.height = 40;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      if (!ctx) return;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      setLiveSignal(sampleCanvas(canvas));
+    }, 600);
+    return () => window.clearInterval(id);
+  }, [cameraOpen, cameraReady]);
+
+  useEffect(() => {
+    if (!cameraOpen) return;
+    const onOrientation = (event: DeviceOrientationEvent) => {
+      const gamma = event.gamma ?? 0;
+      setTilted(Math.abs(gamma) > 18);
+    };
+    window.addEventListener("deviceorientation", onOrientation);
+    return () => window.removeEventListener("deviceorientation", onOrientation);
+  }, [cameraOpen]);
 
   async function addFiles(files: FileList | File[]) {
     const allIncoming = Array.from(files);
@@ -364,6 +544,92 @@ export function PhotoFirstPlanning({
     setStatus(next.length > 0 ? "Photos saved locally" : "No usable photos were added");
     setBusy(false);
     if (inputRef.current) inputRef.current.value = "";
+  }
+
+  async function addCapturedPhoto(dataUrl: string) {
+    if (photos.length >= MAX_PHOTOS) {
+      setIssues((current) => [
+        {
+          id: crypto.randomUUID(),
+          fileName: "Camera capture",
+          message: `This draft already has ${MAX_PHOTOS} photos. Remove one before capturing another.`,
+          severity: "warning",
+        },
+        ...current,
+      ]);
+      return;
+    }
+    setBusy(true);
+    setStatus("Checking camera photo locally...");
+    try {
+      const inspected = await inspectDataUrl(dataUrl);
+      const warnings = [
+        ...inspected.warnings,
+        ...(tilted
+          ? ["Phone looked tilted during capture. Confirm bed edges and measurements."]
+          : []),
+      ];
+      const asset = await saveDraftPhoto({
+        sessionId,
+        type: photoType,
+        dataUrl: inspected.dataUrl,
+        fileName: `${photoType}-${new Date().toISOString().replace(/[:.]/g, "-")}.jpg`,
+        width: inspected.width,
+        height: inspected.height,
+        quality:
+          warnings.length > 0 && inspected.quality === "good" ? "needs_review" : inspected.quality,
+        warnings,
+      });
+      onPhotos([...photos, asset]);
+      if (warnings.length > 0) {
+        setIssues((current) =>
+          [
+            {
+              id: crypto.randomUUID(),
+              fileName: "Camera capture",
+              message: warnings[0],
+              severity: asset.quality === "unusable" ? ("error" as const) : ("warning" as const),
+            },
+            ...current,
+          ].slice(0, 6),
+        );
+      }
+      setCameraOpen(false);
+      setStatus("Camera photo saved locally");
+    } catch (error) {
+      setIssues((current) =>
+        [
+          {
+            id: crypto.randomUUID(),
+            fileName: "Camera capture",
+            message:
+              error instanceof Error ? error.message : "This camera photo could not be processed.",
+            severity: "error" as const,
+          },
+          ...current,
+        ].slice(0, 6),
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function captureFromCamera() {
+    const video = videoRef.current;
+    if (!video || video.videoWidth === 0 || video.videoHeight === 0) {
+      setCameraError("Camera is still warming up. Try again in a moment.");
+      return;
+    }
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      setCameraError("Your browser could not capture this frame.");
+      return;
+    }
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    void addCapturedPhoto(canvas.toDataURL("image/jpeg", 0.86));
   }
 
   function removePhoto(id: string) {
@@ -522,9 +788,7 @@ export function PhotoFirstPlanning({
               onChange={(e) => e.target.files && void addFiles(e.target.files)}
             />
 
-            <button
-              type="button"
-              onClick={() => inputRef.current?.click()}
+            <div
               onDragOver={(e) => {
                 e.preventDefault();
                 setDragging(true);
@@ -547,13 +811,74 @@ export function PhotoFirstPlanning({
                 <Camera className="mb-2 size-7 text-brand" aria-hidden />
               )}
               <span className="text-sm font-semibold text-foreground">
-                Tap to take photos, upload, or drag images here
+                Take guided photos or upload existing images
               </span>
               <span className="mt-1 max-w-md text-xs text-muted">
-                Bloomprint compresses images locally, flags dark or tiny photos, and keeps going
-                even when one upload fails.
+                Camera mode adds gridlines, framing templates, and live lighting hints. Uploads use
+                the same local quality checks.
               </span>
-            </button>
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => setCameraOpen(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
+                >
+                  <Camera className="size-4" aria-hidden />
+                  Open guided camera
+                </button>
+                <button
+                  type="button"
+                  onClick={() => inputRef.current?.click()}
+                  className="rounded-full border border-border px-4 py-2 text-sm font-semibold transition hover:border-brand"
+                >
+                  Upload photos
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Example shots</p>
+          <div className="mt-2 grid gap-3 sm:grid-cols-3">
+            {EXAMPLE_SHOTS.map((shot) => (
+              <button
+                key={shot.type}
+                type="button"
+                onClick={() => setPhotoType(shot.type)}
+                className={`overflow-hidden rounded-xl border text-left transition hover:border-brand ${
+                  photoType === shot.type
+                    ? "border-brand bg-brand-soft"
+                    : "border-border bg-surface"
+                }`}
+              >
+                <div className="relative aspect-[4/3] bg-[linear-gradient(135deg,var(--brand-soft),var(--surface))]">
+                  <div className="absolute inset-x-4 bottom-4 h-8 rounded-t-lg border border-brand/25 bg-surface/70" />
+                  <div className="absolute bottom-4 left-8 h-12 w-7 rounded-full bg-brand/25" />
+                  <div className="absolute bottom-4 right-8 h-16 w-8 rounded-full bg-brand/30" />
+                  {shot.overlay === "wide" ? (
+                    <div className="absolute inset-5 rounded-lg border-2 border-dashed border-brand/60" />
+                  ) : null}
+                  {shot.overlay === "plant" ? (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="flex size-20 items-center justify-center rounded-full border-2 border-dashed border-brand/70 bg-surface/50">
+                        <Leaf className="size-8 text-brand" aria-hidden />
+                      </div>
+                    </div>
+                  ) : null}
+                  {shot.overlay === "measure" ? (
+                    <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 items-center gap-2">
+                      <div className="h-1 flex-1 rounded-full bg-brand/70" />
+                      <Ruler className="size-6 text-brand" aria-hidden />
+                    </div>
+                  ) : null}
+                </div>
+                <div className="p-3">
+                  <p className="text-sm font-semibold text-foreground">{shot.title}</p>
+                  <p className="mt-1 text-xs text-muted">{shot.desc}</p>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
 
@@ -676,78 +1001,104 @@ export function PhotoFirstPlanning({
         </div>
 
         {analysis ? (
-          <div className="mt-4 grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
-            <div className="flex flex-col gap-3">
-              <div className="rounded-xl border border-border bg-background/60 p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                  Detected zones
-                </p>
-                <ul className="mt-2 flex flex-col gap-2">
-                  {analysis.zones.length > 0 ? (
-                    analysis.zones.map((zone) => (
-                      <li
-                        key={zone.id}
-                        className="rounded-lg bg-brand-soft px-3 py-2 text-sm text-brand-strong"
-                      >
-                        Looks like: {zone.label} ({Math.round(zone.confidence * 100)}% confidence)
-                      </li>
-                    ))
-                  ) : (
-                    <li className="rounded-lg bg-border/50 px-3 py-2 text-sm text-muted">
-                      Not enough usable photo information yet.
-                    </li>
-                  )}
-                </ul>
-              </div>
-              <div className="rounded-xl border border-border bg-background/60 p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                  Needs checking
-                </p>
-                <ul className="mt-2 flex flex-col gap-2 text-sm text-muted">
-                  {analysis.missingInfo.map((item) => (
-                    <li key={item} className="flex gap-2">
-                      <AlertTriangle
-                        className="mt-0.5 size-4 shrink-0 text-[var(--warn)]"
-                        aria-hidden
-                      />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+          <div className="mt-4 flex flex-col gap-4">
+            <div className="grid gap-3 sm:grid-cols-3">
+              <ReadinessCheck
+                label="Details detected"
+                value={detailsDetected}
+                yes="Zones or constraints found"
+                no="Add a wide context photo"
+              />
+              <ReadinessCheck
+                label="Plant identified"
+                value={plantIdentified}
+                yes="Plant material visible"
+                no="Add existing-plant close-up"
+              />
+              <ReadinessCheck
+                label="Measurements seen"
+                value={measurementDetected}
+                yes="Measurement reference present"
+                no="Add dimensions manually"
+              />
             </div>
 
-            <div className="rounded-xl border border-border bg-background/60 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                Editable assumptions
-              </p>
-              <div className="mt-3 flex flex-col gap-3">
-                {analysis.assumptions.map((item) => (
-                  <label key={item.id} className="flex flex-col gap-1 text-sm">
-                    <span className="flex items-center gap-2 font-medium text-foreground">
-                      {item.label}
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wide ${
-                          item.confidence === "good"
-                            ? "bg-brand-soft text-brand-strong"
-                            : item.confidence === "medium"
-                              ? "bg-[var(--warn)]/10 text-[var(--warn)]"
-                              : "bg-border/60 text-muted"
-                        }`}
-                      >
-                        {item.confidence}
+            <div className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
+              <div className="flex flex-col gap-3">
+                <div className="rounded-xl border border-border bg-background/60 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                    Detected zones
+                  </p>
+                  <ul className="mt-2 flex flex-col gap-2">
+                    {analysis.zones.length > 0 ? (
+                      analysis.zones.map((zone) => (
+                        <li
+                          key={zone.id}
+                          className="rounded-lg bg-brand-soft px-3 py-2 text-sm text-brand-strong"
+                        >
+                          Looks like: {zone.label} ({Math.round(zone.confidence * 100)}% confidence)
+                        </li>
+                      ))
+                    ) : (
+                      <li className="rounded-lg bg-border/50 px-3 py-2 text-sm text-muted">
+                        Not enough usable photo information yet.
+                      </li>
+                    )}
+                  </ul>
+                </div>
+                <div className="rounded-xl border border-border bg-background/60 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                    Needs checking
+                  </p>
+                  <ul className="mt-2 flex flex-col gap-2 text-sm text-muted">
+                    {analysis.missingInfo.map((item) => (
+                      <li key={item} className="flex gap-2">
+                        <AlertTriangle
+                          className="mt-0.5 size-4 shrink-0 text-[var(--warn)]"
+                          aria-hidden
+                        />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-border bg-background/60 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                  Editable assumptions
+                </p>
+                <div className="mt-3 flex flex-col gap-3">
+                  {analysis.assumptions.map((item) => (
+                    <label key={item.id} className="flex flex-col gap-1 text-sm">
+                      <span className="flex items-center gap-2 font-medium text-foreground">
+                        {item.label}
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wide ${
+                            item.confidence === "good"
+                              ? "bg-brand-soft text-brand-strong"
+                              : item.confidence === "medium"
+                                ? "bg-[var(--warn)]/10 text-[var(--warn)]"
+                                : "bg-border/60 text-muted"
+                          }`}
+                        >
+                          {item.confidence}
+                        </span>
                       </span>
-                    </span>
-                    <textarea
-                      value={assumptionEdits[item.id] ?? item.value}
-                      onChange={(e) =>
-                        setAssumptionEdits((current) => ({ ...current, [item.id]: e.target.value }))
-                      }
-                      className="min-h-16 rounded-lg border border-border bg-surface p-2 text-sm text-foreground"
-                      disabled={!item.editable}
-                    />
-                  </label>
-                ))}
+                      <textarea
+                        value={assumptionEdits[item.id] ?? item.value}
+                        onChange={(e) =>
+                          setAssumptionEdits((current) => ({
+                            ...current,
+                            [item.id]: e.target.value,
+                          }))
+                        }
+                        className="min-h-16 rounded-lg border border-border bg-surface p-2 text-sm text-foreground"
+                        disabled={!item.editable}
+                      />
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -784,6 +1135,170 @@ export function PhotoFirstPlanning({
           </span>
         </div>
       </section>
+
+      {cameraOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Guided camera"
+        >
+          <div className="flex max-h-[96vh] w-full max-w-md flex-col overflow-hidden rounded-2xl bg-surface shadow-2xl">
+            <div className="flex items-center gap-3 border-b border-border p-3">
+              <div>
+                <p className="text-sm font-semibold text-foreground">Guided camera</p>
+                <p className="text-xs text-muted">
+                  {selectedType.label}: {selectedType.hint}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCameraOpen(false)}
+                className="ml-auto rounded-full border border-border p-2 text-muted transition hover:text-foreground"
+                aria-label="Close camera"
+              >
+                <X className="size-4" aria-hidden />
+              </button>
+            </div>
+
+            <div className="relative aspect-[3/4] bg-black">
+              <video ref={videoRef} playsInline muted className="h-full w-full object-cover" />
+
+              <div className="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3">
+                {Array.from({ length: 9 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className={`${index % 3 !== 2 ? "border-r" : ""} ${
+                      index < 6 ? "border-b" : ""
+                    } border-white/25`}
+                  />
+                ))}
+              </div>
+
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                <div
+                  className={`border-2 border-dashed ${
+                    photoType === "measurement"
+                      ? "h-20 w-64 rounded-lg border-sky-300/80"
+                      : photoType === "existing_plants"
+                        ? "size-44 rounded-full border-lime-300/80"
+                        : "h-56 w-64 rounded-2xl border-yellow-300/80"
+                  }`}
+                />
+              </div>
+
+              <div className="pointer-events-none absolute left-0 right-0 top-3 flex justify-center px-3">
+                <span className="rounded-full border border-white/15 bg-black/70 px-4 py-1.5 text-center text-xs font-semibold text-white shadow-lg backdrop-blur-md">
+                  {cameraTip}
+                </span>
+              </div>
+
+              <div className="pointer-events-none absolute bottom-3 left-3 right-3 grid grid-cols-3 gap-2 text-[11px]">
+                <LiveMetric label="Light" ok={!liveSignal.tooDark && !liveSignal.tooBright} />
+                <LiveMetric label="Detail" ok={!liveSignal.lowDetail} />
+                <LiveMetric label="Level" ok={!tilted} />
+              </div>
+
+              {(liveSignal.tooDark || liveSignal.tooBright || liveSignal.lowDetail) && (
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-danger/10">
+                  <span className="rounded-full bg-danger px-3 py-1 text-xs font-bold uppercase tracking-wide text-on-strong">
+                    Check photo before capture
+                  </span>
+                </div>
+              )}
+
+              {!cameraReady ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white">
+                  <div className="text-center">
+                    <Loader2 className="mx-auto mb-2 size-6 animate-spin" aria-hidden />
+                    <p className="text-sm font-semibold">
+                      {cameraError ? "Camera unavailable" : "Opening camera..."}
+                    </p>
+                    {cameraError ? (
+                      <p className="mt-1 max-w-xs text-xs text-white/75">{cameraError}</p>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            <div className="flex flex-col gap-3 p-3">
+              <div className="grid grid-cols-3 gap-2">
+                {(["front_yard", "existing_plants", "measurement"] as PhotoAssetType[]).map(
+                  (type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setPhotoType(type)}
+                      className={`rounded-xl border px-2 py-2 text-xs font-semibold ${
+                        photoType === type
+                          ? "border-brand bg-brand-soft text-brand-strong"
+                          : "border-border text-muted"
+                      }`}
+                    >
+                      {PHOTO_TYPES.find((item) => item.value === type)?.label}
+                    </button>
+                  ),
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={captureFromCamera}
+                disabled={!cameraReady || busy}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
+              >
+                <Maximize2 className="size-4" aria-hidden />
+                Capture guided photo
+              </button>
+              <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                className="rounded-full border border-border px-5 py-2 text-sm font-semibold"
+              >
+                Use upload instead
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function ReadinessCheck({
+  label,
+  value,
+  yes,
+  no,
+}: {
+  label: string;
+  value: boolean;
+  yes: string;
+  no: string;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-background/60 p-3">
+      <div className="flex items-center gap-2">
+        {value ? (
+          <CheckCircle2 className="size-4 text-brand" aria-hidden />
+        ) : (
+          <AlertTriangle className="size-4 text-[var(--warn)]" aria-hidden />
+        )}
+        <p className="text-sm font-semibold text-foreground">{label}</p>
+      </div>
+      <p className="mt-1 text-xs text-muted">{value ? `Yes — ${yes}` : `No — ${no}`}</p>
+    </div>
+  );
+}
+
+function LiveMetric({ label, ok }: { label: string; ok: boolean }) {
+  return (
+    <div
+      className={`rounded-full border px-2 py-1 text-center font-semibold ${
+        ok ? "border-white/20 bg-black/55 text-white" : "border-danger/40 bg-danger text-on-strong"
+      }`}
+    >
+      {label}: {ok ? "OK" : "Fix"}
     </div>
   );
 }

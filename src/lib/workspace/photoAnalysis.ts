@@ -41,7 +41,7 @@ export async function analyzeYardPhotos(photos: PhotoAsset[]): Promise<PhotoAnal
     zones,
     detectedObjects: [
       ...(types.has("front_yard") ? ["house foundation / front bed context"] : []),
-      ...(types.has("existing_plants") ? ["existing plant material"] : []),
+      ...(types.has("existing_plants") ? ["plant material visible (species not confirmed)"] : []),
       ...(types.has("measurement") ? ["measurement reference"] : []),
       ...(types.has("inspiration") ? ["style inspiration"] : []),
       ...(poorPhotos.length > 0 ? ["photo quality warning"] : []),
@@ -81,6 +81,16 @@ export function extractPhotoAssumptions(photos: PhotoAsset[]): PhotoAssumption[]
       label: "Measurements",
       value: "A measurement photo is available; confirm exact length and width before generating",
       confidence: "good",
+      editable: true,
+    });
+  }
+  if (types.has("existing_plants")) {
+    assumptions.push({
+      id: "plant-id",
+      label: "Plant identification",
+      value:
+        "Plant material is visible, but species is not confirmed. Add a leaf close-up or confirm plant names if known.",
+      confidence: "low",
       editable: true,
     });
   }
