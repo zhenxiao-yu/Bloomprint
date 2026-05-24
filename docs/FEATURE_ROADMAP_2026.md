@@ -123,6 +123,12 @@ Verified against the code before building (avoided duplicating shipped work):
   `.ics` reminders from the spec were **dropped** — they'd require month/frost data we don't
   have, and inventing it is off-limits. Best planting window already exists (`bestWeatherWindow`).
   i18n en/zh; tests added.
+- **BP-6 (compare up to 3): shipped.** Named saves + rename/delete/search already existed
+  (`SavedPlans`), so the gap was the 2-plan cap. Generalized `CompareView` to take an
+  `entries[]` (2–3) — N stat columns plus **baseline-relative delta blocks** (each extra plan
+  compared against the first, reusing the pure `diffPlans`). `/plans` now selects up to 3
+  (FIFO past the cap) and enables compare at 2+. i18n hints updated to "2–3" (en/zh). UI-only,
+  no engine change; the diff logic is unchanged and still covered by its tests.
 
 ## Part 2 — Build specs (the "do-next" subset)
 

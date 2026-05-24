@@ -11,10 +11,9 @@ import { SyncStatusBadge } from "@/components/SyncStatusBadge";
 import { trackEvent } from "@/lib/analytics";
 import { readApiError } from "@/lib/apiError";
 
-interface Comparison {
-  a: { label: string; plan: BloomprintPlan };
-  b: { label: string; plan: BloomprintPlan };
-}
+type Entry = { label: string; plan: BloomprintPlan };
+
+const MAX_COMPARE = 3;
 
 async function fetchSaved(p: SavedPlan, regenError: string): Promise<BloomprintPlan> {
   const res = await fetch("/api/plan", {
@@ -30,14 +29,19 @@ export default function PlansPage() {
   const t = useTranslations("SavedPlans");
   const plans = useSavedPlans();
   const [selected, setSelected] = useState<string[]>([]);
-  const [comparison, setComparison] = useState<Comparison | null>(null);
+  const [comparison, setComparison] = useState<Entry[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   function toggle(id: string) {
     setComparison(null);
+    // Select up to MAX_COMPARE; selecting a 4th drops the oldest (FIFO).
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : prev.length >= 2 ? [prev[1], id] : [...prev, id],
+      prev.includes(id)
+        ? prev.filter((x) => x !== id)
+        : prev.length >= MAX_COMPARE
+          ? [...prev.slice(1), id]
+          : [...prev, id],
     );
   }
 
@@ -53,19 +57,21 @@ export default function PlansPage() {
   }
 
   async function compare() {
-    if (selected.length !== 2) return;
-    const aSaved = plans.find((p) => p.id === selected[0]);
-    const bSaved = plans.find((p) => p.id === selected[1]);
-    if (!aSaved || !bSaved) return;
+    const chosen = selected
+      .map((id) => plans.find((p) => p.id === id))
+      .filter((p): p is SavedPlan => Boolean(p));
+    if (chosen.length < 2) return;
     setBusy(true);
     setError(null);
     try {
-      const [a, b] = await Promise.all([
-        fetchSaved(aSaved, t("regenError")),
-        fetchSaved(bSaved, t("regenError")),
-      ]);
-      setComparison({ a: { label: aSaved.label, plan: a }, b: { label: bSaved.label, plan: b } });
-      trackEvent("plan_compared");
+      const built = await Promise.all(
+        chosen.map(async (saved) => ({
+          label: saved.label,
+          plan: await fetchSaved(saved, t("regenError")),
+        })),
+      );
+      setComparison(built);
+      trackEvent("plan_compared", { count: built.length });
     } catch (e) {
       setError(e instanceof Error ? e.message : t("compareError"));
     } finally {
@@ -94,7 +100,7 @@ export default function PlansPage() {
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <button
             onClick={compare}
-            disabled={selected.length !== 2 || busy}
+            disabled={selected.length < 2 || busy}
             className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
           >
             {busy ? t("comparing") : t("compareSelected", { count: selected.length })}
@@ -105,7 +111,7 @@ export default function PlansPage() {
 
       {comparison ? (
         <div className="mt-5">
-          <CompareView a={comparison.a} b={comparison.b} />
+          <CompareView entries={comparison} />
         </div>
       ) : null}
 
