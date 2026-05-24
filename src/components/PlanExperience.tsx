@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import type { BloomprintPlan, RefinementAdjustment } from "@/domain/models";
+import type { BloomprintPlan, Measurement, RefinementAdjustment } from "@/domain/models";
 import { IntakeForm, type IntakeDefaults, type IntakeValues } from "@/components/IntakeForm";
 import { PlanResult, type ViewMode } from "@/components/PlanResult";
 import { PhotoPanel } from "@/components/PhotoPanel";
@@ -31,7 +31,12 @@ import type { PhotoAnalysisResult, PhotoAsset, ProjectKind } from "@/lib/workspa
 
 type GenerateSource = "form" | "demo" | "shared" | "refine" | "accuracy";
 
-type PlanIntake = IntakeValues & { sun?: string; soil?: string; drainage?: string };
+type PlanIntake = IntakeValues & {
+  sun?: string;
+  soil?: string;
+  drainage?: string;
+  measurement?: Measurement;
+};
 type PlanRequest = { intake?: PlanIntake; fixtureKey?: string };
 
 const VIEW_VALUES: { value: ViewMode; key: "simple" | "details" | "staff" }[] = [
@@ -313,7 +318,19 @@ export function PlanExperience() {
       areaSqft: intakeValues.areaSqft,
     };
     saveProfile(next);
-    const req: PlanRequest = { intake: intakeValues };
+    // If the submitted area still matches the Yard Map's calibrated value, carry it as a real
+    // measurement (not a typed guess) so the plan credits its confidence and shows provenance.
+    const usedMapMeasurement =
+      measuredArea != null &&
+      intakeValues.areaSqft != null &&
+      Math.round(intakeValues.areaSqft) === Math.round(measuredArea);
+    const intake: PlanIntake = usedMapMeasurement
+      ? {
+          ...intakeValues,
+          measurement: { area: measuredArea, unit: "ft", source: "photo", confidence: "medium" },
+        }
+      : intakeValues;
+    const req: PlanRequest = { intake };
     updateDraft((current) => ({
       ...current,
       session: {

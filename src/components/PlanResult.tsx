@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { BloomprintPlan, RefinementAdjustment, ShoppingPriority } from "@/domain/models";
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
@@ -85,10 +85,16 @@ export function PlanResult({
   const tr = useTranslations("Refinements");
   const to = useTranslations("Options");
   const tLive = useTranslations("Live");
-  const { plan, enhancement } = result;
+  const { plan } = result;
   const showNumbers = view !== "simple";
   const [boardView, setBoardView] = useState<"now" | "planned" | "overlay">("planned");
   const [arOpen, setArOpen] = useState(false);
+  // AI only *presents* (narrative, concept name, talking points) — it never changes the
+  // deterministic facts. This toggle lets the reader collapse to the raw engine plan and
+  // see that for themselves; every `enhancement?.x` below already falls back to the engine.
+  const [showAi, setShowAi] = useState(true);
+  const hasAi = Boolean(result.enhancement);
+  const enhancement = showAi ? result.enhancement : null;
 
   const heroDescription =
     enhancement?.homeownerExplanation ?? `${plan.narrative} ${plan.insight}`;
@@ -150,6 +156,12 @@ export function PlanResult({
   );
   const weather = live?.weather ?? null;
   const careFact = live?.plantFacts[0] ?? null;
+  // Map live care facts to plants by name so per-plant bloom can show inline — only when a
+  // real provider supplied a flowering season (the mock never sets one, so this stays quiet
+  // offline / mock-only).
+  const factsByName = new Map(
+    (live?.plantFacts ?? []).map((f) => [(f.commonName ?? f.scientificName).toLowerCase(), f]),
+  );
 
   return (
     <div ref={rootRef} className="space-y-6">
@@ -195,6 +207,24 @@ export function PlanResult({
       {/* Hero moment — confidence sentence + visual summary, before any logistics */}
       <section id="summary" className="card scroll-mt-24 overflow-hidden">
         <div className="bg-brand-soft p-6">
+          {/* Honesty control: AI only writes the wording. Collapse it to see the raw engine plan. */}
+          {hasAi ? (
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1 rounded-full bg-surface/70 px-2 py-0.5 text-[11px] font-medium text-muted">
+                <Sparkles className="size-3" aria-hidden />
+                {showAi ? t("aiPresentation") : t("aiHidden")}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowAi((v) => !v)}
+                aria-pressed={!showAi}
+                className="rounded-full border border-border px-2.5 py-0.5 text-[11px] font-semibold text-foreground transition hover:border-brand"
+              >
+                {showAi ? t("aiHide") : t("aiShow")}
+              </button>
+              <span className="basis-full text-[11px] text-muted">{t("aiNote")}</span>
+            </div>
+          ) : null}
           {enhancement?.conceptName ? (
             <p className="text-xs font-semibold uppercase tracking-wide text-brand-strong">
               {enhancement.conceptName}
@@ -555,6 +585,20 @@ export function PlanResult({
                 ) : null}
               </div>
               <p className="text-xs text-muted">{p.spacingNote}</p>
+              {p.safety.toxic || p.safety.invasive ? (
+                <div className="mt-1.5 flex flex-wrap gap-1">
+                  {p.safety.toxic ? (
+                    <span className="rounded-full bg-warn/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-warn">
+                      {t("badgeToxic")}
+                    </span>
+                  ) : null}
+                  {p.safety.invasive ? (
+                    <span className="rounded-full bg-danger/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-danger">
+                      {t("badgeInvasive")}
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
               {showNumbers ? (
                 <p className="mt-1 text-xs text-muted">
                   {p.matureSize} · {p.sunLabel} · {t("maintenanceSuffix", { level: p.maintenance })}
@@ -565,6 +609,18 @@ export function PlanResult({
               {(() => {
                 const inv = invasiveByName.get(p.commonName.toLowerCase());
                 return inv ? <p className="mt-0.5 text-xs text-warn">⚠ {inv.note}</p> : null;
+              })()}
+              {(() => {
+                const facts = factsByName.get(p.commonName.toLowerCase());
+                return facts?.bloom ? (
+                  <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted">
+                    <span>
+                      <span className="font-medium text-foreground">{t("bloomsLabel")}:</span>{" "}
+                      {facts.bloom}
+                    </span>
+                    <LiveBadge source={facts.source} />
+                  </p>
+                ) : null;
               })()}
               {(() => {
                 const alt = plan.alternatives.find((a) => a.plantId === p.plantId);
@@ -582,6 +638,45 @@ export function PlanResult({
             <LiveBadge source={careFact.source} />
           </p>
         ) : null}
+      </Section>
+
+      {/* Across the seasons — season-of-interest from the Core Library notes (not exact months) */}
+      <Section title={t("seasonsTitle")} subtitle={t("seasonsSubtitle")} variant="quiet">
+        <div className="grid gap-3 sm:grid-cols-4">
+          {(
+            [
+              ["spring", "seasonSpring"],
+              ["summer", "seasonSummer"],
+              ["fall", "seasonFall"],
+              ["winter", "seasonWinter"],
+            ] as const
+          ).map(([key, label]) => {
+            const names = plan.seasonalInterest[key];
+            const hasEvergreen = plan.seasonalInterest.evergreenStructure.length > 0;
+            return (
+              <div key={key} className="rounded-lg border border-border bg-background/60 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand">{t(label)}</p>
+                {names.length > 0 ? (
+                  <ul className="mt-1 space-y-0.5 text-xs text-foreground">
+                    {names.map((n) => (
+                      <li key={n}>• {n}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-1 text-xs text-muted">
+                    {hasEvergreen ? t("seasonsEvergreen") : t("seasonsQuiet")}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {plan.seasonalInterest.evergreenStructure.length > 0 ? (
+          <p className="mt-2 text-xs text-muted">
+            {t("seasonsStructure", { plants: plan.seasonalInterest.evergreenStructure.join(", ") })}
+          </p>
+        ) : null}
+        <p className="mt-1 text-xs text-muted">{t("seasonsNote")}</p>
       </Section>
 
       {/* Risks */}

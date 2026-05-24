@@ -18,6 +18,7 @@ import {
   Sparkles,
   Store,
   Trash2,
+  Upload,
   Users,
   X,
 } from "lucide-react";
@@ -28,8 +29,23 @@ import type {
   PhotoQuality,
   ProjectKind,
 } from "@/lib/workspace/types";
-import { analyzeYardPhotos } from "@/lib/workspace/photoAnalysis";
+import {
+  analyzeYardPhotos,
+  derivePhotoIntake,
+  estimateConfidenceFromPhotoData,
+} from "@/lib/workspace/photoAnalysis";
 import { saveDraftPhoto } from "@/lib/workspace/draftStore";
+import {
+  analyzeRegions,
+  areNearDuplicates,
+  computeImageSignals,
+  gradeImageQuality,
+  NEUTRAL_SIGNALS,
+  perceptualHash,
+  type ImageSignals,
+  type RegionClass,
+  type RegionSummary,
+} from "@/lib/workspace/imageSignals";
 
 const MAX_PHOTOS = 8;
 const MAX_FILE_MB = 12;
@@ -138,6 +154,8 @@ type ImageInspection = {
   height: number;
   quality: PhotoQuality;
   warnings: string[];
+  signals: ImageSignals;
+  signature: string;
 };
 
 type FrameSignal = {
@@ -215,6 +233,44 @@ async function readVisionSuggestion(photos: PhotoAsset[]): Promise<VisionSuggest
   }
 }
 
+const REGION_COLS = 6;
+const REGION_ROWS = 4;
+
+/** Decode the first usable photo and compute a pixel-grounded region read for the overlay. */
+async function analyzeFirstPhotoRegions(photos: PhotoAsset[]): Promise<RegionSummary | null> {
+  const photo = photos.find((item) => item.quality !== "unusable" && item.previewUrl);
+  if (!photo?.previewUrl) return null;
+  const src = photo.previewUrl;
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error("decode failed"));
+      image.src = src;
+    });
+    const cw = 96;
+    const ch = 64;
+    const canvas = document.createElement("canvas");
+    canvas.width = cw;
+    canvas.height = ch;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return null;
+    ctx.drawImage(img, 0, 0, cw, ch);
+    const { data } = ctx.getImageData(0, 0, cw, ch);
+    return analyzeRegions(data, cw, ch, REGION_COLS, REGION_ROWS);
+  } catch {
+    return null;
+  }
+}
+
+const REGION_STYLE: Record<RegionClass, { fill: string; label: string }> = {
+  greenery: { fill: "rgba(34,197,94,0.30)", label: "Greenery" },
+  hardscape: { fill: "rgba(148,163,184,0.34)", label: "Hard surface" },
+  sky: { fill: "rgba(56,189,248,0.26)", label: "Sky / open light" },
+  shadow: { fill: "rgba(30,41,59,0.40)", label: "Shade" },
+  mixed: { fill: "rgba(0,0,0,0)", label: "Mixed" },
+};
+
 function mergeVisionSuggestion(
   analysis: PhotoAnalysisResult,
   suggestion: VisionSuggestion | null,
@@ -241,35 +297,27 @@ function mergeVisionSuggestion(
   };
 }
 
-function sampleCanvas(canvas: HTMLCanvasElement): FrameSignal {
+/** Live-camera read: brightness/detail flags plus how much of the frame is yard. */
+function readLiveFrame(canvas: HTMLCanvasElement): { signal: FrameSignal; fill: number } {
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   if (!ctx) {
     return {
-      brightness: null,
-      contrast: null,
-      tooDark: false,
-      tooBright: false,
-      lowDetail: false,
+      signal: { brightness: null, contrast: null, tooDark: false, tooBright: false, lowDetail: false },
+      fill: 1,
     };
   }
-  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-  let brightnessTotal = 0;
-  const brightness: number[] = [];
-  for (let i = 0; i < data.length; i += 4) {
-    const value = (data[i] + data[i + 1] + data[i + 2]) / 3;
-    brightnessTotal += value;
-    brightness.push(value);
-  }
-  const avg = brightnessTotal / brightness.length;
-  const variance =
-    brightness.reduce((sum, value) => sum + Math.pow(value - avg, 2), 0) / brightness.length;
-  const contrast = Math.sqrt(variance);
+  const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const s = computeImageSignals(data, canvas.width, canvas.height);
   return {
-    brightness: avg,
-    contrast,
-    tooDark: avg < 38,
-    tooBright: avg > 238,
-    lowDetail: contrast < 9,
+    signal: {
+      brightness: s.brightness,
+      contrast: s.contrast,
+      tooDark: s.brightness < 38,
+      tooBright: s.brightness > 238,
+      lowDetail: s.contrast < 9,
+    },
+    // Vegetation + hardscape ≈ "actual yard content"; a near-empty frame trends to 0.
+    fill: s.greenRatio + s.hardscapeRatio,
   };
 }
 
@@ -282,42 +330,24 @@ async function inspectDataUrl(source: string): Promise<ImageInspection> {
     image.src = source;
   });
 
-  const warnings: string[] = [];
-  let quality: PhotoQuality = "good";
   const shortestSide = Math.min(img.width, img.height);
-  if (shortestSide < 320) {
-    quality = "unusable";
-    warnings.push(
-      "Image is too small for reliable planning. Retake from farther back or upload a larger photo.",
-    );
-  } else if (shortestSide < 640) {
-    quality = "needs_review";
-    warnings.push(
-      "Image is small. It can help, but measurements and plant details may be unreliable.",
-    );
-  }
 
-  const sample = document.createElement("canvas");
-  sample.width = 40;
-  sample.height = 40;
-  const sampleCtx = sample.getContext("2d", { willReadFrequently: true });
-  if (sampleCtx) {
-    sampleCtx.drawImage(img, 0, 0, sample.width, sample.height);
-    const signal = sampleCanvas(sample);
-
-    if (signal.tooDark) {
-      quality = quality === "unusable" ? "unusable" : "needs_review";
-      warnings.push("Photo looks very dark. Retake in daylight if possible.");
-    }
-    if (signal.tooBright) {
-      quality = quality === "unusable" ? "unusable" : "needs_review";
-      warnings.push("Photo looks overexposed. Retake with less glare if possible.");
-    }
-    if (signal.lowDetail) {
-      quality = quality === "unusable" ? "unusable" : "needs_review";
-      warnings.push("Photo has low detail. A clearer wide shot will improve zone detection.");
-    }
+  // Analysis sample (~160px longest side) — large enough that blur, colour, and
+  // duplicate signals survive, unlike the 40x40 used for cheap live brightness.
+  let signals: ImageSignals = { ...NEUTRAL_SIGNALS };
+  let signature = "";
+  const aSample = document.createElement("canvas");
+  const aScale = Math.min(1, 160 / Math.max(img.width, img.height));
+  aSample.width = Math.max(1, Math.round(img.width * aScale));
+  aSample.height = Math.max(1, Math.round(img.height * aScale));
+  const aCtx = aSample.getContext("2d", { willReadFrequently: true });
+  if (aCtx) {
+    aCtx.drawImage(img, 0, 0, aSample.width, aSample.height);
+    const pixels = aCtx.getImageData(0, 0, aSample.width, aSample.height).data;
+    signals = computeImageSignals(pixels, aSample.width, aSample.height);
+    signature = perceptualHash(pixels, aSample.width, aSample.height);
   }
+  const graded = gradeImageQuality(signals, shortestSide);
 
   const max = 1280;
   const scale = Math.min(1, max / Math.max(img.width, img.height));
@@ -332,8 +362,10 @@ async function inspectDataUrl(source: string): Promise<ImageInspection> {
     dataUrl: canvas.toDataURL("image/jpeg", 0.82),
     width: img.width,
     height: img.height,
-    quality,
-    warnings,
+    quality: graded.quality,
+    warnings: graded.warnings,
+    signals,
+    signature,
   };
 }
 
@@ -394,6 +426,11 @@ export function PhotoFirstPlanning({
   });
   const [tipIndex, setTipIndex] = useState(0);
   const [tilted, setTilted] = useState(false);
+  const [liveFill, setLiveFill] = useState(1);
+  const [regionSummary, setRegionSummary] = useState<RegionSummary | null>(null);
+  const [selectedCell, setSelectedCell] = useState<number | null>(null);
+  // Phones/tablets get the guided camera; desktop defaults shot actions to upload.
+  const [isMobile, setIsMobile] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -402,6 +439,53 @@ export function PhotoFirstPlanning({
   const usableCount = photos.filter((photo) => photo.quality !== "unusable").length;
   const reviewCount = photos.filter((photo) => photo.quality === "needs_review").length;
   const unusableCount = photos.filter((photo) => photo.quality === "unusable").length;
+  // Live "capture plan": which recommended shots are present, confidence so far,
+  // and the single best next shot to coach toward.
+  const presentTypes = new Set(photos.map((photo) => photo.type));
+  const liveConfidence = Math.round(estimateConfidenceFromPhotoData(photos) * 100);
+  const nextShot = EXAMPLE_SHOTS.find((shot) => !presentTypes.has(shot.type));
+  const heroPhoto = photos.find((photo) => photo.quality !== "unusable" && photo.previewUrl) ?? null;
+
+  // Pixel-grounded "I can see…" chips: real ratios from the photo + any vision ML notes.
+  const sceneChips = useMemo(() => {
+    const chips: { label: string; tone: "green" | "neutral" | "sky" | "shade" }[] = [];
+    if (regionSummary) {
+      if (regionSummary.greenRatio > 0.18) chips.push({ label: "Greenery / planting", tone: "green" });
+      if (regionSummary.hardscapeRatio > 0.18)
+        chips.push({ label: "Paths / hard surfaces", tone: "neutral" });
+      if (regionSummary.skyRatio > 0.16) chips.push({ label: "Open sky · bright light", tone: "sky" });
+      if (regionSummary.shadowRatio > 0.28) chips.push({ label: "Shaded areas", tone: "shade" });
+    }
+    for (const obj of analysis?.detectedObjects ?? []) {
+      if (obj.toLowerCase().startsWith("photo ml observation")) {
+        chips.push({ label: obj.replace(/^photo ML observation:\s*/i, ""), tone: "neutral" });
+      }
+    }
+    return chips.slice(0, 6);
+  }, [regionSummary, analysis]);
+
+  const draftRead = useMemo(() => {
+    if (!analysis) return null;
+    const parts: string[] = [];
+    if (regionSummary) {
+      const { greenRatio: g, hardscapeRatio: h, skyRatio: s, shadowRatio: d } = regionSummary;
+      if (g > h && g > 0.2) parts.push("mostly greenery");
+      else if (h > g && h > 0.2) parts.push("a lot of hard surface");
+      else if (g > 0.1 || h > 0.1) parts.push("a mix of planting and paving");
+      if (s > 0.2) parts.push("bright open light");
+      else if (d > 0.3) parts.push("shadier light");
+    }
+    return `Draft read: ${parts.length ? parts.join(", ") : "your yard"}. Confirm the details below before planning.`;
+  }, [analysis, regionSummary]);
+
+  const coverageFor = (cls: RegionClass): number => {
+    if (!regionSummary) return 0;
+    if (cls === "greenery") return regionSummary.greenRatio;
+    if (cls === "hardscape") return regionSummary.hardscapeRatio;
+    if (cls === "sky") return regionSummary.skyRatio;
+    if (cls === "shadow") return regionSummary.shadowRatio;
+    return 0;
+  };
   const selectedType = PHOTO_TYPES.find((type) => type.value === photoType) ?? PHOTO_TYPES[0];
   const detailsDetected = Boolean(
     analysis && (analysis.zones.length > 0 || analysis.detectedObjects.length > 0),
@@ -420,7 +504,16 @@ export function PhotoFirstPlanning({
         ? "Low detail. Hold steady and step back."
         : tilted
           ? "Straighten your phone with the house or walkway."
-          : CAMERA_TIPS[tipIndex % CAMERA_TIPS.length];
+          : liveFill < 0.12
+            ? "Move closer so the bed or yard fills the frame."
+            : CAMERA_TIPS[tipIndex % CAMERA_TIPS.length];
+  // Block capture only when light AND detail AND level are all bad — a frame this
+  // poor would just be rejected on inspection, so stop it before the shutter.
+  const captureBlocked =
+    cameraReady &&
+    (liveSignal.tooDark || liveSignal.tooBright) &&
+    liveSignal.lowDetail &&
+    tilted;
 
   const analysisStatus = useMemo(() => {
     if (busy) return status;
@@ -431,37 +524,45 @@ export function PhotoFirstPlanning({
   }, [analysis, busy, photos.length, status]);
 
   useEffect(() => {
+    // Coarse pointer ≈ phone/tablet → guided camera is useful; otherwise prefer upload.
+    setIsMobile(window.matchMedia?.("(pointer: coarse)").matches ?? false);
+  }, []);
+
+  useEffect(() => {
     if (photos.length === 0) {
       onAnalysis(null);
-      const reset = window.setTimeout(() => setAssumptionEdits({}), 0);
+      const reset = window.setTimeout(() => {
+        setAssumptionEdits({});
+        setRegionSummary(null);
+      }, 0);
       return () => window.clearTimeout(reset);
     }
     let active = true;
-    let stageTimer: number | null = null;
-    const stages = [
-      "Reading yard layout...",
-      "Checking photo quality...",
-      "Estimating planning zones...",
-      "Preparing editable assumptions...",
-    ];
-    let stageIndex = 0;
-    const setupTimer = window.setTimeout(() => {
-      if (!active) return;
-      setBusy(true);
-      setStatus(stages[stageIndex]);
-      stageTimer = window.setInterval(() => {
-        stageIndex = Math.min(stageIndex + 1, stages.length - 1);
-        setStatus(stages[stageIndex]);
-      }, 450);
-    }, 0);
+    // Short debounce so rapid reorders/type changes don't thrash the pipeline.
     const timer = window.setTimeout(() => {
       void (async () => {
+        setBusy(true);
         try {
+          // Each status reflects a real step, not a faked timer.
+          setStatus("Reading your photo...");
           const base = await analyzeYardPhotos(photos);
           if (!active) return;
-          setStatus("Checking optional photo ML...");
-          const next = mergeVisionSuggestion(base, await readVisionSuggestion(photos));
+          setStatus("Mapping greenery and surfaces...");
+          const region = await analyzeFirstPhotoRegions(photos);
           if (!active) return;
+          setRegionSummary(region);
+          setStatus("Checking optional photo ML...");
+          const suggestion = await readVisionSuggestion(photos);
+          if (!active) return;
+          const merged = mergeVisionSuggestion(base, suggestion);
+          const next: PhotoAnalysisResult = {
+            ...merged,
+            derived: derivePhotoIntake({
+              photoTypes: photos.filter((p) => p.quality !== "unusable").map((p) => p.type),
+              region,
+              visionSun: suggestion?.sun,
+            }),
+          };
           onAnalysis(next);
           setAssumptionEdits((current) => {
             const merged = { ...current };
@@ -474,15 +575,12 @@ export function PhotoFirstPlanning({
           if (active) setStatus("Couldn't read that photo automatically — you can still continue.");
         } finally {
           if (active) setBusy(false);
-          if (stageTimer) window.clearInterval(stageTimer);
         }
       })();
-    }, 500);
+    }, 450);
     return () => {
       active = false;
-      window.clearTimeout(setupTimer);
       window.clearTimeout(timer);
-      if (stageTimer) window.clearInterval(stageTimer);
     };
   }, [photos, onAnalysis]);
 
@@ -549,10 +647,21 @@ export function PhotoFirstPlanning({
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
       if (!ctx) return;
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      setLiveSignal(sampleCanvas(canvas));
+      const { signal, fill } = readLiveFrame(canvas);
+      setLiveSignal(signal);
+      setLiveFill(fill);
     }, 600);
     return () => window.clearInterval(id);
   }, [cameraOpen, cameraReady]);
+
+  useEffect(() => {
+    if (!cameraOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setCameraOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [cameraOpen]);
 
   useEffect(() => {
     if (!cameraOpen) return;
@@ -582,6 +691,7 @@ export function PhotoFirstPlanning({
     }
 
     const existingNames = new Set(photos.map((photo) => photo.fileName).filter(Boolean));
+    const knownSignatures = photos.map((photo) => photo.signature).filter(Boolean) as string[];
     const next: PhotoAsset[] = [];
     for (const file of incoming) {
       try {
@@ -596,6 +706,15 @@ export function PhotoFirstPlanning({
           continue;
         }
         const inspected = await inspectAndCompress(file);
+        if (inspected.signature && knownSignatures.some((sig) => areNearDuplicates(sig, inspected.signature))) {
+          nextIssues.push({
+            id: crypto.randomUUID(),
+            fileName: file.name,
+            message: "This looks like a near-duplicate of a photo already added. Capture a different angle instead.",
+            severity: "warning",
+          });
+          continue;
+        }
         const asset = await saveDraftPhoto({
           sessionId,
           type: photoType,
@@ -605,7 +724,9 @@ export function PhotoFirstPlanning({
           height: inspected.height,
           quality: inspected.quality,
           warnings: inspected.warnings,
+          signature: inspected.signature,
         });
+        if (inspected.signature) knownSignatures.push(inspected.signature);
         next.push(asset);
         if (inspected.warnings.length > 0) {
           nextIssues.push({
@@ -648,6 +769,25 @@ export function PhotoFirstPlanning({
     setStatus("Checking camera photo locally...");
     try {
       const inspected = await inspectDataUrl(dataUrl);
+      const knownSignatures = photos.map((photo) => photo.signature).filter(Boolean) as string[];
+      if (
+        inspected.signature &&
+        knownSignatures.some((sig) => areNearDuplicates(sig, inspected.signature))
+      ) {
+        setIssues((current) =>
+          [
+            {
+              id: crypto.randomUUID(),
+              fileName: "Camera capture",
+              message:
+                "This looks like a near-duplicate of a photo already added. Capture a different angle instead.",
+              severity: "warning" as const,
+            },
+            ...current,
+          ].slice(0, 6),
+        );
+        return;
+      }
       const warnings = [
         ...inspected.warnings,
         ...(tilted
@@ -664,6 +804,7 @@ export function PhotoFirstPlanning({
         quality:
           warnings.length > 0 && inspected.quality === "good" ? "needs_review" : inspected.quality,
         warnings,
+        signature: inspected.signature,
       });
       onPhotos([...photos, asset]);
       if (warnings.length > 0) {
@@ -715,6 +856,15 @@ export function PhotoFirstPlanning({
     }
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     void addCapturedPhoto(canvas.toDataURL("image/jpeg", 0.86));
+  }
+
+  // Add a shot of a given type from the best source for the device: the guided
+  // camera on phones/tablets, the file picker on desktop (where a webcam is no
+  // help for photographing a yard). Both feed the same review pipeline.
+  function addShotOfType(type: PhotoAssetType) {
+    setPhotoType(type);
+    if (isMobile) setCameraOpen(true);
+    else inputRef.current?.click();
   }
 
   function removePhoto(id: string) {
@@ -835,6 +985,55 @@ export function PhotoFirstPlanning({
           </div>
         </div>
 
+        <div className="mt-4 rounded-xl border border-border bg-background/60 p-3">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Capture plan</p>
+            <span className="text-xs font-semibold text-brand-strong">{liveConfidence}% photo confidence</span>
+          </div>
+          <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-border">
+            <div
+              className="h-full rounded-full bg-brand transition-all"
+              style={{ width: `${liveConfidence}%` }}
+            />
+          </div>
+          <p className="mt-2 text-xs text-muted">
+            {nextShot
+              ? `Next best shot: ${nextShot.title.toLowerCase()} — ${nextShot.desc}`
+              : "Great coverage. Add more angles or continue to confirm."}
+          </p>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            {EXAMPLE_SHOTS.map((shot) => {
+              const done = presentTypes.has(shot.type);
+              return (
+                <button
+                  key={shot.type}
+                  type="button"
+                  onClick={() => addShotOfType(shot.type)}
+                  className={`flex flex-1 items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs transition ${
+                    done
+                      ? "border-brand/30 bg-brand-soft text-brand-strong"
+                      : "border-border bg-surface text-foreground hover:border-brand"
+                  }`}
+                >
+                  {done ? (
+                    <CheckCircle2 className="size-4 shrink-0 text-brand" aria-hidden />
+                  ) : isMobile ? (
+                    <Camera className="size-4 shrink-0 text-muted" aria-hidden />
+                  ) : (
+                    <Upload className="size-4 shrink-0 text-muted" aria-hidden />
+                  )}
+                  <span className="min-w-0">
+                    <span className="block font-semibold">{shot.title}</span>
+                    <span className="block text-[11px] text-muted">
+                      {done ? "Added" : isMobile ? "Tap to add" : "Upload"}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="mt-4 grid gap-3 lg:grid-cols-[220px_1fr]">
           <div className="rounded-xl border border-border bg-background/60 p-3">
             <label
@@ -897,27 +1096,29 @@ export function PhotoFirstPlanning({
                 <Camera className="mb-2 size-7 text-brand" aria-hidden />
               )}
               <span className="text-sm font-semibold text-foreground">
-                Take guided photos or upload existing images
+                {isMobile ? "Take guided photos or upload existing images" : "Drag photos here or upload to review"}
               </span>
               <span className="mt-1 max-w-md text-xs text-muted">
-                Camera mode adds gridlines, framing templates, and live lighting hints. Uploads use
-                the same local quality checks.
+                {isMobile
+                  ? "Camera mode adds gridlines, framing templates, and live lighting hints. Uploads use the same local quality checks and review."
+                  : "Upload one or more yard photos and Bloomprint reviews each one — quality, greenery, and suggested answers — right here. The guided camera is best on a phone."}
               </span>
               <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                 <button
                   type="button"
-                  onClick={() => setCameraOpen(true)}
+                  onClick={() => inputRef.current?.click()}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
                 >
-                  <Camera className="size-4" aria-hidden />
-                  Open guided camera
+                  <Upload className="size-4" aria-hidden />
+                  Upload photos
                 </button>
                 <button
                   type="button"
-                  onClick={() => inputRef.current?.click()}
-                  className="rounded-full border border-border px-4 py-2 text-sm font-semibold transition hover:border-brand"
+                  onClick={() => setCameraOpen(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold transition hover:border-brand"
                 >
-                  Upload photos
+                  <Camera className="size-4" aria-hidden />
+                  {isMobile ? "Open guided camera" : "Use camera"}
                 </button>
               </div>
             </div>
@@ -998,7 +1199,7 @@ export function PhotoFirstPlanning({
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={photo.previewUrl}
-                      alt=""
+                      alt={`${PHOTO_TYPES.find((type) => type.value === photo.type)?.label ?? "Yard"} photo ${index + 1}`}
                       className="aspect-[4/3] w-full object-cover"
                     />
                   ) : (
@@ -1059,8 +1260,24 @@ export function PhotoFirstPlanning({
                     </button>
                     <button
                       type="button"
+                      onClick={() => addShotOfType(photo.type)}
+                      className={`ml-auto inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold transition ${
+                        photo.quality === "good"
+                          ? "border-border text-muted hover:border-brand hover:text-foreground"
+                          : "border-brand/40 bg-brand-soft text-brand-strong"
+                      }`}
+                    >
+                      {isMobile ? (
+                        <Camera className="size-3.5" aria-hidden />
+                      ) : (
+                        <Upload className="size-3.5" aria-hidden />
+                      )}
+                      {isMobile ? "Retake" : "Replace"}
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => removePhoto(photo.id)}
-                      className="ml-auto inline-flex items-center gap-1 rounded-full border border-border px-2 py-1 text-[11px] font-semibold text-danger transition hover:border-danger/40"
+                      className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-1 text-[11px] font-semibold text-danger transition hover:border-danger/40"
                     >
                       <Trash2 className="size-3.5" aria-hidden />
                       Remove
@@ -1088,6 +1305,105 @@ export function PhotoFirstPlanning({
 
         {analysis ? (
           <div className="mt-4 flex flex-col gap-4">
+            {draftRead ? (
+              <div className="flex items-start gap-2 rounded-xl border border-brand/25 bg-brand-soft p-3">
+                <Sparkles className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
+                <p className="text-sm font-medium text-brand-strong">{draftRead}</p>
+              </div>
+            ) : null}
+
+            {heroPhoto?.previewUrl && regionSummary ? (
+              <div className="rounded-xl border border-border bg-background/60 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                  What Bloomprint sees
+                </p>
+                <p className="mt-1 text-[11px] text-muted">
+                  A rough read of your photo — greenery, surfaces, and light. An estimate to confirm,
+                  not a measurement. Tap a tile for detail.
+                </p>
+                <div className="mt-2 grid gap-3 sm:grid-cols-[1.4fr_1fr]">
+                  <div className="relative overflow-hidden rounded-lg border border-border">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={heroPhoto.previewUrl}
+                      alt="Your yard with a rough greenery and surface read"
+                      className="aspect-[3/2] w-full object-cover"
+                    />
+                    <div
+                      className="absolute inset-0 grid"
+                      style={{
+                        gridTemplateColumns: `repeat(${regionSummary.cols}, 1fr)`,
+                        gridTemplateRows: `repeat(${regionSummary.rows}, 1fr)`,
+                      }}
+                    >
+                      {regionSummary.cells.map((cell, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setSelectedCell(selectedCell === i ? null : i)}
+                          className={`transition ${selectedCell === i ? "ring-2 ring-inset ring-white" : ""}`}
+                          style={{ backgroundColor: REGION_STYLE[cell.cls].fill }}
+                          aria-label={REGION_STYLE[cell.cls].label}
+                        />
+                      ))}
+                    </div>
+                    {selectedCell !== null && regionSummary.cells[selectedCell] ? (
+                      <div className="absolute inset-x-2 bottom-2 rounded-lg bg-black/75 px-3 py-1.5 text-xs text-white">
+                        {REGION_STYLE[regionSummary.cells[selectedCell].cls].label} — about{" "}
+                        {Math.round(coverageFor(regionSummary.cells[selectedCell].cls) * 100)}% of the
+                        photo
+                      </div>
+                    ) : null}
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-wrap gap-1.5">
+                      {sceneChips.length > 0 ? (
+                        sceneChips.map((chip, i) => (
+                          <span
+                            key={`${chip.label}-${i}`}
+                            className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                              chip.tone === "green"
+                                ? "bg-brand-soft text-brand-strong"
+                                : chip.tone === "sky"
+                                  ? "bg-sky-500/15 text-sky-700 dark:text-sky-300"
+                                  : chip.tone === "shade"
+                                    ? "bg-slate-500/15 text-slate-600 dark:text-slate-300"
+                                    : "bg-border/70 text-muted"
+                            }`}
+                          >
+                            {chip.label}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-xs text-muted">
+                          Not enough detail to read confidently — confirm below.
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                        Greenery vs. hard surfaces
+                      </p>
+                      <div className="mt-1 flex h-3 overflow-hidden rounded-full bg-border">
+                        <div
+                          className="bg-brand"
+                          style={{ width: `${Math.round(regionSummary.greenRatio * 100)}%` }}
+                        />
+                        <div
+                          className="bg-slate-400"
+                          style={{ width: `${Math.round(regionSummary.hardscapeRatio * 100)}%` }}
+                        />
+                      </div>
+                      <p className="mt-1 text-[11px] text-muted">
+                        ~{Math.round(regionSummary.greenRatio * 100)}% greenery · ~
+                        {Math.round(regionSummary.hardscapeRatio * 100)}% hard surface (estimate)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
             <div className="grid gap-3 sm:grid-cols-3">
               <ReadinessCheck
                 label="Details detected"
@@ -1261,7 +1577,7 @@ export function PhotoFirstPlanning({
                 ))}
               </div>
 
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3">
                 <div
                   className={`border-2 border-dashed ${
                     photoType === "measurement"
@@ -1271,6 +1587,9 @@ export function PhotoFirstPlanning({
                         : "h-56 w-64 rounded-2xl border-yellow-300/80"
                   }`}
                 />
+                <span className="max-w-[18rem] rounded-lg bg-black/65 px-3 py-1 text-center text-[11px] text-white/90 backdrop-blur-sm">
+                  Frame the {selectedType.label.toLowerCase()}: {selectedType.hint}
+                </span>
               </div>
 
               <div className="pointer-events-none absolute left-0 right-0 top-3 flex justify-center px-3">
@@ -1330,12 +1649,17 @@ export function PhotoFirstPlanning({
               <button
                 type="button"
                 onClick={captureFromCamera}
-                disabled={!cameraReady || busy}
+                disabled={!cameraReady || busy || captureBlocked}
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
               >
                 <Maximize2 className="size-4" aria-hidden />
-                Capture guided photo
+                {captureBlocked ? "Adjust the shot to capture" : "Capture guided photo"}
               </button>
+              {captureBlocked ? (
+                <p className="text-center text-xs font-medium text-danger">
+                  Lighting, detail, and level all need fixing before this photo is usable.
+                </p>
+              ) : null}
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}

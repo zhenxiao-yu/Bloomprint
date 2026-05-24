@@ -22,6 +22,7 @@ import {
   Wrench,
 } from "lucide-react";
 import type {
+  AreaType,
   Drainage,
   EffortLevel,
   Measurement,
@@ -32,6 +33,7 @@ import type {
   StyleFamily,
   SunExposure,
 } from "@/domain/models";
+import { PROBLEM_TO_GOAL } from "@/domain/problem";
 import {
   AREAS,
   BUDGETS,
@@ -212,6 +214,9 @@ export function IntakeForm({
     if (photoHints.suggestedArea) setValue("areaType", photoHints.suggestedArea);
     if (photoHints.suggestedGoal) setValue("goal", photoHints.suggestedGoal);
     if (photoHints.suggestedSun) setValue("sun", photoHints.suggestedSun);
+    if (photoHints.suggestedProblem) setValue("problemType", photoHints.suggestedProblem);
+    if (photoHints.suggestedScope) setValue("scope", photoHints.suggestedScope);
+    if (photoHints.suggestedDrainage) setValue("drainage", photoHints.suggestedDrainage);
     setStepIndex(2);
   }
 
@@ -240,6 +245,7 @@ export function IntakeForm({
         hints={photoHints}
         onApply={applyPhotoHints}
         t={t}
+        to={to}
       />
 
       {activeStep === "goal" ? (
@@ -711,6 +717,7 @@ function PhotoContextCard({
   hints,
   onApply,
   t,
+  to,
 }: {
   photoAnalysis?: PhotoAnalysisResult | null;
   photoPreviewUrl?: string | null;
@@ -718,9 +725,24 @@ function PhotoContextCard({
   hints: PhotoHints;
   onApply: () => void;
   t: ReturnType<typeof useTranslations<"Intake">>;
+  to: ReturnType<typeof useTranslations<"Options">>;
 }) {
+  // Photo-suggested survey answers, resolved to readable labels (confirm-first).
+  const answerChips: string[] = [];
+  if (hints.suggestedProblem) answerChips.push(to(`problems.${hints.suggestedProblem}`));
+  if (hints.suggestedScope) answerChips.push(to(`scope.${hints.suggestedScope}`));
+  if (hints.suggestedArea)
+    answerChips.push(AREAS.find((a) => a.value === hints.suggestedArea)?.label ?? hints.suggestedArea);
+  if (hints.suggestedSun)
+    answerChips.push(SUN_OPTIONS.find((s) => s.value === hints.suggestedSun)?.label ?? hints.suggestedSun);
+  if (hints.suggestedDrainage)
+    answerChips.push(
+      DRAINAGE_OPTIONS.find((d) => d.value === hints.suggestedDrainage)?.label ?? hints.suggestedDrainage,
+    );
+  const hasAnswers = answerChips.length > 0;
   const hasHints =
     hints.items.length > 0 ||
+    hasAnswers ||
     Boolean(hints.suggestedArea || hints.suggestedGoal || hints.suggestedSun);
   return (
     <section className="rounded-2xl border border-border bg-surface p-4">
@@ -763,6 +785,24 @@ function PhotoContextCard({
           </div>
         </div>
       </div>
+      {hasAnswers ? (
+        <div className="mt-3 rounded-xl border border-brand/20 bg-brand-soft/40 p-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-brand-strong">
+            {t("photoAnswersTitle")}
+          </p>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {answerChips.map((label, i) => (
+              <span
+                key={`${label}-${i}`}
+                className="rounded-full border border-brand/30 bg-surface px-2 py-1 text-[11px] font-semibold text-brand-strong"
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+          <p className="mt-1.5 text-[11px] text-muted">{t("photoAnswersVerify")}</p>
+        </div>
+      ) : null}
       {photoAnalysis ? (
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <span className="text-xs text-muted">
@@ -938,9 +978,12 @@ function GoalIllustration({ index }: { index: number }) {
 
 type PhotoHints = {
   items: string[];
-  suggestedArea?: string;
+  suggestedArea?: AreaType;
   suggestedGoal?: ProjectGoal;
   suggestedSun?: SunExposure;
+  suggestedProblem?: ProblemType;
+  suggestedScope?: ProjectScope;
+  suggestedDrainage?: Drainage;
 };
 
 function buildPhotoHints(analysis?: PhotoAnalysisResult | null): PhotoHints {
@@ -953,18 +996,32 @@ function buildPhotoHints(analysis?: PhotoAnalysisResult | null): PhotoHints {
   ];
   const zoneTypes = new Set(analysis.zones.map((zone) => zone.type));
   const sunAssumption = analysis.assumptions.find((item) => item.id === "sun")?.value.toLowerCase();
-  const suggestedSun: SunExposure | undefined = sunAssumption?.includes("lots of sun")
+  const sunFromAssumption: SunExposure | undefined = sunAssumption?.includes("lots of sun")
     ? "full-sun"
     : sunAssumption?.includes("some sun")
       ? "part-sun"
       : sunAssumption?.includes("mostly shade")
         ? "shade"
         : undefined;
+
+  // Photo-derived survey answers (Phase 4) take priority over the older zone heuristics.
+  const d = analysis.derived;
+  const suggestedProblem = d?.problemType;
+  const suggestedGoal: ProjectGoal | undefined = suggestedProblem
+    ? PROBLEM_TO_GOAL[suggestedProblem]
+    : zoneTypes.has("privacy_gap")
+      ? "privacy"
+      : undefined;
+
   return {
     items: Array.from(new Set(items)),
     suggestedArea:
-      zoneTypes.has("foundation") || zoneTypes.has("planting_bed") ? "foundation-bed" : undefined,
-    suggestedGoal: zoneTypes.has("privacy_gap") ? "privacy" : undefined,
-    suggestedSun,
+      d?.areaType ??
+      (zoneTypes.has("foundation") || zoneTypes.has("planting_bed") ? "foundation-bed" : undefined),
+    suggestedGoal,
+    suggestedSun: d?.sun ?? sunFromAssumption,
+    suggestedProblem,
+    suggestedScope: d?.scope,
+    suggestedDrainage: d?.drainage,
   };
 }

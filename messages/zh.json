@@ -123,7 +123,23 @@
       "offlineThem": "时灵时不灵。",
       "offlineUs": "完全可用——AI 和云端只是可选附加项。"
     },
-    "disclaimer": "方案基于 Bloomprint 核心植物库和大致的区域规则。价格是参考区间，不是报价 —— 购买前请先确认本地是否有货。"
+    "disclaimer": "方案基于 Bloomprint 核心植物库和大致的区域规则。价格是参考区间，不是报价 —— 购买前请先确认本地是否有货。",
+    "showcase": {
+      "eyebrow": "改造前后",
+      "title": "从一张照片，到可落地的方案",
+      "subtitle": "真实的材料、真实的用量、正确的施工顺序——不是看着好看却用不上的效果图。",
+      "shotFrontTitle": "门前景观",
+      "shotFrontDesc": "前院花床、间距与收边，都为你算好。",
+      "shotBackTitle": "后院花床",
+      "shotBackDesc": "抬升花床与种植区，按你的空间尺寸规划。",
+      "shotPlantTitle": "对的植物，对的位置",
+      "shotPlantDesc": "买之前先核对光照、土壤与间距。"
+    },
+    "capture": {
+      "title": "拍下你的院子，交给我们读。",
+      "body": "引导拍摄或上传——Bloomprint 会检查照片质量、估算种植区，并把不确定的地方变成可确认的问题，确认后再生成方案。",
+      "cta": "用照片做方案"
+    }
   },
   "Common": {
     "startPlan": "开始做方案",
@@ -349,6 +365,8 @@
     "photoContextNoMl": "暂无机器学习信号",
     "photoContextConfidence": "照片信心 {confidence}%",
     "applyPhotoHints": "应用照片提示",
+    "photoAnswersTitle": "照片得出的答案",
+    "photoAnswersVerify": "供确认的建议——购买前请实地核实。",
     "steps": {
       "goal": {
         "short": "目标",
@@ -527,9 +545,9 @@
     "backToPlanning": "← 返回做方案",
     "home": "首页",
     "title": "已保存的方案",
-    "subtitle": "选两份来对比。打开会重新生成那份方案。",
+    "subtitle": "选择 2–3 个进行对比。点击“打开”会重新生成完整方案。",
     "comparing": "对比中……",
-    "compareSelected": "对比所选（{count}/2）",
+    "compareSelected": "对比所选（{count}/3）",
     "compareError": "无法对比这两份方案。",
     "regenError": "无法重新生成那份已保存的方案。",
     "renamePrompt": "重命名这份方案",
@@ -683,7 +701,25 @@
     "imaginedAlt": "规划后院子的 AI 想象插图",
     "imaginedCaption": "AI 想象插图——并非你院子的真实照片。植物选择、数量与间距来自你的方案，而非这张图。",
     "restyleCaption": "AI 概念重塑——布局与比例为近似值。植物、数量与间距来自你的方案，而非这张图。",
-    "imaginedError": "暂时无法生成图片，请重试。"
+    "imaginedError": "暂时无法生成图片，请重试。",
+    "badgeToxic": "误食有毒",
+    "badgeInvasive": "入侵物种 — 请查本地名录",
+    "bloomsLabel": "花期",
+    "aiPresentation": "AI 撰写的呈现",
+    "aiHidden": "正在显示原始方案",
+    "aiHide": "隐藏 AI 文案",
+    "aiShow": "显示 AI 文案",
+    "aiNote": "AI 只负责文案措辞。植物、价格、用量与风险均来自 Bloomprint 引擎，不会改变。",
+    "seasonsTitle": "四季看点",
+    "seasonsSubtitle": "全年各季的看点，以及相对平淡的时段。",
+    "seasonSpring": "春",
+    "seasonSummer": "夏",
+    "seasonFall": "秋",
+    "seasonWinter": "冬",
+    "seasonsEvergreen": "常绿结构支撑",
+    "seasonsQuiet": "较平淡——暂无特别看点",
+    "seasonsStructure": "全年结构：{plants}",
+    "seasonsNote": "依据 Core Library 的季节说明；花期因地区与年份而异，请在本地确认。"
   },
   "YardMap": {
     "metaTitle": "院子地图（测试版）· Bloomprint",

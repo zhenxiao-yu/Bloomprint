@@ -16,7 +16,7 @@ export default function PricingPage() {
   const t = useTranslations("Pricing");
   return (
     <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6">
-      <div className="animate-fade-up space-y-6">
+      <div className="aurora animate-fade-up space-y-6 rounded-3xl">
         <header className="text-center">
           <h1 className="text-3xl font-semibold text-foreground">{t("title")}</h1>
           <p className="mx-auto mt-2 max-w-xl text-muted">

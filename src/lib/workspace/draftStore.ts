@@ -30,6 +30,7 @@ export interface DraftPhotoInput {
   height?: number;
   quality?: PhotoQuality;
   warnings?: string[];
+  signature?: string;
 }
 
 function now() {
@@ -156,6 +157,7 @@ export async function saveDraftPhoto(input: DraftPhotoInput): Promise<PhotoAsset
     height: input.height,
     quality: input.quality,
     warnings: input.warnings,
+    signature: input.signature,
     createdAt: timestamp,
     updatedAt: timestamp,
   };
