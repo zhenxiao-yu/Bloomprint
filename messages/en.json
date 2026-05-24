@@ -701,7 +701,9 @@
     "imaginedAlt": "AI-imagined illustration of the planned yard",
     "imaginedCaption": "AI-imagined illustration — not a photo of your yard. Plant choices, counts, and spacing come from your plan, not this image.",
     "restyleCaption": "AI concept restyle — layout and scale are approximate. Plants, counts, and spacing come from your plan, not this image.",
-    "imaginedError": "Couldn't generate an image — try again."
+    "imaginedError": "Couldn't generate an image — try again.",
+    "badgeToxic": "Toxic if chewed",
+    "badgeInvasive": "Invasive — check local list"
   },
   "YardMap": {
     "metaTitle": "Yard Map (beta) · Bloomprint",

@@ -139,6 +139,7 @@ export function composePalette(
         matureSize: matureSize(plant.matureHeightCm, plant.matureWidthCm),
         sunLabel: sunLabel(plant.sun),
         maintenance: plant.maintenance,
+        safety: { toxic: plant.toxicToPetsOrKids, invasive: plant.invasive },
       });
     }
   }
@@ -283,6 +284,18 @@ export function generateRiskWarnings(
         mitigation: "Site these away from play areas, or tap “Safer for dogs” to swap them out.",
       });
     }
+  }
+
+  // Invasive status comes straight from the Core Library flag, so the caution holds
+  // even when the optional live invasive-species check is off or unavailable.
+  const invasive = plants.filter((p) => p.invasive);
+  if (invasive.length > 0) {
+    risks.push({
+      id: "invasive",
+      severity: "high",
+      message: `${invasive.map((p) => p.commonName).join(", ")} is considered invasive in many regions and can spread aggressively.`,
+      mitigation: "Check your local invasive-species list before planting, or ask staff for a well-behaved substitute.",
+    });
   }
 
   if (site.drainage === "poor") {

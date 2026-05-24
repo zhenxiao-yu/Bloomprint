@@ -183,6 +183,29 @@ describe("a measured bed area (from the Yard Map) sharpens the estimate", () => 
   });
 });
 
+describe("BP-2 — honest safety facts surfaced at the point of decision", () => {
+  it("mirrors the Core Library toxic/invasive flags onto every plant placement", () => {
+    const plan = generateDeterministicPlan(FIXTURES["oakville-front-yard"]);
+    expect(plan.plants.length).toBeGreaterThan(0);
+    for (const p of plan.plants) {
+      const rec = getPlant(p.plantId);
+      expect(p.safety.toxic).toBe(rec?.toxicToPetsOrKids ?? false);
+      expect(p.safety.invasive).toBe(rec?.invasive ?? false);
+    }
+  });
+
+  it("raises a high-severity 'invasive' risk exactly when an invasive plant is placed", () => {
+    // Invariant, not a tautology: it must hold the moment an invasive species enters
+    // the catalog/selection, and the warning must NOT depend on pets/kids or the
+    // optional live invasive check. The current seed catalog has none, so both sides
+    // are false today — and stay in lock-step as the library grows.
+    const plan = generateDeterministicPlan(FIXTURES["oakville-front-yard"]);
+    const anyInvasive = plan.plants.some((p) => p.safety.invasive);
+    const hasInvasiveRisk = plan.risks.some((r) => r.id === "invasive" && r.severity === "high");
+    expect(hasInvasiveRisk).toBe(anyInvasive);
+  });
+});
+
 describe("pet-safe fixture flags toxicity as a risk before refinement", () => {
   it("includes a high-severity toxicity risk when a toxic plant is selected", () => {
     const plan = generateDeterministicPlan(FIXTURES["pet-safe-front-yard"]);

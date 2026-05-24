@@ -555,6 +555,20 @@ export function PlanResult({
                 ) : null}
               </div>
               <p className="text-xs text-muted">{p.spacingNote}</p>
+              {p.safety.toxic || p.safety.invasive ? (
+                <div className="mt-1.5 flex flex-wrap gap-1">
+                  {p.safety.toxic ? (
+                    <span className="rounded-full bg-warn/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-warn">
+                      {t("badgeToxic")}
+                    </span>
+                  ) : null}
+                  {p.safety.invasive ? (
+                    <span className="rounded-full bg-danger/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-danger">
+                      {t("badgeInvasive")}
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
               {showNumbers ? (
                 <p className="mt-1 text-xs text-muted">
                   {p.matureSize} · {p.sunLabel} · {t("maintenanceSuffix", { level: p.maintenance })}

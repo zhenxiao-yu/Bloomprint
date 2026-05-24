@@ -701,7 +701,9 @@
     "imaginedAlt": "规划后院子的 AI 想象插图",
     "imaginedCaption": "AI 想象插图——并非你院子的真实照片。植物选择、数量与间距来自你的方案，而非这张图。",
     "restyleCaption": "AI 概念重塑——布局与比例为近似值。植物、数量与间距来自你的方案，而非这张图。",
-    "imaginedError": "暂时无法生成图片，请重试。"
+    "imaginedError": "暂时无法生成图片，请重试。",
+    "badgeToxic": "误食有毒",
+    "badgeInvasive": "入侵物种 — 请查本地名录"
   },
   "YardMap": {
     "metaTitle": "院子地图（测试版）· Bloomprint",

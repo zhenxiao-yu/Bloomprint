@@ -83,6 +83,7 @@ export function generateDeterministicPlan(intake: YardIntake, options: PlanOptio
         matureSize: matureSize(top.plant.matureHeightCm, top.plant.matureWidthCm),
         sunLabel: sunLabel(top.plant.sun),
         maintenance: top.plant.maintenance,
+        safety: { toxic: top.plant.toxicToPetsOrKids, invasive: top.plant.invasive },
       },
     ];
   }

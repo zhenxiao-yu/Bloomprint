@@ -431,6 +431,12 @@ export const PlantPlacement = z.object({
   matureSize: z.string(),
   sunLabel: z.string(),
   maintenance: MaintenanceLevel,
+  // Honest safety facts from the Core Library, surfaced at the point of decision.
+  // Intrinsic plant properties only (site-dependent cautions like deer live in risks).
+  safety: z.object({
+    toxic: z.boolean(),
+    invasive: z.boolean(),
+  }),
 });
 export type PlantPlacement = z.infer<typeof PlantPlacement>;
 
