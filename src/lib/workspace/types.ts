@@ -99,6 +99,8 @@ export interface PhotoAsset {
   height?: number;
   quality?: PhotoQuality;
   warnings?: string[];
+  /** 64-bit average-hash (hex) for near-duplicate detection; see imageSignals.ts. */
+  signature?: string;
   aiAnalysis?: PhotoAnalysisResult;
   createdAt: number;
   updatedAt: number;

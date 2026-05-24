@@ -15,7 +15,7 @@ export function PricingCards() {
         return (
           <div
             key={key}
-            className={`card flex flex-col gap-3 p-5 ${isCurrent ? "ring-2 ring-brand" : ""}`}
+            className={`card hover-lift flex flex-col gap-3 p-5 ${isCurrent ? "ring-2 ring-brand" : ""}`}
           >
             <div>
               <div className="flex items-baseline justify-between">

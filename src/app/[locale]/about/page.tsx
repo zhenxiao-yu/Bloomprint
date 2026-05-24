@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import type { Metadata } from "next";
+import { Photo } from "@/components/ui/photo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("About");
@@ -17,12 +18,21 @@ export default function AboutPage() {
   return (
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-6">
       <div className="animate-fade-up space-y-6">
-        <header>
-          <h1 className="text-3xl font-semibold text-foreground">{t("title")}</h1>
-          <p className="mt-2 text-muted">{t("intro")}</p>
-        </header>
+        <Photo
+          src="/photos/soil-hands.jpg"
+          alt="Hands holding garden soil"
+          priority
+          scrim
+          sizes="(max-width: 672px) 100vw, 640px"
+          className="flex min-h-56 rounded-3xl ring-1 ring-foreground/10"
+        >
+          <header className="mt-auto p-5 sm:p-7">
+            <h1 className="text-3xl font-semibold text-white drop-shadow-sm">{t("title")}</h1>
+            <p className="mt-2 max-w-lg text-sm text-white/85">{t("intro")}</p>
+          </header>
+        </Photo>
 
-        <section>
+        <section className="card hover-lift p-5">
           <h2 className="text-lg font-semibold text-foreground">{t("howTitle")}</h2>
           <ol className="mt-2 space-y-2 text-sm text-foreground">
             <li>{t("how1")}</li>
@@ -31,7 +41,7 @@ export default function AboutPage() {
           </ol>
         </section>
 
-        <section>
+        <section className="card hover-lift p-5">
           <h2 className="text-lg font-semibold text-foreground">{t("diffTitle")}</h2>
           <ul className="mt-2 space-y-2 text-sm text-foreground">
             <li>
@@ -46,7 +56,7 @@ export default function AboutPage() {
           </ul>
         </section>
 
-        <section>
+        <section className="card hover-lift p-5">
           <h2 className="text-lg font-semibold text-foreground">{t("privacyTitle")}</h2>
           <p className="mt-2 text-sm text-foreground">{t("privacyBody")}</p>
         </section>

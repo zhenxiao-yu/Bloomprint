@@ -23,8 +23,8 @@ export default function ProjectPage({ params }: { params: Promise<{ projectId: s
   if (!loaded) {
     return (
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-4 py-10">
-        <div className="h-9 w-56 animate-pulse rounded bg-border" />
-        <div className="h-28 w-full animate-pulse rounded-xl bg-border" />
+        <div className="skeleton h-9 w-56" />
+        <div className="skeleton h-28 w-full rounded-xl" />
       </main>
     );
   }

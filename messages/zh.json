@@ -123,7 +123,23 @@
       "offlineThem": "时灵时不灵。",
       "offlineUs": "完全可用——AI 和云端只是可选附加项。"
     },
-    "disclaimer": "方案基于 Bloomprint 核心植物库和大致的区域规则。价格是参考区间，不是报价 —— 购买前请先确认本地是否有货。"
+    "disclaimer": "方案基于 Bloomprint 核心植物库和大致的区域规则。价格是参考区间，不是报价 —— 购买前请先确认本地是否有货。",
+    "showcase": {
+      "eyebrow": "改造前后",
+      "title": "从一张照片，到可落地的方案",
+      "subtitle": "真实的材料、真实的用量、正确的施工顺序——不是看着好看却用不上的效果图。",
+      "shotFrontTitle": "门前景观",
+      "shotFrontDesc": "前院花床、间距与收边，都为你算好。",
+      "shotBackTitle": "后院花床",
+      "shotBackDesc": "抬升花床与种植区，按你的空间尺寸规划。",
+      "shotPlantTitle": "对的植物，对的位置",
+      "shotPlantDesc": "买之前先核对光照、土壤与间距。"
+    },
+    "capture": {
+      "title": "拍下你的院子，交给我们读。",
+      "body": "引导拍摄或上传——Bloomprint 会检查照片质量、估算种植区，并把不确定的地方变成可确认的问题，确认后再生成方案。",
+      "cta": "用照片做方案"
+    }
   },
   "Common": {
     "startPlan": "开始做方案",

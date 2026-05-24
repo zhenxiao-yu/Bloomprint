@@ -30,6 +30,14 @@ import type {
 } from "@/lib/workspace/types";
 import { analyzeYardPhotos } from "@/lib/workspace/photoAnalysis";
 import { saveDraftPhoto } from "@/lib/workspace/draftStore";
+import {
+  areNearDuplicates,
+  computeImageSignals,
+  gradeImageQuality,
+  NEUTRAL_SIGNALS,
+  perceptualHash,
+  type ImageSignals,
+} from "@/lib/workspace/imageSignals";
 
 const MAX_PHOTOS = 8;
 const MAX_FILE_MB = 12;
@@ -138,6 +146,8 @@ type ImageInspection = {
   height: number;
   quality: PhotoQuality;
   warnings: string[];
+  signals: ImageSignals;
+  signature: string;
 };
 
 type FrameSignal = {
@@ -282,42 +292,24 @@ async function inspectDataUrl(source: string): Promise<ImageInspection> {
     image.src = source;
   });
 
-  const warnings: string[] = [];
-  let quality: PhotoQuality = "good";
   const shortestSide = Math.min(img.width, img.height);
-  if (shortestSide < 320) {
-    quality = "unusable";
-    warnings.push(
-      "Image is too small for reliable planning. Retake from farther back or upload a larger photo.",
-    );
-  } else if (shortestSide < 640) {
-    quality = "needs_review";
-    warnings.push(
-      "Image is small. It can help, but measurements and plant details may be unreliable.",
-    );
-  }
 
-  const sample = document.createElement("canvas");
-  sample.width = 40;
-  sample.height = 40;
-  const sampleCtx = sample.getContext("2d", { willReadFrequently: true });
-  if (sampleCtx) {
-    sampleCtx.drawImage(img, 0, 0, sample.width, sample.height);
-    const signal = sampleCanvas(sample);
-
-    if (signal.tooDark) {
-      quality = quality === "unusable" ? "unusable" : "needs_review";
-      warnings.push("Photo looks very dark. Retake in daylight if possible.");
-    }
-    if (signal.tooBright) {
-      quality = quality === "unusable" ? "unusable" : "needs_review";
-      warnings.push("Photo looks overexposed. Retake with less glare if possible.");
-    }
-    if (signal.lowDetail) {
-      quality = quality === "unusable" ? "unusable" : "needs_review";
-      warnings.push("Photo has low detail. A clearer wide shot will improve zone detection.");
-    }
+  // Analysis sample (~160px longest side) — large enough that blur, colour, and
+  // duplicate signals survive, unlike the 40x40 used for cheap live brightness.
+  let signals: ImageSignals = { ...NEUTRAL_SIGNALS };
+  let signature = "";
+  const aSample = document.createElement("canvas");
+  const aScale = Math.min(1, 160 / Math.max(img.width, img.height));
+  aSample.width = Math.max(1, Math.round(img.width * aScale));
+  aSample.height = Math.max(1, Math.round(img.height * aScale));
+  const aCtx = aSample.getContext("2d", { willReadFrequently: true });
+  if (aCtx) {
+    aCtx.drawImage(img, 0, 0, aSample.width, aSample.height);
+    const pixels = aCtx.getImageData(0, 0, aSample.width, aSample.height).data;
+    signals = computeImageSignals(pixels, aSample.width, aSample.height);
+    signature = perceptualHash(pixels, aSample.width, aSample.height);
   }
+  const graded = gradeImageQuality(signals, shortestSide);
 
   const max = 1280;
   const scale = Math.min(1, max / Math.max(img.width, img.height));
@@ -332,8 +324,10 @@ async function inspectDataUrl(source: string): Promise<ImageInspection> {
     dataUrl: canvas.toDataURL("image/jpeg", 0.82),
     width: img.width,
     height: img.height,
-    quality,
-    warnings,
+    quality: graded.quality,
+    warnings: graded.warnings,
+    signals,
+    signature,
   };
 }
 
@@ -421,6 +415,13 @@ export function PhotoFirstPlanning({
         : tilted
           ? "Straighten your phone with the house or walkway."
           : CAMERA_TIPS[tipIndex % CAMERA_TIPS.length];
+  // Block capture only when light AND detail AND level are all bad — a frame this
+  // poor would just be rejected on inspection, so stop it before the shutter.
+  const captureBlocked =
+    cameraReady &&
+    (liveSignal.tooDark || liveSignal.tooBright) &&
+    liveSignal.lowDetail &&
+    tilted;
 
   const analysisStatus = useMemo(() => {
     if (busy) return status;
@@ -556,6 +557,15 @@ export function PhotoFirstPlanning({
 
   useEffect(() => {
     if (!cameraOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setCameraOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [cameraOpen]);
+
+  useEffect(() => {
+    if (!cameraOpen) return;
     const onOrientation = (event: DeviceOrientationEvent) => {
       const gamma = event.gamma ?? 0;
       setTilted(Math.abs(gamma) > 18);
@@ -582,6 +592,7 @@ export function PhotoFirstPlanning({
     }
 
     const existingNames = new Set(photos.map((photo) => photo.fileName).filter(Boolean));
+    const knownSignatures = photos.map((photo) => photo.signature).filter(Boolean) as string[];
     const next: PhotoAsset[] = [];
     for (const file of incoming) {
       try {
@@ -596,6 +607,15 @@ export function PhotoFirstPlanning({
           continue;
         }
         const inspected = await inspectAndCompress(file);
+        if (inspected.signature && knownSignatures.some((sig) => areNearDuplicates(sig, inspected.signature))) {
+          nextIssues.push({
+            id: crypto.randomUUID(),
+            fileName: file.name,
+            message: "This looks like a near-duplicate of a photo already added. Capture a different angle instead.",
+            severity: "warning",
+          });
+          continue;
+        }
         const asset = await saveDraftPhoto({
           sessionId,
           type: photoType,
@@ -605,7 +625,9 @@ export function PhotoFirstPlanning({
           height: inspected.height,
           quality: inspected.quality,
           warnings: inspected.warnings,
+          signature: inspected.signature,
         });
+        if (inspected.signature) knownSignatures.push(inspected.signature);
         next.push(asset);
         if (inspected.warnings.length > 0) {
           nextIssues.push({
@@ -648,6 +670,25 @@ export function PhotoFirstPlanning({
     setStatus("Checking camera photo locally...");
     try {
       const inspected = await inspectDataUrl(dataUrl);
+      const knownSignatures = photos.map((photo) => photo.signature).filter(Boolean) as string[];
+      if (
+        inspected.signature &&
+        knownSignatures.some((sig) => areNearDuplicates(sig, inspected.signature))
+      ) {
+        setIssues((current) =>
+          [
+            {
+              id: crypto.randomUUID(),
+              fileName: "Camera capture",
+              message:
+                "This looks like a near-duplicate of a photo already added. Capture a different angle instead.",
+              severity: "warning" as const,
+            },
+            ...current,
+          ].slice(0, 6),
+        );
+        return;
+      }
       const warnings = [
         ...inspected.warnings,
         ...(tilted
@@ -664,6 +705,7 @@ export function PhotoFirstPlanning({
         quality:
           warnings.length > 0 && inspected.quality === "good" ? "needs_review" : inspected.quality,
         warnings,
+        signature: inspected.signature,
       });
       onPhotos([...photos, asset]);
       if (warnings.length > 0) {
@@ -998,7 +1040,7 @@ export function PhotoFirstPlanning({
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={photo.previewUrl}
-                      alt=""
+                      alt={`${PHOTO_TYPES.find((type) => type.value === photo.type)?.label ?? "Yard"} photo ${index + 1}`}
                       className="aspect-[4/3] w-full object-cover"
                     />
                   ) : (
@@ -1330,12 +1372,17 @@ export function PhotoFirstPlanning({
               <button
                 type="button"
                 onClick={captureFromCamera}
-                disabled={!cameraReady || busy}
+                disabled={!cameraReady || busy || captureBlocked}
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
               >
                 <Maximize2 className="size-4" aria-hidden />
-                Capture guided photo
+                {captureBlocked ? "Adjust the shot to capture" : "Capture guided photo"}
               </button>
+              {captureBlocked ? (
+                <p className="text-center text-xs font-medium text-danger">
+                  Lighting, detail, and level all need fixing before this photo is usable.
+                </p>
+              ) : null}
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}

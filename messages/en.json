@@ -123,7 +123,23 @@
       "offlineThem": "Hit or miss.",
       "offlineUs": "Works fully — AI and the cloud are optional add-ons."
     },
-    "disclaimer": "Plans use the Bloomprint Core Library and approximate regional rules. Prices are ranges, not quotes — confirm local availability before buying."
+    "disclaimer": "Plans use the Bloomprint Core Library and approximate regional rules. Prices are ranges, not quotes — confirm local availability before buying.",
+    "showcase": {
+      "eyebrow": "The transformation",
+      "title": "From a photo to a plan you can build",
+      "subtitle": "Real materials, real quantities, in the right order — not a pretty render you can’t act on.",
+      "shotFrontTitle": "Curb appeal",
+      "shotFrontDesc": "Front-yard beds, spacing, and edging worked out for you.",
+      "shotBackTitle": "Backyard beds",
+      "shotBackDesc": "Raised beds and planting zones sized to your space.",
+      "shotPlantTitle": "Right plant, right spot",
+      "shotPlantDesc": "Sun, soil, and spacing checked before you buy."
+    },
+    "capture": {
+      "title": "Snap your yard. We’ll read it.",
+      "body": "Guided camera or upload — Bloomprint checks the photo, estimates planting zones, and turns uncertainty into questions you confirm before anything is generated.",
+      "cta": "Plan from a photo"
+    }
   },
   "Common": {
     "startPlan": "Start a plan",
