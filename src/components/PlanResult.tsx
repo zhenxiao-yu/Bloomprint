@@ -640,6 +640,45 @@ export function PlanResult({
         ) : null}
       </Section>
 
+      {/* Across the seasons — season-of-interest from the Core Library notes (not exact months) */}
+      <Section title={t("seasonsTitle")} subtitle={t("seasonsSubtitle")} variant="quiet">
+        <div className="grid gap-3 sm:grid-cols-4">
+          {(
+            [
+              ["spring", "seasonSpring"],
+              ["summer", "seasonSummer"],
+              ["fall", "seasonFall"],
+              ["winter", "seasonWinter"],
+            ] as const
+          ).map(([key, label]) => {
+            const names = plan.seasonalInterest[key];
+            const hasEvergreen = plan.seasonalInterest.evergreenStructure.length > 0;
+            return (
+              <div key={key} className="rounded-lg border border-border bg-background/60 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand">{t(label)}</p>
+                {names.length > 0 ? (
+                  <ul className="mt-1 space-y-0.5 text-xs text-foreground">
+                    {names.map((n) => (
+                      <li key={n}>• {n}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-1 text-xs text-muted">
+                    {hasEvergreen ? t("seasonsEvergreen") : t("seasonsQuiet")}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {plan.seasonalInterest.evergreenStructure.length > 0 ? (
+          <p className="mt-2 text-xs text-muted">
+            {t("seasonsStructure", { plants: plan.seasonalInterest.evergreenStructure.join(", ") })}
+          </p>
+        ) : null}
+        <p className="mt-1 text-xs text-muted">{t("seasonsNote")}</p>
+      </Section>
+
       {/* Risks */}
       {plan.risks.length > 0 ? (
         <Section id="risks" title={t("whatToWatch")} variant="trust">

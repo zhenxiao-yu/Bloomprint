@@ -709,7 +709,17 @@
     "aiHidden": "Showing the raw plan",
     "aiHide": "Hide AI wording",
     "aiShow": "Show AI wording",
-    "aiNote": "AI only writes the wording. Plants, prices, quantities, and risks come from Bloomprint’s engine and never change."
+    "aiNote": "AI only writes the wording. Plants, prices, quantities, and risks come from Bloomprint’s engine and never change.",
+    "seasonsTitle": "Across the seasons",
+    "seasonsSubtitle": "What carries interest through the year — and where the quieter stretches are.",
+    "seasonSpring": "Spring",
+    "seasonSummer": "Summer",
+    "seasonFall": "Fall",
+    "seasonWinter": "Winter",
+    "seasonsEvergreen": "Evergreen structure holds it",
+    "seasonsQuiet": "Quieter — nothing specific noted",
+    "seasonsStructure": "Year-round structure: {plants}",
+    "seasonsNote": "Based on the Core Library’s noted season of interest; bloom timing varies by region and year — confirm locally."
   },
   "YardMap": {
     "metaTitle": "Yard Map (beta) · Bloomprint",

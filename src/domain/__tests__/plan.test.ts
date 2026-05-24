@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { DeterministicPlan, type YardIntake } from "@/domain/models";
+import { DeterministicPlan, type PlantPlacement, type YardIntake } from "@/domain/models";
 import { generateDeterministicPlan, refinePlan } from "@/domain/plan";
-import { maturityFill } from "@/domain/generators";
+import { buildSeasonalInterest, maturityFill } from "@/domain/generators";
 import { FIXTURES } from "@/domain/fixtures";
 import { getPlant } from "@/domain/data";
+
+const placementFor = (plantId: string) => ({ plantId }) as unknown as PlantPlacement;
 
 const fixtureEntries = Object.entries(FIXTURES);
 
@@ -229,6 +231,29 @@ describe("BP-3 — maturity / crowding forecast", () => {
     // privacy-side-yard fills densely (~2.4×), so it must carry the positive hedge framing.
     expect(crowding?.severity).toBe("low");
     expect(crowding?.message).toMatch(/hedge/i);
+  });
+});
+
+describe("BP-5 — seasonal interest read from Core Library notes (no invented months)", () => {
+  it("classifies a known summer→fall bloomer and an evergreen from the season note", () => {
+    const s = buildSeasonalInterest([
+      placementFor("limelight-hydrangea"), // "Lime-to-pink summer blooms, dries for fall"
+      placementFor("emerald-cedar"), // evergreen screening
+    ]);
+    expect(s.summer).toContain("Limelight Hydrangea");
+    expect(s.fall).toContain("Limelight Hydrangea");
+    expect(s.evergreenStructure).toContain("Emerald Cedar");
+    // No month-level claims exist on the shape — season granularity only.
+    expect(Object.keys(s).sort()).toEqual(["evergreenStructure", "fall", "spring", "summer", "winter"]);
+  });
+
+  it("only ever lists plants that are actually in the plan", () => {
+    const plan = generateDeterministicPlan(FIXTURES["oakville-front-yard"]);
+    const planNames = new Set(plan.plants.map((p) => getPlant(p.plantId)?.commonName));
+    const s = plan.seasonalInterest;
+    for (const bucket of [s.spring, s.summer, s.fall, s.winter, s.evergreenStructure]) {
+      for (const name of bucket) expect(planNames.has(name)).toBe(true);
+    }
   });
 });
 

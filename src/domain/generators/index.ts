@@ -17,6 +17,7 @@ import type {
   Readiness,
   ReadinessFactor,
   RiskWarning,
+  SeasonalInterest,
   ShoppingItem,
   SiteCondition,
   StaffNotes,
@@ -364,6 +365,44 @@ export function generateRiskWarnings(
   }
 
   return risks;
+}
+
+/* ----------------------------- seasonal interest ------------------------- */
+
+/**
+ * Season-by-season interest, read from each plant's Core Library `seasonInterest` note and
+ * type. We only flag a season the note explicitly names — no inference of exact timing — and
+ * mark evergreens/grasses as year-round structure. Empty seasons are honest gaps, left empty.
+ */
+export function buildSeasonalInterest(placements: PlantPlacement[]): SeasonalInterest {
+  const spring: string[] = [];
+  const summer: string[] = [];
+  const fall: string[] = [];
+  const winter: string[] = [];
+  const evergreenStructure: string[] = [];
+
+  for (const p of placements) {
+    const rec = getPlant(p.plantId);
+    if (!rec) continue;
+    const name = rec.commonName;
+    const text = rec.seasonInterest.toLowerCase();
+    if (/spring/.test(text)) spring.push(name);
+    if (/summer/.test(text)) summer.push(name);
+    if (/fall|autumn/.test(text)) fall.push(name);
+    if (/winter/.test(text)) winter.push(name);
+    if (rec.type === "evergreen" || rec.type === "grass" || /year-round|evergreen/.test(text)) {
+      evergreenStructure.push(name);
+    }
+  }
+
+  const dedupe = (xs: string[]) => [...new Set(xs)];
+  return {
+    spring: dedupe(spring),
+    summer: dedupe(summer),
+    fall: dedupe(fall),
+    winter: dedupe(winter),
+    evergreenStructure: dedupe(evergreenStructure),
+  };
 }
 
 /* ----------------------------- narrative & insight ----------------------- */

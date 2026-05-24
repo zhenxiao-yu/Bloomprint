@@ -24,6 +24,7 @@ import {
 import {
   buildAccuracyUpgrades,
   buildConfidenceReasons,
+  buildSeasonalInterest,
   buildStaffNotes,
   buildTopActions,
   buildVisualSummary,
@@ -146,6 +147,7 @@ export function generateDeterministicPlan(intake: YardIntake, options: PlanOptio
     storeSearches: buildStoreSearches(shoppingList),
     readiness: computeReadiness(intake),
     tiers: buildPlanTiers(intake, budget.diyTotal),
+    seasonalInterest: buildSeasonalInterest(placements),
   };
 }
 

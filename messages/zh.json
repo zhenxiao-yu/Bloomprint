@@ -709,7 +709,17 @@
     "aiHidden": "正在显示原始方案",
     "aiHide": "隐藏 AI 文案",
     "aiShow": "显示 AI 文案",
-    "aiNote": "AI 只负责文案措辞。植物、价格、用量与风险均来自 Bloomprint 引擎，不会改变。"
+    "aiNote": "AI 只负责文案措辞。植物、价格、用量与风险均来自 Bloomprint 引擎，不会改变。",
+    "seasonsTitle": "四季看点",
+    "seasonsSubtitle": "全年各季的看点，以及相对平淡的时段。",
+    "seasonSpring": "春",
+    "seasonSummer": "夏",
+    "seasonFall": "秋",
+    "seasonWinter": "冬",
+    "seasonsEvergreen": "常绿结构支撑",
+    "seasonsQuiet": "较平淡——暂无特别看点",
+    "seasonsStructure": "全年结构：{plants}",
+    "seasonsNote": "依据 Core Library 的季节说明；花期因地区与年份而异，请在本地确认。"
   },
   "YardMap": {
     "metaTitle": "院子地图（测试版）· Bloomprint",

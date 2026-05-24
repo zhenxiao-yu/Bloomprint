@@ -113,6 +113,16 @@ Verified against the code before building (avoided duplicating shipped work):
   others get a "will look full, thin/divide later" heads-up (medium). Of the fixtures, only the
   privacy plan (2.42×) triggers it. The "fills in by year N" estimate is intentionally omitted —
   it needs growth-rate data the static catalog doesn't have (no fabrication). Tests added.
+- **BP-5 (seasonal interest): shipped (the honest slice).** Audit showed the data supports
+  **season granularity, not months** (the catalog's `seasonInterest` is free text like "summer
+  blooms, dries for fall"; regions carry a text `weatherWindow`, no structured frost dates).
+  So: added an exported `buildSeasonalInterest()` that **extracts only the seasons the Core
+  Library note explicitly names** (+ evergreens/grasses as year-round structure) into a new
+  `seasonalInterest` plan field, surfaced as an **"Across the seasons"** 4-season strip with
+  honest gaps ("quieter — nothing specific noted"). The 12-month bloom strip and frost-date
+  `.ics` reminders from the spec were **dropped** — they'd require month/frost data we don't
+  have, and inventing it is off-limits. Best planting window already exists (`bestWeatherWindow`).
+  i18n en/zh; tests added.
 
 ## Part 2 — Build specs (the "do-next" subset)
 
