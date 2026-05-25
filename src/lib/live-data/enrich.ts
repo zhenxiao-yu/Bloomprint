@@ -8,12 +8,14 @@
  */
 import type { ConfidenceLevel } from "@/domain/models";
 import { getPlant } from "@/domain/data";
+import { getHardinessZone, isUsZip, parseZoneNumber, plantsOutOfZone } from "@/lib/live-data/hardiness";
 import { getInvasiveRisk } from "@/lib/live-data/invasive";
 import { getPlantFacts } from "@/lib/live-data/plantFacts";
 import { getRetailerMatches } from "@/lib/live-data/retailer";
 import { getWeatherContext } from "@/lib/live-data/weather";
 import {
   type EnrichPlanRequest,
+  type HardinessContext,
   type InvasiveRisk,
   LIVE_DISCLAIMER,
   LivePlanEnrichment,
@@ -43,6 +45,7 @@ export async function getLiveEnrichment(req: EnrichPlanRequest): Promise<LivePla
     weather: null,
     plantFacts: [],
     invasive: [],
+    hardiness: null,
     disclaimer: LIVE_DISCLAIMER,
   };
 
@@ -95,6 +98,30 @@ export async function getLiveEnrichment(req: EnrichPlanRequest): Promise<LivePla
       if (risk) invasive.push(risk.value);
     }
 
+    // Location-precise hardiness zone — only for a US ZIP, and only when live data is on
+    // (keyless public source, but we still respect the master live-data switch). Flags any plant
+    // whose Core Library cold-hardiness may not cover the resolved zone. Region zone stands otherwise.
+    let hardiness: HardinessContext | null = null;
+    if (realProvidersConfigured() && isUsZip(req.region)) {
+      const zip = req.region!.trim();
+      const res = await getHardinessZone(zip);
+      if (res) {
+        const zoneNumber = parseZoneNumber(res.value.zone);
+        const knownPlants = req.plants
+          .map((p) => getPlant(p.plantId))
+          .filter((rec): rec is NonNullable<typeof rec> => !!rec)
+          .map((rec) => ({ commonName: rec.commonName, hardinessMin: rec.hardinessMin }));
+        hardiness = {
+          query: zip,
+          zone: res.value.zone,
+          temperatureRange: res.value.temperatureRange,
+          outOfRange: zoneNumber != null ? plantsOutOfZone(knownPlants, zoneNumber) : [],
+          source: res.source,
+          lastCheckedAt: res.retrievedAt,
+        };
+      }
+    }
+
     return LivePlanEnrichment.parse({
       enabled: realProvidersConfigured(),
       generatedAt,
@@ -102,6 +129,7 @@ export async function getLiveEnrichment(req: EnrichPlanRequest): Promise<LivePla
       weather,
       plantFacts,
       invasive,
+      hardiness,
       disclaimer: LIVE_DISCLAIMER,
     });
   } catch {

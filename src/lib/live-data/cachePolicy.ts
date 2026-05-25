@@ -13,6 +13,8 @@ export const LIVE_DATA_CACHE_POLICY: Record<LiveDataKind, CachePolicy> = {
   "retailer-products": { ttlMs: 12 * HOUR },
   "plant-facts": { ttlMs: 60 * DAY },
   invasive: { ttlMs: 30 * DAY },
+  // Hardiness zones change only when USDA re-issues the map (years apart).
+  hardiness: { ttlMs: 30 * DAY },
 };
 
 export function getCachePolicy(kind: LiveDataKind): CachePolicy {

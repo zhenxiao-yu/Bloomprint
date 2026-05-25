@@ -155,6 +155,7 @@ export function PlanResult({
       .map((x) => [(x.commonName ?? x.scientificName).toLowerCase(), x]),
   );
   const weather = live?.weather ?? null;
+  const hardiness = live?.hardiness ?? null;
   const careFact = live?.plantFacts[0] ?? null;
   // Map live care facts to plants by name so per-plant bloom can show inline — only when a
   // real provider supplied a flowering season (the mock never sets one, so this stays quiet
@@ -567,6 +568,24 @@ export function PlanResult({
         {weather ? (
           <p className="mt-3 rounded-lg border border-blueprint/30 bg-blueprint-soft px-3 py-2 text-xs text-foreground">
             <span className="font-semibold">{tLive("timingTitle")}:</span> {weather.plantingNote}
+          </p>
+        ) : null}
+        {hardiness ? (
+          <p
+            className={`mt-2 flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2 text-xs ${
+              hardiness.outOfRange.length > 0
+                ? "border-warn/30 bg-warn/10 text-foreground"
+                : "border-blueprint/30 bg-blueprint-soft text-foreground"
+            }`}
+          >
+            <span>
+              <span className="font-semibold">{tLive("hardinessTitle")}:</span>{" "}
+              {tLive("hardinessZone", { zip: hardiness.query, zone: hardiness.zone })}{" "}
+              {hardiness.outOfRange.length > 0
+                ? tLive("hardinessOutOfRange", { plants: hardiness.outOfRange.join(", ") })
+                : tLive("hardinessAllHardy")}
+            </span>
+            <LiveBadge source={hardiness.source} />
           </p>
         ) : null}
       </Section>

@@ -866,7 +866,11 @@
     "timingTitle": "Planting timing",
     "cautionTitle": "Ecological caution",
     "careTitle": "Care notes",
-    "sourceLabel": "Source"
+    "sourceLabel": "Source",
+    "hardinessTitle": "Hardiness check",
+    "hardinessZone": "{zip} is USDA zone {zone}.",
+    "hardinessAllHardy": "All chosen plants are rated hardy here.",
+    "hardinessOutOfRange": "May not survive winter here: {plants} — confirm before buying."
   },
   "Evidence": {
     "titleExpert": "Why Bloomprint recommends this",

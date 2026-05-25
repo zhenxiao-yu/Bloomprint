@@ -866,7 +866,11 @@
     "timingTitle": "种植时机",
     "cautionTitle": "生态提醒",
     "careTitle": "养护提示",
-    "sourceLabel": "来源"
+    "sourceLabel": "来源",
+    "hardinessTitle": "耐寒区核对",
+    "hardinessZone": "{zip} 属于 USDA {zone} 区。",
+    "hardinessAllHardy": "所选植物在此区均可越冬。",
+    "hardinessOutOfRange": "可能无法在此越冬：{plants} —— 购买前请确认。"
   },
   "Evidence": {
     "titleExpert": "Bloomprint 为什么这样推荐",

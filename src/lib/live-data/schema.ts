@@ -99,6 +99,21 @@ export const InvasiveRisk = z.object({
 });
 export type InvasiveRisk = z.infer<typeof InvasiveRisk>;
 
+/**
+ * Location-precise USDA hardiness zone (from a US ZIP), with an honest comparison against the
+ * plan's plants. Sharpens the engine's region-level zone; enriches, never overrides locked facts.
+ */
+export const HardinessContext = z.object({
+  query: z.string(),
+  zone: z.string(),
+  temperatureRange: z.string().optional(),
+  /** Plant common names whose Core Library cold-hardiness range may not cover this zone. */
+  outOfRange: z.array(z.string()).default([]),
+  source: SourceRef,
+  lastCheckedAt: z.string(),
+});
+export type HardinessContext = z.infer<typeof HardinessContext>;
+
 /** The whole enrichment payload returned by POST /api/live/enrich-plan. */
 export const LivePlanEnrichment = z.object({
   /** True only when REAL providers are configured; mock-only deployments report false. */
@@ -108,6 +123,7 @@ export const LivePlanEnrichment = z.object({
   weather: WeatherTiming.nullable().default(null),
   plantFacts: z.array(PlantFacts).default([]),
   invasive: z.array(InvasiveRisk).default([]),
+  hardiness: HardinessContext.nullable().default(null),
   disclaimer: z.string(),
 });
 export type LivePlanEnrichment = z.infer<typeof LivePlanEnrichment>;
