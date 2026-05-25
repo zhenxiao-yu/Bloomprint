@@ -36,6 +36,9 @@ export interface SupabaseSessionState {
   // Phone SMS OTP — dormant until an SMS provider is configured
   signInWithPhoneOtp: (phone: string) => Promise<Result>;
   verifyPhoneOtp: (phone: string, token: string) => Promise<Result>;
+  // Password management (signed-in change + signed-out reset email)
+  updatePassword: (newPassword: string) => Promise<Result>;
+  requestPasswordReset: (email: string) => Promise<Result>;
   signOut: () => Promise<void>;
 }
 
@@ -122,6 +125,22 @@ export function useSupabaseSession(): SupabaseSessionState {
     return { error: error?.message ?? null };
   }, []);
 
+  const updatePassword = useCallback(async (newPassword: string): Promise<Result> => {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) return NOT_CONFIGURED;
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    return { error: error?.message ?? null };
+  }, []);
+
+  const requestPasswordReset = useCallback(async (email: string): Promise<Result> => {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) return NOT_CONFIGURED;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${origin()}/auth/confirm`,
+    });
+    return { error: error?.message ?? null };
+  }, []);
+
   const signOut = useCallback(async () => {
     const supabase = getSupabaseBrowserClient();
     if (supabase) await supabase.auth.signOut();
@@ -140,6 +159,8 @@ export function useSupabaseSession(): SupabaseSessionState {
     signInWithGoogle,
     signInWithPhoneOtp,
     verifyPhoneOtp,
+    updatePassword,
+    requestPasswordReset,
     signOut,
   };
 }

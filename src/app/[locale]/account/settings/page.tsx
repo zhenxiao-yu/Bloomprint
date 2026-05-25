@@ -10,6 +10,8 @@ import { signOut, updateAccount, useAccount } from "@/lib/accountStore";
 import { accountSchema, type AccountFormValues } from "@/lib/accountForm";
 import { clearPlans, useSavedPlans } from "@/lib/plansStore";
 import { AccountAppSettings } from "@/components/AccountAppSettings";
+import { PreferencesCard } from "@/components/account/PreferencesCard";
+import { PasswordCard } from "@/components/account/PasswordCard";
 
 export default function SettingsPage() {
   const t = useTranslations("Settings");
@@ -97,6 +99,14 @@ export default function SettingsPage() {
       </form>
 
       <div className="mt-4">
+        <PreferencesCard />
+      </div>
+
+      <div className="mt-4">
+        <PasswordCard />
+      </div>
+
+      <div className="mt-4">
         <AccountAppSettings />
       </div>
 
@@ -112,7 +122,7 @@ export default function SettingsPage() {
             onClick={() => {
               if (confirm(t("clearConfirm"))) clearPlans();
             }}
-            className="rounded-full border border-border px-4 py-2 text-sm text-foreground transition hover:border-[var(--danger)]"
+            className="rounded-full border border-border px-4 py-2 text-sm text-foreground transition hover:border-danger"
           >
             {t("clearPlans")}
           </button>
@@ -123,7 +133,7 @@ export default function SettingsPage() {
                 router.push("/");
               }
             }}
-            className="rounded-full border border-border px-4 py-2 text-sm text-[var(--danger)] transition hover:border-[var(--danger)]"
+            className="rounded-full border border-border px-4 py-2 text-sm text-danger transition hover:border-danger"
           >
             {t("signOut")}
           </button>
