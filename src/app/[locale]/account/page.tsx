@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { initials, useAccount } from "@/lib/accountStore";
 import { useSavedPlans } from "@/lib/plansStore";
 import { CloudSyncCard } from "@/components/CloudSyncCard";
+import { ConnectAccountCard } from "@/components/account/ConnectAccountCard";
 import { BillingStatus } from "@/components/billing/BillingStatus";
 
 export default function AccountPage() {
@@ -70,6 +71,7 @@ export default function AccountPage() {
 
       <div className="mt-4 space-y-3">
         <CloudSyncCard />
+        <ConnectAccountCard />
         <BillingStatus />
       </div>
 
