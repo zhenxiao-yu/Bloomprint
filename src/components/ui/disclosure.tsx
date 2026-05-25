@@ -1,10 +1,14 @@
 "use client"
 
 import * as React from "react"
-import { Collapsible } from "@base-ui/react/collapsible"
 import { ChevronDown } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 
 export function Disclosure(props: {
   title: string
@@ -18,11 +22,11 @@ export function Disclosure(props: {
   const { title, summary, defaultOpen, badge, children } = props
 
   return (
-    <Collapsible.Root
+    <Collapsible
       defaultOpen={defaultOpen}
       className="rounded-xl border border-border bg-surface"
     >
-      <Collapsible.Trigger
+      <CollapsibleTrigger
         className={cn(
           "group/disclosure flex min-h-11 w-full items-center justify-between gap-3 px-4 py-3 text-left",
           "rounded-xl text-sm font-medium text-foreground"
@@ -43,13 +47,13 @@ export function Disclosure(props: {
           aria-hidden
           className={cn(
             "size-4 shrink-0 text-muted transition-transform duration-200 ease-(--ease-out-soft)",
-            "group-data-[panel-open]/disclosure:rotate-180"
+            "group-data-[state=open]/disclosure:rotate-180"
           )}
         />
-      </Collapsible.Trigger>
-      <Collapsible.Panel keepMounted className="bp-collapsible-panel">
+      </CollapsibleTrigger>
+      <CollapsibleContent className="bp-collapsible-panel">
         <div className="px-4 pb-4 text-sm text-foreground">{children}</div>
-      </Collapsible.Panel>
-    </Collapsible.Root>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }

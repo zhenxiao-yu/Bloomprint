@@ -69,6 +69,8 @@ export function mapPerenualToFacts(
 
 /** Cap on `species/details` calls per lookup — bounds free-tier rate-limit usage. */
 const MAX_DETAIL_ATTEMPTS = 3;
+/** Cap on distinct search queries (exact → base species → synonyms) — bounds outbound calls. */
+const MAX_SEARCH_QUERIES = 4;
 
 /**
  * Drop the cultivar so we can fall back from a gated cultivar record to its base species.
@@ -93,15 +95,18 @@ export function baseSpecies(scientificName: string): string | null {
 async function fetchPerenualFacts(
   scientificName: string,
   commonName?: string,
+  synonyms: string[] = [],
 ): Promise<PlantFacts | null> {
   const apiKey = process.env.PERENUAL_API_KEY;
   if (!apiKey) return null;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
-    const queries = [scientificName, baseSpecies(scientificName)].filter(
-      (q): q is string => Boolean(q),
-    );
+    // Exact name first, then base species, then USDA synonyms — deduped and capped so
+    // a missed cultivar can still resolve via a known alternate name without unbounded calls.
+    const queries = [...new Set([scientificName, baseSpecies(scientificName), ...synonyms])]
+      .filter((q): q is string => Boolean(q))
+      .slice(0, MAX_SEARCH_QUERIES);
     let attempts = 0;
     for (const query of queries) {
       const listRes = await fetch(
@@ -161,6 +166,7 @@ function mockFacts(scientificName: string, commonName?: string): PlantFacts {
 export async function getPlantFacts(
   scientificName: string,
   commonName?: string,
+  synonyms: string[] = [],
 ): Promise<CachedLiveData<PlantFacts> | null> {
   const key = `plant-facts:${scientificName.toLowerCase()}`;
   const cached = getCached<PlantFacts>(key);
@@ -168,7 +174,7 @@ export async function getPlantFacts(
   if (process.env.LIVE_DATA_PROVIDER === "perenual") {
     // Real provider configured: use live facts when we get them, otherwise return null.
     // We never fall back to the mock here — that would label fabricated wording as "live".
-    const live = await fetchPerenualFacts(scientificName, commonName);
+    const live = await fetchPerenualFacts(scientificName, commonName, synonyms);
     if (live) return setCached(key, live, getCachePolicy("plant-facts"), live.source);
     return null;
   }

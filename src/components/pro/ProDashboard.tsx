@@ -23,8 +23,29 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Link } from "@/i18n/navigation";
 import { Photo } from "@/components/ui/photo";
+import { Button } from "@/components/ui/button";
+import { MagicCard } from "@/components/ui/magic-card";
+import { NumberTicker } from "@/components/ui/number-ticker";
+import { BlurFade } from "@/components/ui/blur-fade";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 import { generateDeterministicPlan } from "@/domain/plan";
 import { getSavedPlan, useSavedPlans } from "@/lib/plansStore";
 import { encodeShare, SHARE_PARAM } from "@/lib/shareLink";
@@ -94,30 +115,58 @@ export function ProDashboard() {
     return (
       <main className="aurora mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-12 sm:px-6">
         <ProHeader onNewProject={() => setEditing("new")} />
-        <div className="card flex flex-col items-center gap-4 p-8 text-center">
-          <BriefcaseBusiness className="size-10 text-brand" aria-hidden />
-          <div>
-            <h2 className="text-xl font-semibold text-foreground">{t("emptyTitle")}</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-muted">{t("emptyBody")}</p>
-          </div>
-          <div className="flex flex-wrap justify-center gap-2">
-            <button
-              type="button"
-              onClick={() => setEditing("new")}
-              className="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
+        <BlurFade inView>
+          <div className="card overflow-hidden p-0">
+            <Photo
+              src="/photos/garden-path.jpg"
+              alt={t("emptyPhotoAlt")}
+              scrim
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="flex min-h-40 items-end"
             >
-              <Plus className="size-4" aria-hidden />
-              {t("addFirst")}
-            </button>
-            <button
-              type="button"
-              onClick={() => seedSampleWorkspace()}
-              className="rounded-full border border-border px-5 py-2.5 text-sm font-semibold transition hover:border-brand"
-            >
-              {t("loadSample")}
-            </button>
+              <div className="p-5">
+                <span className="glass-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-white">
+                  <BriefcaseBusiness className="size-3.5" aria-hidden />
+                  {t("eyebrow")}
+                </span>
+              </div>
+            </Photo>
+            <div className="flex flex-col items-center gap-5 p-6 text-center sm:p-8">
+              <div>
+                <h2 className="title-1 text-foreground">{t("emptyTitle")}</h2>
+                <p className="mx-auto mt-2 max-w-md text-sm text-muted">{t("emptyBody")}</p>
+              </div>
+              <div className="grid w-full gap-2 sm:grid-cols-3">
+                <OnboardStep n="1" title={t("onboard1Title")} body={t("onboard1Body")} />
+                <OnboardStep n="2" title={t("onboard2Title")} body={t("onboard2Body")} />
+                <OnboardStep n="3" title={t("onboard3Title")} body={t("onboard3Body")} />
+              </div>
+              <div className="flex flex-wrap justify-center gap-2">
+                <Button
+                  type="button"
+                  size="lg"
+                  onClick={() => setEditing("new")}
+                  className="rounded-full bg-brand text-on-strong hover:bg-brand-strong"
+                >
+                  <Plus className="size-4" aria-hidden />
+                  {t("addFirst")}
+                </Button>
+                <Button
+                  type="button"
+                  size="lg"
+                  variant="outline"
+                  className="rounded-full"
+                  onClick={() => {
+                    seedSampleWorkspace();
+                    toast.success(t("toastSampleLoaded"));
+                  }}
+                >
+                  {t("loadSample")}
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
+        </BlurFade>
         {editing ? (
           <ProjectDialog
             project={editing === "new" ? null : editing}
@@ -134,39 +183,37 @@ export function ProDashboard() {
       <ProHeader onNewProject={() => setEditing("new")} />
 
       <section className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={Layers} label={t("statActive")} value={String(stats.active)} />
-        <StatCard icon={FileCheck2} label={t("statAwaiting")} value={String(stats.awaitingApproval)} />
-        <StatCard icon={CalendarDays} label={t("statScheduled")} value={String(stats.scheduledSoon)} />
-        <StatCard icon={DollarSign} label={t("statPipeline")} value={money(stats.pipelineValue)} />
+        <StatCard icon={Layers} label={t("statActive")} hint={t("statActiveHint")} value={stats.active} tone="brand" />
+        <StatCard icon={FileCheck2} label={t("statAwaiting")} hint={t("statAwaitingHint")} value={stats.awaitingApproval} tone="accent" />
+        <StatCard icon={CalendarDays} label={t("statScheduled")} hint={t("statScheduledHint")} value={stats.scheduledSoon} tone="trust" />
+        <StatCard icon={DollarSign} label={t("statPipeline")} hint={t("statPipelineHint")} value={stats.pipelineValue} tone="blueprint" money />
       </section>
 
-      <div className="flex flex-wrap gap-1 rounded-full border border-border bg-surface p-1 text-sm">
-        {(
-          [
-            ["pipeline", t("tabPipeline"), BriefcaseBusiness],
-            ["clients", t("tabClients"), Users],
-            ["buylist", t("tabBuylist"), ClipboardList],
-          ] as [View, string, typeof Users][]
-        ).map(([key, label, Icon]) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setView(key)}
-            className={`inline-flex flex-1 items-center justify-center gap-2 rounded-full px-3 py-2 font-semibold transition ${
-              view === key ? "bg-brand text-on-strong" : "text-muted hover:text-foreground"
-            }`}
-          >
-            <Icon className="size-4" aria-hidden />
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {view === "pipeline" ? (
-        <PipelineBoard projects={projects} clients={clients} onOpen={setEditing} />
-      ) : null}
-      {view === "clients" ? <ClientsView clients={clients} projects={projects} /> : null}
-      {view === "buylist" ? <BuyListView projects={projects} /> : null}
+      <Tabs value={view} onValueChange={(v) => setView(v as View)}>
+        <TabsList className="grid w-full grid-cols-3 rounded-full bg-surface-muted p-1">
+          <TabsTrigger value="pipeline" className="rounded-full data-[state=active]:bg-brand data-[state=active]:text-on-strong">
+            <BriefcaseBusiness aria-hidden />
+            <span className="hidden sm:inline">{t("tabPipeline")}</span>
+          </TabsTrigger>
+          <TabsTrigger value="clients" className="rounded-full data-[state=active]:bg-brand data-[state=active]:text-on-strong">
+            <Users aria-hidden />
+            <span className="hidden sm:inline">{t("tabClients")}</span>
+          </TabsTrigger>
+          <TabsTrigger value="buylist" className="rounded-full data-[state=active]:bg-brand data-[state=active]:text-on-strong">
+            <ClipboardList aria-hidden />
+            <span className="hidden sm:inline">{t("tabBuylist")}</span>
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="pipeline" className="mt-4">
+          <PipelineBoard projects={projects} clients={clients} onOpen={setEditing} />
+        </TabsContent>
+        <TabsContent value="clients" className="mt-4">
+          <ClientsView clients={clients} projects={projects} />
+        </TabsContent>
+        <TabsContent value="buylist" className="mt-4">
+          <BuyListView projects={projects} />
+        </TabsContent>
+      </Tabs>
 
       <p className="flex items-center gap-2 text-xs text-muted">
         <CheckCircle2 className="size-3.5 text-brand" aria-hidden />
@@ -174,7 +221,10 @@ export function ProDashboard() {
         <button
           type="button"
           onClick={() => {
-            if (confirm(t("clearConfirm"))) clearProWorkspace();
+            if (confirm(t("clearConfirm"))) {
+              clearProWorkspace();
+              toast.success(t("toastWorkspaceCleared"));
+            }
           }}
           className="ml-auto rounded-full border border-border px-2 py-1 font-semibold text-muted transition hover:border-danger/40 hover:text-danger"
         >
@@ -196,51 +246,103 @@ export function ProDashboard() {
 function ProHeader({ onNewProject }: { onNewProject: () => void }) {
   const t = useTranslations("Pro");
   return (
-    <Photo
-      src="/photos/yard-lawn.jpg"
-      alt="A manicured lawn bordered by a modern fence"
-      priority
-      scrim
-      sizes="(max-width: 1152px) 100vw, 1152px"
-      className="flex min-h-52 rounded-3xl ring-1 ring-foreground/10"
-    >
-      <header className="mt-auto flex flex-col gap-3 p-5 sm:flex-row sm:items-end sm:justify-between sm:p-7">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-wide text-white/80">{t("eyebrow")}</p>
-          <h1 className="mt-1 text-3xl font-semibold text-white drop-shadow-sm sm:text-4xl">
-            {t("title")}
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-white/85">{t("subtitle")}</p>
-        </div>
-        <button
-          type="button"
-          onClick={onNewProject}
-          className="inline-flex shrink-0 items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
-        >
-          <Plus className="size-4" aria-hidden />
-          {t("newProject")}
-        </button>
-      </header>
-    </Photo>
+    <BlurFade inView>
+      <Photo
+        src="/photos/yard-lawn.jpg"
+        alt="A manicured lawn bordered by a modern fence"
+        priority
+        scrim
+        sizes="(max-width: 1152px) 100vw, 1152px"
+        className="relative flex min-h-56 rounded-3xl ring-1 ring-foreground/10"
+      >
+        <BorderBeam
+          size={140}
+          duration={9}
+          colorFrom="var(--brand)"
+          colorTo="var(--accent)"
+          className="opacity-70"
+        />
+        <header className="mt-auto flex flex-col gap-3 p-5 sm:flex-row sm:items-end sm:justify-between sm:p-7">
+          <div>
+            <span className="glass-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+              <BriefcaseBusiness className="size-3.5" aria-hidden />
+              {t("eyebrow")}
+            </span>
+            <h1 className="display-lg mt-2 text-white drop-shadow-sm">{t("title")}</h1>
+            <p className="lead mt-2 max-w-2xl text-white/85">{t("subtitle")}</p>
+          </div>
+          <Button
+            type="button"
+            size="lg"
+            onClick={onNewProject}
+            className="shrink-0 rounded-full bg-brand text-on-strong hover:bg-brand-strong"
+          >
+            <Plus className="size-4" aria-hidden />
+            {t("newProject")}
+          </Button>
+        </header>
+      </Photo>
+    </BlurFade>
   );
 }
+
+const STAT_TONE: Record<string, string> = {
+  brand: "bg-brand-soft text-brand-strong",
+  trust: "bg-[var(--trust)]/15 text-[var(--trust)]",
+  accent: "bg-[var(--accent)]/15 text-[var(--accent)]",
+  blueprint: "bg-[var(--blueprint)]/15 text-[var(--blueprint)]",
+};
 
 function StatCard({
   icon: Icon,
   label,
+  hint,
   value,
+  tone,
+  money: isMoney = false,
 }: {
   icon: typeof Users;
   label: string;
-  value: string;
+  hint: string;
+  value: number;
+  tone: keyof typeof STAT_TONE;
+  money?: boolean;
 }) {
   return (
-    <div className="card hover-lift p-4">
-      <span className="mb-2 flex size-9 items-center justify-center rounded-full bg-brand-soft text-brand">
-        <Icon className="size-5" aria-hidden />
+    <MagicCard className="card hover-lift h-full rounded-xl" gradientOpacity={0.12}>
+      <div className="flex h-full flex-col p-4 sm:p-5">
+        <div className="flex items-start justify-between">
+          <span className={`flex size-9 items-center justify-center rounded-full ${STAT_TONE[tone]}`}>
+            <Icon className="size-5" aria-hidden />
+          </span>
+          <Tooltip>
+            <TooltipTrigger
+              className="-m-2 rounded-full p-2 text-muted transition hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+              aria-label={hint}
+            >
+              <Info className="size-4" aria-hidden />
+            </TooltipTrigger>
+            <TooltipContent className="max-w-56">{hint}</TooltipContent>
+          </Tooltip>
+        </div>
+        <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-muted">{label}</p>
+        <span className="numeric mt-1 inline-flex items-baseline text-3xl font-semibold text-foreground">
+          {isMoney ? "$" : ""}
+          <NumberTicker value={value} className="numeric text-3xl font-semibold !text-foreground" />
+        </span>
+      </div>
+    </MagicCard>
+  );
+}
+
+function OnboardStep({ n, title, body }: { n: string; title: string; body: string }) {
+  return (
+    <div className="rounded-xl border border-border bg-surface-muted/50 p-3 text-left">
+      <span className="flex size-7 items-center justify-center rounded-full bg-brand text-xs font-semibold text-on-strong">
+        {n}
       </span>
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-foreground">{value}</p>
+      <p className="mt-2 text-sm font-semibold text-foreground">{title}</p>
+      <p className="mt-0.5 text-xs text-muted">{body}</p>
     </div>
   );
 }
@@ -341,10 +443,18 @@ function ProjectCard({
   );
 }
 
+const CLIENTS_PER_PAGE = 9;
+
 function ClientsView({ clients, projects }: { clients: ProClient[]; projects: ProProject[] }) {
   const t = useTranslations("Pro");
   const [name, setName] = useState("");
+  const [page, setPage] = useState(1);
   const countFor = (id: string) => projects.filter((p) => p.clientId === id).length;
+
+  const pageCount = Math.max(1, Math.ceil(clients.length / CLIENTS_PER_PAGE));
+  const safePage = Math.min(page, pageCount);
+  const pageClients = clients.slice((safePage - 1) * CLIENTS_PER_PAGE, safePage * CLIENTS_PER_PAGE);
+
   return (
     <section className="flex flex-col gap-3">
       <form
@@ -352,6 +462,7 @@ function ClientsView({ clients, projects }: { clients: ProClient[]; projects: Pr
           e.preventDefault();
           if (name.trim()) {
             addClient({ name });
+            toast.success(t("toastClientAdded", { name: name.trim() }));
             setName("");
           }
         }}
@@ -364,31 +475,74 @@ function ClientsView({ clients, projects }: { clients: ProClient[]; projects: Pr
           aria-label={t("addClientPlaceholder")}
           className="min-w-0 flex-1 rounded-full border border-border bg-surface px-4 py-2 text-sm text-foreground"
         />
-        <button
-          type="submit"
-          className="inline-flex items-center gap-1 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
-        >
+        <Button type="submit" className="rounded-full bg-brand text-on-strong hover:bg-brand-strong">
           <Plus className="size-4" aria-hidden />
           {t("addClientBtn")}
-        </button>
+        </Button>
       </form>
       {clients.length === 0 ? (
         <p className="rounded-xl border border-dashed border-border p-4 text-center text-sm text-muted">
           {t("noClients")}
         </p>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {clients.map((client) => (
-            <div key={client.id} className="card hover-lift p-4">
-              <p className="text-sm font-semibold text-foreground">{client.name}</p>
-              {client.email ? <p className="mt-0.5 text-xs text-muted">{client.email}</p> : null}
-              {client.phone ? <p className="text-xs text-muted">{client.phone}</p> : null}
-              <p className="mt-2 text-xs font-medium text-brand-strong">
-                {t("clientProjects", { count: countFor(client.id) })}
-              </p>
-            </div>
-          ))}
-        </div>
+        <>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {pageClients.map((client, i) => (
+              <BlurFade key={client.id} inView delay={0.04 * i} className="flex">
+                <div className="card hover-lift flex w-full flex-col p-4">
+                  <p className="text-sm font-semibold text-foreground">{client.name}</p>
+                  {client.email ? <p className="mt-0.5 text-xs text-muted">{client.email}</p> : null}
+                  {client.phone ? <p className="text-xs text-muted">{client.phone}</p> : null}
+                  <p className="mt-2 text-xs font-medium text-brand-strong">
+                    {t("clientProjects", { count: countFor(client.id) })}
+                  </p>
+                </div>
+              </BlurFade>
+            ))}
+          </div>
+          {pageCount > 1 ? (
+            <Pagination className="mt-2">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    aria-disabled={safePage <= 1}
+                    className={safePage <= 1 ? "pointer-events-none opacity-50" : ""}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPage((p) => Math.max(1, p - 1));
+                    }}
+                  />
+                </PaginationItem>
+                {Array.from({ length: pageCount }, (_, idx) => idx + 1).map((p) => (
+                  <PaginationItem key={p}>
+                    <PaginationLink
+                      href="#"
+                      isActive={p === safePage}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setPage(p);
+                      }}
+                    >
+                      {p}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    aria-disabled={safePage >= pageCount}
+                    className={safePage >= pageCount ? "pointer-events-none opacity-50" : ""}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setPage((p) => Math.min(pageCount, p + 1));
+                    }}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          ) : null}
+        </>
       )}
     </section>
   );
@@ -424,7 +578,10 @@ function BuyListView({ projects }: { projects: ProProject[] }) {
     const text = items
       .map((i) => `${i.quantity} ${i.unit} — ${i.name} (${money(i.priceMin)}–${money(i.priceMax)})`)
       .join("\n");
-    void navigator.clipboard?.writeText(text).catch(() => undefined);
+    navigator.clipboard
+      ?.writeText(text)
+      .then(() => toast.success(t("toastBuyCopied")))
+      .catch(() => toast.error(t("toastBuyCopyError")));
   }
 
   if (items.length === 0) {

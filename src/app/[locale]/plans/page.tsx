@@ -4,12 +4,14 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { BloomprintPlan } from "@/domain/models";
-import { deletePlan, renamePlan, useSavedPlans, type SavedPlan } from "@/lib/plansStore";
+import { deletePlan, useSavedPlans, type SavedPlan } from "@/lib/plansStore";
 import { SavedPlans } from "@/components/SavedPlans";
 import { CompareView } from "@/components/CompareView";
 import { SyncStatusBadge } from "@/components/SyncStatusBadge";
 import { trackEvent } from "@/lib/analytics";
 import { readApiError } from "@/lib/apiError";
+import { Button } from "@/components/ui/button";
+import { GitCompare } from "lucide-react";
 
 type Entry = { label: string; plan: BloomprintPlan };
 
@@ -45,15 +47,16 @@ export default function PlansPage() {
     );
   }
 
-  function rename(id: string) {
-    const current = plans.find((p) => p.id === id);
-    const label = window.prompt(t("renamePrompt"), current?.label ?? "");
-    if (label && label.trim()) renamePlan(id, label.trim());
+  // Rename writes + toasts inside SavedPlans (via a Dialog); here we just drop any
+  // stale comparison so the renamed label re-renders cleanly.
+  function rename() {
+    setComparison(null);
   }
 
   function remove(id: string) {
     deletePlan(id);
     setSelected((prev) => prev.filter((x) => x !== id));
+    setComparison(null);
   }
 
   async function compare() {
@@ -91,20 +94,21 @@ export default function PlansPage() {
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="text-2xl font-semibold text-foreground">{t("title")}</h1>
+        <h1 className="display-lg text-foreground">{t("title")}</h1>
         <SyncStatusBadge />
       </div>
-      <p className="mt-1 text-sm text-muted">{t("subtitle")}</p>
+      <p className="lead mt-1 text-muted">{t("subtitle")}</p>
 
       {plans.length >= 2 ? (
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <button
+          <Button
             onClick={compare}
             disabled={selected.length < 2 || busy}
-            className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
+            className="rounded-full bg-brand text-on-strong hover:bg-brand-strong"
           >
+            <GitCompare className="size-4" aria-hidden />
             {busy ? t("comparing") : t("compareSelected", { count: selected.length })}
-          </button>
+          </Button>
           {error ? <span className="text-xs text-[var(--danger)]">{error}</span> : null}
         </div>
       ) : null}

@@ -12,6 +12,7 @@ import { getHardinessZone, isUsZip, parseZoneNumber, plantsOutOfZone } from "@/l
 import { getInvasiveRisk } from "@/lib/live-data/invasive";
 import { getPlantFacts } from "@/lib/live-data/plantFacts";
 import { getRetailerMatches } from "@/lib/live-data/retailer";
+import { getPlantSynonymTerms } from "@/lib/live-data/synonyms";
 import { getWeatherContext } from "@/lib/live-data/weather";
 import {
   type EnrichPlanRequest,
@@ -92,7 +93,9 @@ export async function getLiveEnrichment(req: EnrichPlanRequest): Promise<LivePla
       const record = getPlant(plant.plantId);
       const scientificName = record?.botanicalName ?? plant.commonName ?? plant.plantId;
       const commonName = record?.commonName ?? plant.commonName;
-      const facts = await getPlantFacts(scientificName, commonName);
+      // USDA botanical synonyms widen the live-API search so a missed cultivar still resolves.
+      const synonyms = getPlantSynonymTerms(plant.plantId);
+      const facts = await getPlantFacts(scientificName, commonName, synonyms);
       if (facts) plantFacts.push(facts.value);
       const risk = await getInvasiveRisk(scientificName, Boolean(record?.invasive), commonName);
       if (risk) invasive.push(risk.value);

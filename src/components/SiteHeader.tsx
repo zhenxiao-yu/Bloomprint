@@ -2,11 +2,28 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { motion } from "motion/react";
+import { ChevronDown, LogOut, Settings, UserRound } from "lucide-react";
+
 import { initials, signOut, useAccount } from "@/lib/accountStore";
 import { Link, usePathname } from "@/i18n/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { SyncStatusBadge } from "@/components/SyncStatusBadge";
+import { BorderBeam } from "@/components/ui/border-beam";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const NAV = [
   { href: "/dashboard", key: "dashboard" },
@@ -35,25 +52,34 @@ export function SiteHeader() {
 
   return (
     <header
-      className={`sticky top-0 z-30 border-b backdrop-blur-xl transition-[background-color,box-shadow,border-color] duration-300 ${
+      className={`no-print sticky top-0 z-30 border-b backdrop-blur-xl transition-[background-color,box-shadow,border-color] duration-300 ${
         scrolled
-          ? "border-border bg-surface/80 shadow-[0_8px_30px_-18px_rgba(0,0,0,0.45)]"
-          : "border-transparent bg-surface/60"
+          ? "border-border bg-surface/80 shadow-[0_10px_34px_-20px_color-mix(in_srgb,var(--brand-strong)_70%,transparent)]"
+          : "border-transparent bg-surface/55"
       }`}
     >
+      {/* Hairline brand gradient that brightens once the bar lifts off content. */}
+      <span
+        aria-hidden
+        className={`pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-brand/50 to-transparent transition-opacity duration-300 ${
+          scrolled ? "opacity-100" : "opacity-0"
+        }`}
+      />
+
       <div className="mx-auto flex h-14 w-full max-w-5xl items-center gap-3 px-4 sm:px-6">
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-2 font-semibold text-brand transition active:scale-95"
+          className="group flex shrink-0 items-center gap-2 rounded-full font-display font-semibold text-brand outline-none transition focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface active:scale-95"
         >
-          <span className="flex size-8 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-strong text-xs font-bold text-on-strong shadow-sm">
+          <span className="relative flex size-8 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-brand to-brand-strong text-xs font-bold text-on-strong shadow-sm transition group-hover:shadow-[0_6px_18px_-6px_color-mix(in_srgb,var(--brand-strong)_80%,transparent)]">
+            <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
             BP
           </span>
-          <span className="text-base">Bloomprint</span>
+          <span className="title-3 text-base tracking-tight">Bloomprint</span>
         </Link>
 
         {/* Primary nav is hidden on mobile — the fixed bottom MobileNav carries it there. */}
-        <nav className="ml-2 hidden items-center gap-1 text-sm sm:flex">
+        <nav className="ml-2 hidden items-center gap-0.5 text-sm sm:flex">
           {NAV.map((n) => {
             const href = n.href as string;
             const active = pathname === href || pathname.startsWith(`${href}/`);
@@ -62,10 +88,19 @@ export function SiteHeader() {
                 key={n.href}
                 href={n.href}
                 aria-current={active ? "page" : undefined}
-                className={`shrink-0 rounded-full px-2.5 py-1.5 transition sm:px-3 ${
-                  active ? "bg-brand-soft text-brand-strong" : "text-muted hover:text-foreground"
+                className={`group relative shrink-0 rounded-full px-3 py-1.5 font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand/50 ${
+                  active ? "text-brand-strong" : "text-muted hover:text-foreground"
                 }`}
               >
+                {active ? (
+                  <motion.span
+                    layoutId="nav-active-pill"
+                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                    className="absolute inset-0 -z-10 rounded-full bg-brand-soft"
+                  />
+                ) : (
+                  <span className="absolute inset-0 -z-10 scale-90 rounded-full bg-foreground/[0.04] opacity-0 transition group-hover:scale-100 group-hover:opacity-100" />
+                )}
                 {t(n.key)}
               </Link>
             );
@@ -79,35 +114,73 @@ export function SiteHeader() {
           <LanguageSwitch />
           <ThemeToggle />
           {account ? (
-            <details className="group relative">
-              <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-border py-1 pl-1 pr-3 transition hover:border-brand">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-xs font-semibold text-on-strong">
-                  {initials(account.name) || "🌱"}
-                </span>
-                <span className="hidden max-w-[8rem] truncate text-sm text-foreground sm:inline">{account.name}</span>
-              </summary>
-              <div className="absolute right-0 mt-2 w-44 overflow-hidden rounded-xl border border-border bg-surface shadow-lg">
-                <Link href="/account" className="block px-4 py-2 text-sm text-foreground hover:bg-brand-soft">
-                  {t("account")}
-                </Link>
-                <Link href="/account/settings" className="block px-4 py-2 text-sm text-foreground hover:bg-brand-soft">
-                  {t("settings")}
-                </Link>
-                <button
-                  onClick={() => signOut()}
-                  className="block w-full px-4 py-2 text-left text-sm text-danger hover:bg-brand-soft"
+            <DropdownMenu>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger
+                    aria-label={t("account")}
+                    className="group flex cursor-pointer list-none items-center gap-2 rounded-full border border-border py-1 pl-1 pr-2.5 outline-none transition hover:border-brand focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface data-[state=open]:border-brand"
+                  >
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-strong text-xs font-semibold text-on-strong">
+                      {initials(account.name) || "🌱"}
+                    </span>
+                    <span className="hidden max-w-[8rem] truncate text-sm font-medium text-foreground sm:inline">
+                      {account.name}
+                    </span>
+                    <ChevronDown
+                      className="hidden size-3.5 text-muted transition-transform duration-200 group-data-[state=open]:rotate-180 sm:block"
+                      aria-hidden
+                    />
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">{t("account")}</TooltipContent>
+              </Tooltip>
+              <DropdownMenuContent align="end" sideOffset={8} className="w-52 rounded-xl border-border bg-surface/95 backdrop-blur-xl">
+                <DropdownMenuLabel className="flex flex-col gap-0.5">
+                  <span className="truncate text-sm font-semibold text-foreground">{account.name}</span>
+                  <span className="eyebrow text-muted">Bloomprint</span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild className="cursor-pointer gap-2.5 rounded-lg">
+                  <Link href="/account">
+                    <UserRound className="size-4" aria-hidden />
+                    {t("account")}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer gap-2.5 rounded-lg">
+                  <Link href="/account/settings">
+                    <Settings className="size-4" aria-hidden />
+                    {t("settings")}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  variant="destructive"
+                  onSelect={() => signOut()}
+                  className="cursor-pointer gap-2.5 rounded-lg"
                 >
+                  <LogOut className="size-4" aria-hidden />
                   {t("signOut")}
-                </button>
-              </div>
-            </details>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <Link
               href="/signup"
-              className="rounded-full bg-brand px-3 py-1.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong sm:px-4"
+              className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-brand to-brand-strong px-3.5 py-1.5 text-sm font-semibold text-on-strong shadow-[0_8px_22px_-12px_color-mix(in_srgb,var(--brand-strong)_85%,transparent)] outline-none transition hover:shadow-[0_12px_28px_-12px_color-mix(in_srgb,var(--brand-strong)_85%,transparent)] focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface active:scale-[0.97] sm:px-4"
             >
-              <span className="sm:hidden">{t("me")}</span>
-              <span className="hidden sm:inline">{t("createAccount")}</span>
+              {/* Subtle sheen sweep on hover keeps the CTA lively without being garish. */}
+              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+              <span className="relative sm:hidden">{t("me")}</span>
+              <span className="relative hidden sm:inline">{t("createAccount")}</span>
+              <BorderBeam
+                size={56}
+                duration={5}
+                borderWidth={1.4}
+                colorFrom="color-mix(in srgb, var(--on-strong) 90%, transparent)"
+                colorTo="color-mix(in srgb, var(--brand-soft) 70%, transparent)"
+                className="opacity-70"
+              />
             </Link>
           )}
         </div>

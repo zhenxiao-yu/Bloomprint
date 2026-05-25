@@ -10,6 +10,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { MobileNav } from "@/components/MobileNav";
 import { PwaClient } from "@/components/PwaClient";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
@@ -110,12 +112,15 @@ export default async function LocaleLayout({
       <body className="flex min-h-full flex-col pb-16 sm:pb-0" suppressHydrationWarning>
         <NextIntlClientProvider>
           <ThemeProvider>
-            <SiteHeader />
-            <PwaClient />
-            <div className="flex flex-1 flex-col">{children}</div>
-            <SiteFooter />
-            <MobileNav />
-            <Analytics />
+            <TooltipProvider delayDuration={200}>
+              <SiteHeader />
+              <PwaClient />
+              <div className="flex flex-1 flex-col">{children}</div>
+              <SiteFooter />
+              <MobileNav />
+              <Toaster />
+              <Analytics />
+            </TooltipProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
