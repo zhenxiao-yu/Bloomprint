@@ -1,0 +1,291 @@
+{
+  "emerald-cedar": {
+    "usageKey": 2684178,
+    "canonicalName": "Thuja occidentalis",
+    "family": "Cupressaceae",
+    "establishmentMeans": [
+      "introduced",
+      "managed",
+      "native"
+    ]
+  },
+  "green-velvet-boxwood": {
+    "usageKey": 2984666,
+    "canonicalName": "Buxus",
+    "family": "Buxaceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
+  },
+  "dwarf-mugo-pine": {
+    "usageKey": 5285385,
+    "canonicalName": "Pinus mugo",
+    "family": "Pinaceae",
+    "establishmentMeans": [
+      "introduced",
+      "native"
+    ]
+  },
+  "blue-star-juniper": {
+    "usageKey": 2684690,
+    "canonicalName": "Juniperus squamata",
+    "family": "Cupressaceae",
+    "establishmentMeans": [
+      "introduced",
+      "native"
+    ]
+  },
+  "hicks-yew": {
+    "usageKey": 6420771,
+    "canonicalName": "Taxus media",
+    "family": "Taxaceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
+  },
+  "inkberry-holly": {
+    "usageKey": 5414266,
+    "canonicalName": "Ilex glabra",
+    "family": "Aquifoliaceae",
+    "establishmentMeans": [
+      "native"
+    ]
+  },
+  "limelight-hydrangea": {
+    "usageKey": 2985995,
+    "canonicalName": "Hydrangea paniculata",
+    "family": "Hydrangeaceae",
+    "establishmentMeans": [
+      "introduced",
+      "managed",
+      "native"
+    ]
+  },
+  "endless-summer-hydrangea": {
+    "usageKey": 2985994,
+    "canonicalName": "Hydrangea macrophylla",
+    "family": "Hydrangeaceae",
+    "establishmentMeans": [
+      "introduced",
+      "managed",
+      "naturalised"
+    ]
+  },
+  "goldflame-spirea": {
+    "usageKey": 8170635,
+    "canonicalName": "Spiraea japonica",
+    "family": "Rosaceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
+  },
+  "diabolo-ninebark": {
+    "usageKey": 2988354,
+    "canonicalName": "Physocarpus opulifolius",
+    "family": "Rosaceae",
+    "establishmentMeans": [
+      "introduced",
+      "native"
+    ]
+  },
+  "red-twig-dogwood": {
+    "usageKey": 3082244,
+    "canonicalName": "Cornus sericea",
+    "family": "Cornaceae",
+    "establishmentMeans": [
+      "introduced",
+      "native"
+    ]
+  },
+  "potentilla": {
+    "usageKey": 7740434,
+    "canonicalName": "Potentilla fruticosa",
+    "family": "Rosaceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
+  },
+  "wine-and-roses-weigela": {
+    "usageKey": 2888730,
+    "canonicalName": "Weigela florida",
+    "family": "Caprifoliaceae",
+    "establishmentMeans": [
+      "introduced",
+      "managed"
+    ]
+  },
+  "dwarf-korean-lilac": {
+    "usageKey": 6433189,
+    "canonicalName": "Syringa meyeri",
+    "family": "Oleaceae",
+    "establishmentMeans": []
+  },
+  "rose-of-sharon": {
+    "usageKey": 3152583,
+    "canonicalName": "Hibiscus syriacus",
+    "family": "Malvaceae",
+    "establishmentMeans": [
+      "introduced",
+      "managed"
+    ]
+  },
+  "karl-foerster-grass": {
+    "usageKey": 4127011,
+    "canonicalName": "Calamagrostis acutiflora",
+    "family": "Poaceae",
+    "establishmentMeans": []
+  },
+  "little-bluestem": {
+    "usageKey": 2704432,
+    "canonicalName": "Schizachyrium scoparium",
+    "family": "Poaceae",
+    "establishmentMeans": []
+  },
+  "hakone-grass": {
+    "usageKey": 4125185,
+    "canonicalName": "Hakonechloa macra",
+    "family": "Poaceae",
+    "establishmentMeans": [
+      "introduced",
+      "managed"
+    ]
+  },
+  "blue-fescue": {
+    "usageKey": 2705031,
+    "canonicalName": "Festuca glauca",
+    "family": "Poaceae",
+    "establishmentMeans": [
+      "introduced",
+      "managed"
+    ]
+  },
+  "catmint": {
+    "usageKey": 2927325,
+    "canonicalName": "Nepeta",
+    "family": "Lamiaceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
+  },
+  "coneflower": {
+    "usageKey": 3150935,
+    "canonicalName": "Echinacea purpurea",
+    "family": "Asteraceae",
+    "establishmentMeans": [
+      "introduced",
+      "native",
+      "uncertain"
+    ]
+  },
+  "black-eyed-susan": {
+    "usageKey": 7344766,
+    "canonicalName": "Rudbeckia fulgida",
+    "family": "Asteraceae",
+    "establishmentMeans": [
+      "introduced",
+      "native",
+      "uncertain"
+    ]
+  },
+  "stella-daylily": {
+    "usageKey": 2752065,
+    "canonicalName": "Hemerocallis",
+    "family": "Liliaceae",
+    "establishmentMeans": []
+  },
+  "patriot-hosta": {
+    "usageKey": 7707728,
+    "canonicalName": "Tracheophyta",
+    "establishmentMeans": []
+  },
+  "russian-sage": {
+    "usageKey": 10801424,
+    "canonicalName": "Salvia yangii",
+    "family": "Lamiaceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
+  },
+  "astilbe": {
+    "usageKey": 3755232,
+    "canonicalName": "Astilbe chinensis",
+    "family": "Saxifragaceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
+  },
+  "coral-bells": {
+    "usageKey": 3032645,
+    "canonicalName": "Heuchera",
+    "family": "Saxifragaceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
+  },
+  "creeping-juniper": {
+    "usageKey": 2684410,
+    "canonicalName": "Juniperus horizontalis",
+    "family": "Cupressaceae",
+    "establishmentMeans": [
+      "introduced",
+      "managed",
+      "native"
+    ]
+  },
+  "brandon-cedar": {
+    "usageKey": 2684178,
+    "canonicalName": "Thuja occidentalis",
+    "family": "Cupressaceae",
+    "establishmentMeans": [
+      "introduced",
+      "managed",
+      "native"
+    ]
+  },
+  "dwarf-alberta-spruce": {
+    "usageKey": 5284745,
+    "canonicalName": "Picea glauca",
+    "family": "Pinaceae",
+    "establishmentMeans": [
+      "introduced",
+      "invasive",
+      "native"
+    ]
+  },
+  "munstead-lavender": {
+    "usageKey": 2927305,
+    "canonicalName": "Lavandula angustifolia",
+    "family": "Lamiaceae",
+    "establishmentMeans": [
+      "introduced",
+      "invasive",
+      "managed"
+    ]
+  },
+  "autumn-joy-sedum": {
+    "usageKey": 2985862,
+    "canonicalName": "Hylotelephium",
+    "family": "Crassulaceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
+  },
+  "creeping-phlox": {
+    "usageKey": 2927727,
+    "canonicalName": "Phlox subulata",
+    "family": "Polemoniaceae",
+    "establishmentMeans": [
+      "introduced",
+      "native"
+    ]
+  },
+  "ostrich-fern": {
+    "usageKey": 2650999,
+    "canonicalName": "Matteuccia struthiopteris",
+    "family": "Onocleaceae",
+    "establishmentMeans": [
+      "introduced",
+      "native"
+    ]
+  }
+}

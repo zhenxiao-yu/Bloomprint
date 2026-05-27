@@ -1,0 +1,171 @@
+{
+  "emerald-cedar": {
+    "accepted": "Thuja occidentalis",
+    "synonyms": []
+  },
+  "dwarf-mugo-pine": {
+    "accepted": "Pinus mugo",
+    "synonyms": [
+      "Pinus montana"
+    ]
+  },
+  "blue-star-juniper": {
+    "accepted": "Juniperus squamata",
+    "synonyms": []
+  },
+  "hicks-yew": {
+    "accepted": "Taxus ×media",
+    "synonyms": []
+  },
+  "inkberry-holly": {
+    "accepted": "Ilex glabra",
+    "synonyms": []
+  },
+  "limelight-hydrangea": {
+    "accepted": "Hydrangea paniculata",
+    "synonyms": []
+  },
+  "endless-summer-hydrangea": {
+    "accepted": "Hydrangea macrophylla",
+    "synonyms": []
+  },
+  "goldflame-spirea": {
+    "accepted": "Spiraea japonica",
+    "synonyms": [
+      "Spiraea bullata"
+    ]
+  },
+  "diabolo-ninebark": {
+    "accepted": "Physocarpus opulifolius",
+    "synonyms": [
+      "Opulaster alabamensis",
+      "Opulaster australis",
+      "Opulaster intermedius",
+      "Opulaster opulifolius",
+      "Opulaster stellatus",
+      "Physocarpus intermedius",
+      "Spiraea opulifolia"
+    ]
+  },
+  "red-twig-dogwood": {
+    "accepted": "Cornus sericea",
+    "synonyms": [
+      "Cornus alba",
+      "Cornus baileyi",
+      "Cornus instolonea",
+      "Cornus interior",
+      "Cornus occidentalis",
+      "Cornus stolonifera",
+      "Cornus ×californica",
+      "Swida instolonea"
+    ]
+  },
+  "wine-and-roses-weigela": {
+    "accepted": "Weigela florida",
+    "synonyms": [
+      "Diervilla florida"
+    ]
+  },
+  "dwarf-korean-lilac": {
+    "accepted": "Syringa meyeri",
+    "synonyms": []
+  },
+  "rose-of-sharon": {
+    "accepted": "Hibiscus syriacus",
+    "synonyms": []
+  },
+  "karl-foerster-grass": {
+    "accepted": "Calamagrostis ×acutiflora",
+    "synonyms": [
+      "Calamagrostis ×acutifolia"
+    ]
+  },
+  "little-bluestem": {
+    "accepted": "Schizachyrium scoparium",
+    "synonyms": [
+      "Andropogon divergens",
+      "Andropogon praematurus",
+      "Andropogon scoparius",
+      "Andropogon stolonifer",
+      "Schizachyrium praematurum",
+      "Schizachyrium stoloniferum"
+    ]
+  },
+  "hakone-grass": {
+    "accepted": "Hakonechloa macra",
+    "synonyms": [
+      "Phragmites macer"
+    ]
+  },
+  "blue-fescue": {
+    "accepted": "Festuca arvernensis",
+    "synonyms": [
+      "Festuca arvernensis",
+      "Festuca ovina"
+    ]
+  },
+  "coneflower": {
+    "accepted": "Echinacea purpurea",
+    "synonyms": [
+      "Brauneria purpurea",
+      "Rudbeckia purpurea"
+    ]
+  },
+  "black-eyed-susan": {
+    "accepted": "Rudbeckia fulgida",
+    "synonyms": [
+      "Rudbeckia acuminata",
+      "Rudbeckia chapmanii",
+      "Rudbeckia deamii",
+      "Rudbeckia foliosa",
+      "Rudbeckia gloriosa",
+      "Rudbeckia palustris",
+      "Rudbeckia spathulata",
+      "Rudbeckia speciosa"
+    ]
+  },
+  "creeping-juniper": {
+    "accepted": "Juniperus horizontalis",
+    "synonyms": [
+      "Juniperus hudsonica",
+      "Juniperus prostrata",
+      "Juniperus repens",
+      "Juniperus virginiana",
+      "Sabina horizontalis",
+      "Sabina prostrata"
+    ]
+  },
+  "brandon-cedar": {
+    "accepted": "Thuja occidentalis",
+    "synonyms": []
+  },
+  "dwarf-alberta-spruce": {
+    "accepted": "Picea glauca",
+    "synonyms": [
+      "Picea canadensis"
+    ]
+  },
+  "munstead-lavender": {
+    "accepted": "Lavandula angustifolia",
+    "synonyms": [
+      "Lavandula officinalis",
+      "Lavandula spica",
+      "Lavandula vera"
+    ]
+  },
+  "creeping-phlox": {
+    "accepted": "Phlox subulata",
+    "synonyms": [
+      "Phlox brittonii"
+    ]
+  },
+  "ostrich-fern": {
+    "accepted": "Matteuccia struthiopteris",
+    "synonyms": [
+      "Matteuccia pensylvanica",
+      "Onoclea struthiopteris",
+      "Pteretis nodulosa",
+      "Pteretis pensylvanica"
+    ]
+  }
+}

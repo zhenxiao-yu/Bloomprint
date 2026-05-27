@@ -7,18 +7,20 @@
  */
 import { NextResponse } from "next/server";
 import { clientIp, rateLimit } from "@/lib/rateLimit";
-import { getLiveEnrichment, realProvidersConfigured } from "@/lib/live-data";
+import { getLiveEnrichment, freeDataEnrichmentEnabled } from "@/lib/live-data";
 import { EnrichPlanRequest, LIVE_DISCLAIMER } from "@/lib/live-data/schema";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
 export async function GET() {
-  return NextResponse.json({ enabled: realProvidersConfigured() });
+  return NextResponse.json({ enabled: freeDataEnrichmentEnabled() });
 }
 
 export async function POST(request: Request) {
-  const rl = rateLimit(`${clientIp(request)}:live`, 30, 60_000);
+  // Generous: enrichment now runs on free, key-free sources, prefetched + Vercel-Data-Cache
+  // backed, so the cost is near-zero and the real protection is caching, not this limiter.
+  const rl = rateLimit(`${clientIp(request)}:live`, 60, 60_000);
   if (!rl.ok) {
     return NextResponse.json(
       { error: "Too many live-data requests — please wait a moment." },

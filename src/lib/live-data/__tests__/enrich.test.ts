@@ -15,7 +15,7 @@ describe("getLiveEnrichment — mock-first, honest enrichment", () => {
   it("returns a schema-valid payload that reports real providers as off", async () => {
     const out = await getLiveEnrichment(sample);
     expect(() => LivePlanEnrichment.parse(out)).not.toThrow();
-    expect(out.enabled).toBe(false); // mock-only deployment
+    expect(out.enabled).toBe(true); // free, key-free enrichment is on by default
     expect(out.disclaimer).toMatch(/verify/i);
   });
 
@@ -45,10 +45,11 @@ describe("getLiveEnrichment — mock-first, honest enrichment", () => {
     expect(mulch?.priceRange).toBeNull();
   });
 
-  it("lights up weather timing, plant facts, and an invasive caution (quiet when not flagged)", async () => {
+  it("lights up deterministic weather timing + an invasive caution; care facts stay in the Core Library", async () => {
     const out = await getLiveEnrichment(sample);
     expect(out.weather).not.toBeNull();
-    expect(out.plantFacts.length).toBeGreaterThan(0);
+    // No free live care provider — care facts come from the Core Library, so this stays empty.
+    expect(out.plantFacts.length).toBe(0);
     expect(out.invasive.length).toBeGreaterThan(0);
     // Emerald Cedar is a curated, non-invasive Core Library plant → no false alarm.
     const cedar = out.invasive.find((x) => /cedar/i.test(x.commonName ?? x.scientificName));
