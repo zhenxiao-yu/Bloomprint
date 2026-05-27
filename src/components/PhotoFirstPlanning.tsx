@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { z } from "zod";
 import {
   AlertTriangle,
   ArrowDown,
@@ -166,11 +167,19 @@ type FrameSignal = {
   lowDetail: boolean;
 };
 
-type VisionSuggestion = {
-  sun?: string;
-  observations?: string[];
-  note?: string;
-};
+// Validate the vision endpoint's payload at the boundary — an upstream/model change
+// can never inject an unexpected shape into the honest-AI presentation below.
+const VisionSuggestionSchema = z.object({
+  sun: z.string().optional(),
+  observations: z.array(z.string()).optional(),
+  note: z.string().optional(),
+});
+type VisionSuggestion = z.infer<typeof VisionSuggestionSchema>;
+
+/** Stable id for a UI issue. `crypto.randomUUID` is missing on some insecure origins. */
+function issueId(): string {
+  return crypto.randomUUID?.() ?? `issue-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
 
 function qualityLabel(quality: PhotoQuality | undefined): string {
   if (quality === "unusable") return "Retake";
@@ -224,8 +233,9 @@ async function readVisionSuggestion(photos: PhotoAsset[]): Promise<VisionSuggest
       signal: controller.signal,
     });
     if (!res.ok) return null;
-    const data = (await res.json()) as { suggestion?: VisionSuggestion };
-    return data.suggestion ?? null;
+    const data = (await res.json()) as { suggestion?: unknown };
+    const parsed = VisionSuggestionSchema.safeParse(data.suggestion);
+    return parsed.success ? parsed.data : null;
   } catch {
     return null;
   } finally {
@@ -292,7 +302,12 @@ function mergeVisionSuggestion(
           }
         : item,
     ),
-    risks: [...analysis.risks, ...(suggestion.note ? [`Photo ML note: ${suggestion.note}`] : [])],
+    // A free-form model note is never presented as a fact — it's hedged like the other
+    // vision-derived fields (honest-AI contract: AI explains, it never asserts).
+    risks: [
+      ...analysis.risks,
+      ...(suggestion.note ? [`Photo ML thinks (unconfirmed): ${suggestion.note}`] : []),
+    ],
     confidence: Math.min(0.82, analysis.confidence + (observations.length > 0 ? 0.04 : 0)),
   };
 }
@@ -440,6 +455,19 @@ export function PhotoFirstPlanning({
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  // Latest-committed photos, read at await-resume so concurrent/slow adds never
+  // commit against a stale list and silently drop an interleaved change.
+  const photosRef = useRef(photos);
+  photosRef.current = photos;
+  // Guards setState after awaits so a mid-upload unmount (user navigates away)
+  // doesn't warn or touch a torn-down tree.
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const currentStep = activeStep(photos, analysis);
   const usableCount = photos.filter((photo) => photo.quality !== "unusable").length;
@@ -591,9 +619,11 @@ export function PhotoFirstPlanning({
   }, [photos, onAnalysis]);
 
   useEffect(() => {
+    // Tips only show in the camera modal — don't re-render the whole tree otherwise.
+    if (!cameraOpen) return;
     const id = window.setInterval(() => setTipIndex((current) => current + 1), 3500);
     return () => window.clearInterval(id);
-  }, []);
+  }, [cameraOpen]);
 
   useEffect(() => {
     if (!cameraOpen) return;
@@ -689,26 +719,28 @@ export function PhotoFirstPlanning({
     if (allIncoming.length === 0) return;
     setBusy(true);
     setStatus("Checking and compressing photos locally...");
-    const remaining = Math.max(0, MAX_PHOTOS - photos.length);
+    const remaining = Math.max(0, MAX_PHOTOS - photosRef.current.length);
     const incoming = allIncoming.slice(0, remaining);
     const nextIssues: PhotoIssue[] = [];
     if (allIncoming.length > remaining) {
       nextIssues.push({
-        id: crypto.randomUUID(),
+        id: issueId(),
         fileName: "Photo limit",
         message: `Bloomprint keeps up to ${MAX_PHOTOS} photos per planning draft. Extra photos were not added.`,
         severity: "warning",
       });
     }
 
-    const existingNames = new Set(photos.map((photo) => photo.fileName).filter(Boolean));
-    const knownSignatures = photos.map((photo) => photo.signature).filter(Boolean) as string[];
+    const existingNames = new Set(photosRef.current.map((photo) => photo.fileName).filter(Boolean));
+    const knownSignatures = photosRef.current
+      .map((photo) => photo.signature)
+      .filter(Boolean) as string[];
     const next: PhotoAsset[] = [];
     for (const file of incoming) {
       try {
         if (existingNames.has(file.name)) {
           nextIssues.push({
-            id: crypto.randomUUID(),
+            id: issueId(),
             fileName: file.name,
             message:
               "A photo with this name is already in the draft. It was skipped to avoid duplicates.",
@@ -722,7 +754,7 @@ export function PhotoFirstPlanning({
           knownSignatures.some((sig) => areNearDuplicates(sig, inspected.signature))
         ) {
           nextIssues.push({
-            id: crypto.randomUUID(),
+            id: issueId(),
             fileName: file.name,
             message:
               "This looks like a near-duplicate of a photo already added. Capture a different angle instead.",
@@ -745,7 +777,7 @@ export function PhotoFirstPlanning({
         next.push(asset);
         if (inspected.warnings.length > 0) {
           nextIssues.push({
-            id: crypto.randomUUID(),
+            id: issueId(),
             fileName: file.name,
             message: inspected.warnings[0],
             severity: inspected.quality === "unusable" ? "error" : "warning",
@@ -753,25 +785,28 @@ export function PhotoFirstPlanning({
         }
       } catch (error) {
         nextIssues.push({
-          id: crypto.randomUUID(),
+          id: issueId(),
           fileName: file.name,
           message: error instanceof Error ? error.message : "This photo could not be processed.",
           severity: "error",
         });
       }
     }
+    // The user may have navigated away during the per-file awaits above.
+    if (!mountedRef.current) return;
     setIssues((current) => [...nextIssues, ...current].slice(0, 6));
-    if (next.length > 0) onPhotos([...photos, ...next]);
+    // Commit against the latest committed list, not the one captured before awaits.
+    if (next.length > 0) onPhotos([...photosRef.current, ...next]);
     setStatus(next.length > 0 ? "Photos saved locally" : "No usable photos were added");
     setBusy(false);
     if (inputRef.current) inputRef.current.value = "";
   }
 
   async function addCapturedPhoto(dataUrl: string) {
-    if (photos.length >= MAX_PHOTOS) {
+    if (photosRef.current.length >= MAX_PHOTOS) {
       setIssues((current) => [
         {
-          id: crypto.randomUUID(),
+          id: issueId(),
           fileName: "Camera capture",
           message: `This draft already has ${MAX_PHOTOS} photos. Remove one before capturing another.`,
           severity: "warning",
@@ -784,7 +819,10 @@ export function PhotoFirstPlanning({
     setStatus("Checking camera photo locally...");
     try {
       const inspected = await inspectDataUrl(dataUrl);
-      const knownSignatures = photos.map((photo) => photo.signature).filter(Boolean) as string[];
+      if (!mountedRef.current) return;
+      const knownSignatures = photosRef.current
+        .map((photo) => photo.signature)
+        .filter(Boolean) as string[];
       if (
         inspected.signature &&
         knownSignatures.some((sig) => areNearDuplicates(sig, inspected.signature))
@@ -792,7 +830,7 @@ export function PhotoFirstPlanning({
         setIssues((current) =>
           [
             {
-              id: crypto.randomUUID(),
+              id: issueId(),
               fileName: "Camera capture",
               message:
                 "This looks like a near-duplicate of a photo already added. Capture a different angle instead.",
@@ -821,12 +859,13 @@ export function PhotoFirstPlanning({
         warnings,
         signature: inspected.signature,
       });
-      onPhotos([...photos, asset]);
+      if (!mountedRef.current) return;
+      onPhotos([...photosRef.current, asset]);
       if (warnings.length > 0) {
         setIssues((current) =>
           [
             {
-              id: crypto.randomUUID(),
+              id: issueId(),
               fileName: "Camera capture",
               message: warnings[0],
               severity: asset.quality === "unusable" ? ("error" as const) : ("warning" as const),
@@ -838,10 +877,11 @@ export function PhotoFirstPlanning({
       setCameraOpen(false);
       setStatus("Camera photo saved locally");
     } catch (error) {
+      if (!mountedRef.current) return;
       setIssues((current) =>
         [
           {
-            id: crypto.randomUUID(),
+            id: issueId(),
             fileName: "Camera capture",
             message:
               error instanceof Error ? error.message : "This camera photo could not be processed.",
@@ -851,7 +891,7 @@ export function PhotoFirstPlanning({
         ].slice(0, 6),
       );
     } finally {
-      setBusy(false);
+      if (mountedRef.current) setBusy(false);
     }
   }
 
@@ -1368,14 +1408,18 @@ export function PhotoFirstPlanning({
                             key={i}
                             type="button"
                             onClick={() => setSelectedCell(selectedCell === i ? null : i)}
+                            aria-pressed={selectedCell === i}
                             className={`transition ${selectedCell === i ? "ring-2 ring-inset ring-white" : ""}`}
                             style={{ backgroundColor: REGION_STYLE[cell.cls].fill }}
-                            aria-label={REGION_STYLE[cell.cls].label}
+                            aria-label={`${REGION_STYLE[cell.cls].label}, cell ${i + 1} of ${regionSummary.cells.length}, about ${Math.round(coverageFor(cell.cls) * 100)}% of the photo`}
                           />
                         ))}
                       </div>
                       {selectedCell !== null && regionSummary.cells[selectedCell] ? (
-                        <div className="absolute inset-x-2 bottom-2 rounded-lg bg-black/75 px-3 py-1.5 text-xs text-white">
+                        <div
+                          className="absolute inset-x-2 bottom-2 rounded-lg bg-black/75 px-3 py-1.5 text-xs text-white"
+                          aria-live="polite"
+                        >
                           {REGION_STYLE[regionSummary.cells[selectedCell].cls].label} — about{" "}
                           {Math.round(coverageFor(regionSummary.cells[selectedCell].cls) * 100)}% of
                           the photo
@@ -1631,7 +1675,10 @@ export function PhotoFirstPlanning({
                       </span>
                     </div>
 
-                    <div className="pointer-events-none absolute left-0 right-0 top-24 z-10 flex justify-center px-3">
+                    <div
+                      className="pointer-events-none absolute left-0 right-0 top-24 z-10 flex justify-center px-3"
+                      aria-live="polite"
+                    >
                       <span className="rounded-full border border-white/15 bg-black/70 px-4 py-1.5 text-center text-xs font-semibold text-white shadow-lg backdrop-blur-md">
                         {cameraTip}
                       </span>
@@ -1652,7 +1699,10 @@ export function PhotoFirstPlanning({
                     )}
 
                     {!cameraReady ? (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white">
+                      <div
+                        className="absolute inset-0 flex items-center justify-center bg-black/70 text-white"
+                        role={cameraError ? "alert" : undefined}
+                      >
                         <div className="text-center">
                           <Loader2 className="mx-auto mb-2 size-6 animate-spin" aria-hidden />
                           <p className="text-sm font-semibold">
