@@ -1274,6 +1274,21 @@
       "Make this cheaper",
       "What can wait?",
       "Where am I overspending?"
+    ],
+    "promptsShopping": [
+      "What can I skip?",
+      "Make this cheaper",
+      "What do I buy first?"
+    ],
+    "promptsTimeline": [
+      "Can you make this easier?",
+      "What takes the longest?",
+      "Can I do it in one weekend?"
+    ],
+    "promptsRisks": [
+      "How do I avoid these?",
+      "Which risk matters most?",
+      "Make it lower-maintenance"
     ]
   }
 }

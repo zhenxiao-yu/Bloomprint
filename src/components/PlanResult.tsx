@@ -11,6 +11,7 @@ import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/
 import { Chip, Money, Section, SeverityTag } from "@/components/ui";
 import { PlanCopilotDrawer, type CopilotSection } from "@/components/plan/PlanCopilotDrawer";
 import { PlanSectionActions } from "@/components/plan/PlanSectionActions";
+import { AssumptionBadge, ConfidenceBadge, VerificationBadge } from "@/components/plan/TrustBadges";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { MagicCard } from "@/components/ui/magic-card";
@@ -334,7 +335,8 @@ export function PlanResult({
           </h2>
           <p className="mt-3 max-w-prose text-base leading-relaxed text-foreground/80">{heroDescription}</p>
 
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <ConfidenceBadge level={plan.confidence} />
             {plan.visualSummary.moodChips.map((c) => (
               <Chip key={c}>{c}</Chip>
             ))}
@@ -582,6 +584,9 @@ export function PlanResult({
           <span className="self-start">
             <InfoTip label={t("budget")}>{t("tipBudget")}</InfoTip>
           </span>
+          <span className="self-center">
+            <VerificationBadge status="estimate" />
+          </span>
         </p>
         {view !== "simple" ? (
           <div className="mt-3 grid gap-5 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-start">
@@ -634,7 +639,11 @@ export function PlanResult({
       ) : null}
 
       {/* Shopping list — sortable table in Details, grouped by priority in Simple */}
-      <Section title={t("shoppingList")} variant="action">
+      <Section
+        title={t("shoppingList")}
+        variant="action"
+        action={<PlanSectionActions onAsk={() => openCopilot("shopping", t("shoppingList"), "promptsShopping")} />}
+      >
         {view !== "simple" ? (
           <ShoppingTable items={plan.shoppingList} />
         ) : (
@@ -676,6 +685,7 @@ export function PlanResult({
           people: plan.labor.people,
           effort: plan.visualSummary.expectedEffort.split(" · ")[0],
         })}
+        action={<PlanSectionActions onAsk={() => openCopilot("timeline", t("installPlan"), "promptsTimeline")} />}
       >
         <p className="mb-3 inline-block rounded bg-brand-soft px-3 py-1 text-xs font-medium text-brand-strong">
           {t("bestPlantingWindow", { window: plan.bestWeatherWindow })}
@@ -858,7 +868,12 @@ export function PlanResult({
 
       {/* Risks */}
       {plan.risks.length > 0 ? (
-        <Section id="risks" title={t("whatToWatch")} variant="trust">
+        <Section
+          id="risks"
+          title={t("whatToWatch")}
+          variant="trust"
+          action={<PlanSectionActions onAsk={() => openCopilot("risks", t("whatToWatch"), "promptsRisks")} />}
+        >
           <ul className="space-y-2">
             {plan.risks.map((r) => (
               <li key={r.id} className="text-sm">
@@ -924,9 +939,12 @@ export function PlanResult({
 
       {/* Honesty footer */}
       {plan.site.assumptions.length > 0 ? (
-        <p className="px-1 text-xs text-muted">
-          <span className="font-medium">{t("assumptionsLabel")}</span> {plan.site.assumptions.join(" ")}
-        </p>
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 px-1 text-xs text-muted">
+          <span className="self-center">
+            <AssumptionBadge />
+          </span>
+          <span>{plan.site.assumptions.join(" ")}</span>
+        </div>
       ) : null}
 
       <BackToTop label={t("backToTop")} />
