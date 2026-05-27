@@ -21,12 +21,13 @@
  *   sun:  full|part|shade|any
  *   invasiveWatch: true where the species is invasive in parts of NA (must NOT be promoted blindly)
  */
-import { writeFileSync } from "node:fs";
+import { writeFileSync, readdirSync, readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = join(root, "src/domain/data/plant-catalog.generated.json");
+const SEEDS_DIR = join(root, "data/plant-catalog/seeds");
 const GBIF = "https://api.gbif.org/v1";
 const UA = "Bloomprint/1.0 (+https://bloomprint.vercel.app; plant catalog)";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -124,9 +125,42 @@ async function getJson(url) {
   }
 }
 
+/** Parse a batch CSV (header row required) into seed tuples. Tolerant of quotes + extra cols. */
+function parseSeedCsv(text) {
+  const lines = text.split(/\r?\n/).filter((l) => l.trim() && !l.startsWith("#"));
+  const rows = [];
+  let start = 0;
+  if (/commonName/i.test(lines[0] ?? "")) start = 1; // skip header
+  for (let i = start; i < lines.length; i++) {
+    const f = lines[i].split(",").map((s) => s.trim().replace(/^"|"$/g, ""));
+    if (f.length < 9 || !f[1]) continue;
+    rows.push([
+      f[0], f[1], f[2], Number(f[3]), Number(f[4]), f[5],
+      /^(true|1|yes)$/i.test(f[6]), /^(true|1|yes)$/i.test(f[7]), f[8],
+    ]);
+  }
+  return rows;
+}
+
+// Merge the inline base tranche with any batch CSVs dropped by subagents in data/plant-catalog/seeds/.
+const combined = [...SEED];
+if (existsSync(SEEDS_DIR)) {
+  for (const file of readdirSync(SEEDS_DIR).filter((f) => f.endsWith(".csv"))) {
+    combined.push(...parseSeedCsv(readFileSync(join(SEEDS_DIR, file), "utf8")));
+  }
+}
+// Dedupe by botanical name (case-insensitive); first occurrence wins.
+const seen = new Set();
+const seeds = combined.filter(([, botanical]) => {
+  const key = String(botanical).toLowerCase().trim();
+  if (!key || seen.has(key)) return false;
+  seen.add(key);
+  return true;
+});
+
 const result = [];
 let matched = 0;
-for (const [commonName, botanical, type, zMin, zMax, sun, nativeNA, invasiveWatch, category] of SEED) {
+for (const [commonName, botanical, type, zMin, zMax, sun, nativeNA, invasiveWatch, category] of seeds) {
   const match = await getJson(`${GBIF}/species/match?kingdom=Plantae&name=${encodeURIComponent(botanical)}`);
   let gbif = null;
   if (match && match.usageKey && match.matchType !== "NONE") {
@@ -138,7 +172,9 @@ for (const [commonName, botanical, type, zMin, zMax, sun, nativeNA, invasiveWatc
     matched++;
   }
   result.push({
-    commonName, botanical, type, zoneMin: zMin, zoneMax: zMax, sun, nativeNA, invasiveWatch, category,
+    commonName,
+    commonNameZh: null, // reserved for a SOURCED Simplified-Chinese common name (never machine-guessed)
+    botanical, type, zoneMin: zMin, zoneMax: zMax, sun, nativeNA, invasiveWatch, category,
     gbif,
     verified: false, // candidate only — must be sourced before promotion to a PlantRecord
   });
