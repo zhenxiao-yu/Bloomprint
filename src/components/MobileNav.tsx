@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
 import {
   Bookmark,
+  Calculator,
   GraduationCap,
   Home,
   Info,
@@ -36,6 +37,7 @@ const ITEMS = [
 
 // Secondary destinations that don't earn a permanent slot in the bottom bar.
 const MORE = [
+  { href: "/toolbox", key: "toolbox", icon: Calculator },
   { href: "/pro", key: "pro", icon: Wrench },
   { href: "/pricing", key: "pricing", icon: Tag },
   { href: "/guide", key: "guide", icon: GraduationCap },
