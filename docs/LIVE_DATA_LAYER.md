@@ -45,8 +45,9 @@ LivePlanEnrichment → StoreRealityCheck (full UI) + timing note + caution chip 
 Key files:
 - Validated boundary: `src/lib/live-data/schema.ts` (`RetailerMatch`, `StoreRealityResult`,
   `WeatherTiming`, `PlantFacts`, `InvasiveRisk`, `LivePlanEnrichment`, `EnrichPlanRequest`).
-- Orchestrator: `src/lib/live-data/enrich.ts` (`getLiveEnrichment`, `realProvidersConfigured`).
-- Mock providers: `src/lib/live-data/{retailer,plantFacts,invasive,weather,gbif}.ts`.
+- Orchestrator: `src/lib/live-data/enrich.ts` (`getLiveEnrichment`, `freeDataEnrichmentEnabled`).
+- Providers: `src/lib/live-data/{retailer,plantFacts,invasive,weather,gbif}.ts`; outbound GETs via
+  `freeFetch.ts`; Core Library prefetch in `plantEnrichment.ts`.
 - Caching: in-memory `src/lib/live-data/cache.ts` + TTLs in `cachePolicy.ts`; optional Supabase
   `live_data_cache` via `src/lib/supabase/cache.ts` (`liveDataCacheGet/Set`).
 - Route: `src/app/api/live/enrich-plan/route.ts`. UI: `src/components/StoreRealityCheck.tsx`,
@@ -63,15 +64,37 @@ Key files:
 | `gbif` / `geocode` | 30d |
 | `store-search` | 7d |
 
+## Free-forever providers (no keys, commercial-OK)
+
+The layer runs on free, key-free, commercial-OK sources and is **on by default** — there are no
+paid dependencies:
+
+| Data | Source | Key? | How it stays free at scale |
+|------|--------|------|----------------------------|
+| Plant name + invasive/establishment context | **GBIF** (`gbif.ts`, CC0) | none | build-time prefetch of the Core Library (`scripts/build-plant-data.mjs` → `plant-enrichment.generated.json`); unknown names do one `freeFetch` GET cached in Vercel's Data Cache |
+| Hardiness (US ZIP) | **USDA phzmapi** (`hardiness.ts`, public domain) | none | cached 30d |
+| Planting window / frost | **regional climatology** (`weather.ts` ← `regions.ts`) | none | deterministic, no network |
+| Retailer | generated **search links** (`retailer.ts`) | none | static templates, no inventory/price claims |
+| Plant **care** facts | **Bloomprint Core Library** | n/a | locked, never from a free API |
+
+**Removed** (not generous enough for a free product): Perenual (free tier paywalls
+`species/details`), Open-Meteo (free tier is CC-BY non-commercial), SerpApi (kept as free search links).
+
 ## Config
 
-All optional; the layer works mock-only with **no keys**.
+- `NEXT_PUBLIC_ENABLE_LIVE_DATA` — gates the optional **client** enrichment call.
+- `LIVE_DATA_ENRICHMENT=off` — kill-switch for the whole layer (otherwise always on).
+- No provider keys are read. `realProvidersConfigured()` is a legacy seam; the layer is gated by
+  `freeDataEnrichmentEnabled()`.
 
-- `NEXT_PUBLIC_ENABLE_LIVE_DATA` — client-visible feature flag (default `false`).
-- `LIVE_DATA_PROVIDER` — `mock` (default) or a real family: `serpapi`, `perenual`, `open-meteo`, `gbif`.
-- `SERPAPI_KEY`, `PERENUAL_API_KEY`, `WEATHER_PROVIDER` — for the deferred real adapters (server-only).
+`GET /api/live/enrich-plan` returns `{ enabled }` (true by default; false only when the kill-switch is set).
 
-`GET /api/live/enrich-plan` returns `{ enabled }` (true only when a real provider is configured).
+## Outbound calls & caching
+
+`freeFetch.ts` wraps every third-party GET with a timeout, a polite User-Agent, and Vercel's free
+shared **Data Cache** (`next: { revalidate }`), so identical queries across users collapse to one
+upstream call. The build-time prefetch means the fixed 34-plant library makes **zero** runtime
+upstream calls — only unknown/custom names hit GBIF live (then cached).
 
 ## Adding a real provider
 
