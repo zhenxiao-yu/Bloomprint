@@ -477,7 +477,14 @@ export function PlanExperience() {
   return (
     <main
       className={`mx-auto min-w-0 w-full flex-1 px-3 pb-28 pt-5 sm:px-6 sm:py-10 ${
-        step === "result" ? "max-w-[75rem]" : "max-w-3xl"
+        step === "result"
+          ? "max-w-[75rem]"
+          : // The photo-prep workspace has two-column (lg:) layouts that were cramped
+            // into a 768px form column; give it room. The survey form still reads best
+            // narrow, so only widen while gathering photos.
+            step === "intake" && !prepComplete
+            ? "max-w-5xl"
+            : "max-w-3xl"
       }`}
     >
       <div className="mb-6 flex items-center justify-between">

@@ -75,7 +75,7 @@ export function SettingsDialog({ children }: { children: React.ReactNode }) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
         showCloseButton
-        className="top-auto bottom-0 max-h-[92dvh] w-full max-w-2xl translate-y-0 gap-0 overflow-hidden rounded-t-3xl rounded-b-none border-border bg-surface/95 p-0 backdrop-blur-2xl data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2 sm:rounded-3xl"
+        className="top-auto bottom-0 flex h-[86dvh] w-full max-w-2xl translate-y-0 flex-col gap-0 overflow-hidden rounded-t-3xl rounded-b-none border-border bg-surface/95 p-0 backdrop-blur-2xl data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom sm:top-1/2 sm:bottom-auto sm:h-[600px] sm:max-h-[88vh] sm:-translate-y-1/2 sm:rounded-3xl"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <BorderBeam size={120} duration={8} borderWidth={1.2} className="opacity-50" />
@@ -93,7 +93,7 @@ export function SettingsDialog({ children }: { children: React.ReactNode }) {
           {/* Section nav — horizontal pills on mobile, vertical rail on desktop. */}
           <nav
             aria-label={t("title")}
-            className="flex shrink-0 gap-1 overflow-x-auto border-b border-border/70 px-3 py-2 sm:w-48 sm:flex-col sm:overflow-visible sm:border-r sm:border-b-0 sm:px-2 sm:py-3"
+            className="flex shrink-0 gap-1 overflow-x-auto border-b border-border/70 px-3 py-2 sm:w-52 sm:flex-col sm:overflow-visible sm:border-r sm:border-b-0 sm:px-2 sm:py-3"
           >
             {SECTIONS.map(({ id, icon: Icon }) => {
               const active = section === id;
@@ -161,8 +161,8 @@ function Row({
   htmlFor?: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-background/50 px-3.5 py-3">
-      <label htmlFor={htmlFor} className="min-w-0 flex-1 cursor-pointer">
+    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5 rounded-2xl border border-border bg-background/50 px-3.5 py-3">
+      <label htmlFor={htmlFor} className="min-w-0 flex-1 basis-40 cursor-pointer">
         <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
           {Icon && <Icon className="size-4 shrink-0 text-brand" aria-hidden />}
           {title}
