@@ -1252,5 +1252,28 @@
     "verifiedTip": "已与可信来源核对确认。",
     "verifyTip": "为近似值——在依赖之前，请在本地核实（库存、价格、适配性或尺寸）。",
     "estimateTip": "为规划用的估算，并非保证的精确数值。"
+  },
+  "Copilot": {
+    "askAi": "问 AI",
+    "title": "询问：{section}",
+    "titleGeneric": "询问这份方案",
+    "disclaimer": "仅解释你的方案——它不会更改数字。应用某条建议才能真正调整方案。",
+    "tryAsking": "试试这样问",
+    "placeholder": "就这一部分提问……",
+    "ask": "提问",
+    "thinking": "思考中……",
+    "error": "暂时无法回答。可以试试下方的建议。",
+    "turnIntoChange": "把它变成一处调整",
+    "applied": "已应用：{label}",
+    "promptsPlants": [
+      "为什么选这些植物？",
+      "哪些对狗狗安全？",
+      "有没有更便宜的替代？"
+    ],
+    "promptsBudget": [
+      "让它更便宜",
+      "哪些可以缓一缓？",
+      "我在哪里花多了？"
+    ]
   }
 }

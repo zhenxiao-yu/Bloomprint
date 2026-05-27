@@ -14,12 +14,15 @@ export function Section({
   title,
   subtitle,
   variant = "default",
+  action,
   children,
 }: {
   id?: string;
   title: string;
   subtitle?: string;
   variant?: "default" | "decision" | "action" | "trust" | "quiet";
+  /** Optional header-right slot (e.g. per-section workspace actions). */
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   const variantClass = {
@@ -43,6 +46,7 @@ export function Section({
       <div className="flex items-center gap-2.5">
         <span className={cn("h-4 w-1 shrink-0 rounded-full", accentClass)} aria-hidden />
         <h3 className="text-base font-semibold text-foreground">{title}</h3>
+        {action ? <div className="ml-auto shrink-0">{action}</div> : null}
       </div>
       {subtitle ? <p className="mt-1 pl-3.5 text-sm text-muted">{subtitle}</p> : null}
       <div className="mt-3.5">{children}</div>

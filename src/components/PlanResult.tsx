@@ -9,6 +9,8 @@ import { Link } from "@/i18n/navigation";
 import type { BloomprintPlan, RefinementAdjustment, ShoppingPriority } from "@/domain/models";
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
 import { Chip, Money, Section, SeverityTag } from "@/components/ui";
+import { PlanCopilotDrawer, type CopilotSection } from "@/components/plan/PlanCopilotDrawer";
+import { PlanSectionActions } from "@/components/plan/PlanSectionActions";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { NumberTicker } from "@/components/ui/number-ticker";
 import { MagicCard } from "@/components/ui/magic-card";
@@ -154,10 +156,18 @@ export function PlanResult({
   const to = useTranslations("Options");
   const locale = useLocale();
   const tLive = useTranslations("Live");
+  const tCop = useTranslations("Copilot");
   const { plan } = result;
   const showNumbers = view !== "simple";
   const [boardView, setBoardView] = useState<"now" | "planned" | "overlay">("planned");
   const [arOpen, setArOpen] = useState(false);
+  // Bounded section copilot (docs/DECISIONS.md D15) — explains a section, never mutates facts.
+  const [copilot, setCopilot] = useState<CopilotSection | null>(null);
+  const copilotRegion = plan.intake.locationQuery ?? plan.intake.regionId;
+  function openCopilot(type: CopilotSection["type"], title: string, promptsKey: string) {
+    const raw = tCop.has(promptsKey) ? (tCop.raw(promptsKey) as unknown) : [];
+    setCopilot({ type, title, prompts: Array.isArray(raw) ? (raw as string[]) : [] });
+  }
   // AI only *presents* (narrative, concept name, talking points) — it never changes the
   // deterministic facts. This toggle lets the reader collapse to the raw engine plan and
   // see that for themselves; every `enhancement?.x` below already falls back to the engine.
@@ -483,6 +493,14 @@ export function PlanResult({
       {/* Natural-language command bar — maps plain language onto the refinements below */}
       <CommandBar adjustments={adjustments} busy={busy} onRefine={onRefine} />
 
+      <PlanCopilotDrawer
+        section={copilot}
+        open={copilot !== null}
+        onOpenChange={(o) => !o && setCopilot(null)}
+        onRefine={onRefine}
+        region={copilotRegion}
+      />
+
       {/* Refinement chips — first plan is Draft 1 */}
       <section className="card p-5">
         <p className="text-sm font-semibold text-foreground">{t("firstDraft")}</p>
@@ -552,7 +570,13 @@ export function PlanResult({
       </Section>
 
       {/* Budget */}
-      <Section id="buy" title={t("budget")} subtitle={t("budgetSubtitle")} variant="action">
+      <Section
+        id="buy"
+        title={t("budget")}
+        subtitle={t("budgetSubtitle")}
+        variant="action"
+        action={<PlanSectionActions onAsk={() => openCopilot("budget", t("budget"), "promptsBudget")} />}
+      >
         <p className="flex flex-wrap items-center gap-1.5 text-2xl font-semibold text-foreground">
           {t("expectedDiyTotal")} <MoneyTicker value={plan.budget.diyTotal} />
           <span className="self-start">
@@ -716,7 +740,13 @@ export function PlanResult({
       </Section>
 
       {/* Plants */}
-      <Section id="plants" title={t("plants")} subtitle={t("plantsSubtitle", { count: plan.plants.length })} variant="quiet">
+      <Section
+        id="plants"
+        title={t("plants")}
+        subtitle={t("plantsSubtitle", { count: plan.plants.length })}
+        variant="quiet"
+        action={<PlanSectionActions onAsk={() => openCopilot("plants", t("plants"), "promptsPlants")} />}
+      >
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {plan.plants.map((p) => (
             <div key={p.plantId} className="rounded-lg border border-border p-3">

@@ -1252,5 +1252,28 @@
     "verifiedTip": "Confirmed against a trusted source.",
     "verifyTip": "Approximate — confirm locally (stock, price, fit, or measurements) before you rely on it.",
     "estimateTip": "A planning estimate, not a guaranteed exact figure."
+  },
+  "Copilot": {
+    "askAi": "Ask AI",
+    "title": "Ask about {section}",
+    "titleGeneric": "Ask about this plan",
+    "disclaimer": "Explains your plan only — it never changes the numbers. Apply a suggestion to actually adjust it.",
+    "tryAsking": "Try asking",
+    "placeholder": "Ask about this section…",
+    "ask": "Ask",
+    "thinking": "Thinking…",
+    "error": "Couldn't answer right now. Try a suggestion below.",
+    "turnIntoChange": "Turn this into a change",
+    "applied": "Applied: {label}",
+    "promptsPlants": [
+      "Why these plants?",
+      "Which are dog-safe?",
+      "What are cheaper alternatives?"
+    ],
+    "promptsBudget": [
+      "Make this cheaper",
+      "What can wait?",
+      "Where am I overspending?"
+    ]
   }
 }
