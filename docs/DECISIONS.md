@@ -120,3 +120,16 @@ source + confidence + `lastCheckedAt`. Real providers (SerpApi/Perenual/Open-Met
 behind each module's seam without touching the engine. *Why:* feel current and grounded in the real
 world without the dangerous promise "this exact store has this exact plant at this exact price." See
 docs/LIVE_DATA_LAYER.md.
+
+## D15 — Section copilot is bounded, not a chatbot (amends D4)
+The plan workspace lets a user ask a question about ONE section (`POST /api/plan/ask`). This bends
+D4's "no freeform chat," so it is fenced tightly: the request is section-scoped and length-capped
+(`SectionQuestion`); the response is **Zod-validated** to explanation text + suggested refinements
+drawn ONLY from the fixed `RefinementAdjustment` vocabulary + a disclaimer (`SectionAnswer`) — it
+can return **no** plan facts. "Turn this into a change" routes through the existing deterministic
+refinement flow (`parseCommand` → `onRefine` → `/api/plan`), never a freeform mutation. It is
+**mock-first**: with `AI_PROVIDER=mock` (default, no key) it returns honest, deterministic guidance
+that never invents prices, quantities, plants, or other locked facts; a real provider may later
+supply richer wording behind the *same* bounded schema. There is still no raw-AI `/api/analyze`
+(D3) and AI still cannot decide facts (D2). *Why:* let users interrogate a plan section and act on
+it without opening a hallucination surface or a general chatbot. See src/ai/sectionCopilot.ts.
