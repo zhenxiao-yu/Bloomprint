@@ -95,6 +95,7 @@ export function DimensionGroup({
   onWidth,
   onRadius,
   onArea,
+  shapes = ["rectangle", "circle", "area"],
 }: {
   shape: Shape;
   unit: LenUnit;
@@ -108,10 +109,17 @@ export function DimensionGroup({
   onWidth: (v: string) => void;
   onRadius: (v: string) => void;
   onArea: (v: string) => void;
+  /** Limit the offered shapes (e.g. edging has no "known area" option). */
+  shapes?: Shape[];
 }) {
   const t = useTranslations("Toolbox.common");
   const lenUnit = unit === "ft" ? t("unitFt") : t("unitM");
   const areaUnit = unit === "ft" ? t("unitSqFt") : t("unitSqM");
+  const shapeLabel: Record<Shape, string> = {
+    rectangle: t("shapeRectangle"),
+    circle: t("shapeCircle"),
+    area: t("shapeArea"),
+  };
   return (
     <>
       <div className="grid grid-cols-2 gap-4">
@@ -121,9 +129,11 @@ export function DimensionGroup({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="rectangle">{t("shapeRectangle")}</SelectItem>
-              <SelectItem value="circle">{t("shapeCircle")}</SelectItem>
-              <SelectItem value="area">{t("shapeArea")}</SelectItem>
+              {shapes.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {shapeLabel[s]}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </Field>

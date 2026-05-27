@@ -1390,7 +1390,24 @@
       "applyToPlan": "添加到方案",
       "aiSoonHint": "AI 协助将随方案工作台一起推出。",
       "applySoonHint": "添加到方案功能将随方案工作台一起推出。",
-      "optionalNote": "AI 和添加到方案都是可选项——每个计算器都可以独立使用。"
+      "optionalNote": "AI 和添加到方案都是可选项——每个计算器都可以独立使用。",
+      "extra": "额外余量",
+      "bagSize": "每袋容量",
+      "bagSizeValue": "{size} 立方英尺",
+      "bags": "袋",
+      "recommendedBags": "建议：{count} 袋（含余量）",
+      "volumeYd": "散装体积",
+      "cuYd": "立方码",
+      "tons": "估算散装重量",
+      "tonsValue": "{low}–{high} 吨",
+      "assumeBag": "每袋 = {size} 立方英尺。",
+      "assumeDepth": "厚度：整块区域均按 {depth} 英寸计算。",
+      "assumeBuffer": "含 {pct}% 余量，用于沉降和损耗。",
+      "pieces": "段",
+      "recommendedPieces": "建议：{count} 段（含余量）",
+      "pieceLength": "每段长度",
+      "assumePiece": "每段长 {len} 英尺。",
+      "perimeter": "周长"
     }
   },
   "SettingsModal": {
@@ -1507,6 +1524,36 @@
       "assumeBuffer": "含 {pct}% 余量，用于沉降和铺撒不均的情况。",
       "emptyTitle": "输入花床尺寸",
       "emptyBody": "填好尺寸和厚度，就能看到需要购买多少覆盖物。"
+    },
+    "soil": {
+      "title": "土壤计算器",
+      "intro": "按袋或立方码，算出填满一处花床需要多少表层土或园艺土。",
+      "emptyTitle": "输入花床尺寸",
+      "emptyBody": "填好面积和厚度，就能看到需要购买多少土。"
+    },
+    "compost": {
+      "title": "堆肥计算器",
+      "intro": "为花床覆面或改良土壤需要多少堆肥。",
+      "emptyTitle": "输入花床尺寸",
+      "emptyBody": "填好面积和厚度，就能看到需要购买多少堆肥。"
+    },
+    "gravel": {
+      "title": "砾石与碎石计算器",
+      "intro": "覆盖一片区域需要多少砾石或碎石——按袋、按立方码或估算吨数。",
+      "emptyTitle": "输入区域面积",
+      "emptyBody": "填好面积和厚度，就能看到需要购买多少碎石。"
+    },
+    "edging": {
+      "title": "收边计算器",
+      "intro": "为花床收边需要多少段材料。",
+      "emptyTitle": "选择花床形状",
+      "emptyBody": "选择矩形或圆形并输入尺寸，即可看到需要多少收边材料。"
+    },
+    "bedArea": {
+      "title": "花床面积计算器",
+      "intro": "测量花床的面积和周长——每个材料估算的起点。",
+      "emptyTitle": "输入尺寸",
+      "emptyBody": "填好形状即可看到面积和周长。"
     }
   }
 }

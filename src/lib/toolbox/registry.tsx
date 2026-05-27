@@ -1,5 +1,13 @@
 import { lazy, type ComponentType, type LazyExoticComponent } from "react";
-import { Layers, type LucideIcon } from "lucide-react";
+import {
+  Layers,
+  Mountain,
+  Ruler,
+  Scissors,
+  Shovel,
+  Sprout,
+  type LucideIcon,
+} from "lucide-react";
 
 import { TOOL_CATALOG, type ToolMeta } from "@/domain/toolbox/catalog";
 
@@ -17,10 +25,24 @@ export interface ToolEntry extends ToolMeta {
 const COMPONENTS: Record<string, () => Promise<{ default: ComponentType }>> = {
   mulch: () =>
     import("@/components/toolbox/tools/MulchCalculator").then((m) => ({ default: m.MulchCalculator })),
+  soil: () => import("@/components/toolbox/tools/SoilCalculator").then((m) => ({ default: m.SoilCalculator })),
+  compost: () =>
+    import("@/components/toolbox/tools/CompostCalculator").then((m) => ({ default: m.CompostCalculator })),
+  gravel: () =>
+    import("@/components/toolbox/tools/GravelCalculator").then((m) => ({ default: m.GravelCalculator })),
+  edging: () =>
+    import("@/components/toolbox/tools/EdgingCalculator").then((m) => ({ default: m.EdgingCalculator })),
+  bedArea: () =>
+    import("@/components/toolbox/tools/BedAreaCalculator").then((m) => ({ default: m.BedAreaCalculator })),
 };
 
 const ICONS: Record<string, LucideIcon> = {
   mulch: Layers,
+  soil: Shovel,
+  compost: Sprout,
+  gravel: Mountain,
+  edging: Scissors,
+  bedArea: Ruler,
 };
 
 export const TOOL_REGISTRY: ToolEntry[] = TOOL_CATALOG.map((meta) => ({

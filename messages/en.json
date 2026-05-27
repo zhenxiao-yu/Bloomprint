@@ -1390,7 +1390,24 @@
       "applyToPlan": "Add to plan",
       "aiSoonHint": "AI help arrives with the plan workspace.",
       "applySoonHint": "Apply-to-plan arrives with the plan workspace.",
-      "optionalNote": "AI and apply-to-plan are optional — every calculator works on its own."
+      "optionalNote": "AI and apply-to-plan are optional — every calculator works on its own.",
+      "extra": "Extra buffer",
+      "bagSize": "Bag size",
+      "bagSizeValue": "{size} cu ft",
+      "bags": "bags",
+      "recommendedBags": "Recommended: {count} bags (with buffer)",
+      "volumeYd": "Bulk volume",
+      "cuYd": "cu yd",
+      "tons": "Est. bulk weight",
+      "tonsValue": "{low}–{high} tons",
+      "assumeBag": "One bag = {size} cu ft.",
+      "assumeDepth": "Depth: {depth} in across the whole area.",
+      "assumeBuffer": "Includes a {pct}% buffer for settling and waste.",
+      "pieces": "pieces",
+      "recommendedPieces": "Recommended: {count} pieces (with buffer)",
+      "pieceLength": "Piece length",
+      "assumePiece": "Each piece is {len} ft long.",
+      "perimeter": "Perimeter"
     }
   },
   "SettingsModal": {
@@ -1507,6 +1524,36 @@
       "assumeBuffer": "Includes a {pct}% buffer for settling and uneven coverage.",
       "emptyTitle": "Enter your bed size",
       "emptyBody": "Fill in the dimensions and depth to see how much mulch to buy."
+    },
+    "soil": {
+      "title": "Topsoil Calculator",
+      "intro": "How much topsoil or garden soil to fill a bed, by bag or cubic yard.",
+      "emptyTitle": "Enter your bed size",
+      "emptyBody": "Fill in the area and depth to see how much soil to buy."
+    },
+    "compost": {
+      "title": "Compost Calculator",
+      "intro": "How much compost to top-dress or amend a bed.",
+      "emptyTitle": "Enter your bed size",
+      "emptyBody": "Fill in the area and depth to see how much compost to buy."
+    },
+    "gravel": {
+      "title": "Gravel & Stone Calculator",
+      "intro": "How much gravel or crushed stone to cover an area — by bag, cubic yard, or estimated tons.",
+      "emptyTitle": "Enter your area",
+      "emptyBody": "Fill in the area and depth to see how much stone to buy."
+    },
+    "edging": {
+      "title": "Edging Calculator",
+      "intro": "How many edging pieces to border a bed.",
+      "emptyTitle": "Enter your bed shape",
+      "emptyBody": "Pick a rectangle or circle and enter its size to see how much edging you need."
+    },
+    "bedArea": {
+      "title": "Bed Area Calculator",
+      "intro": "Measure a bed's area and perimeter — the starting point for every material estimate.",
+      "emptyTitle": "Enter your dimensions",
+      "emptyBody": "Fill in the shape to see area and perimeter."
     }
   }
 }
