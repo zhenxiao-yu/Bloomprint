@@ -1579,6 +1579,41 @@
         "sand": "Sand",
         "bark": "Bark / wood chips"
       }
+    },
+    "spacing": {
+      "title": "Plant Spacing Calculator",
+      "intro": "How many plants fill a bed at a given spacing — square or triangular layout.",
+      "emptyTitle": "Enter area and spacing",
+      "emptyBody": "Fill in the bed size and how far apart the plants go.",
+      "spacingLabel": "Spacing (center to center)",
+      "pattern": "Layout",
+      "patternSquare": "Square grid",
+      "patternTriangular": "Triangular (offset rows)",
+      "plants": "plants",
+      "perPlant": "Area per plant",
+      "formula": "square: plants = area ÷ spacing²   ·   triangular: ~15% more",
+      "how": "Each plant needs a spacing × spacing square of room. Triangular (offset) rows pack about 15% more plants into the same area. Counts round down so you never over-buy.",
+      "evidence": [
+        "Spacing is center-to-center — from the plant tag or our plant library.",
+        "Triangular layout uses ~0.866× the area per plant.",
+        "Counts round down to whole plants."
+      ]
+    },
+    "watering": {
+      "title": "Watering Run-Time Calculator",
+      "intro": "How long to run a sprinkler to apply a target amount of water.",
+      "emptyTitle": "Enter your sprinkler rate",
+      "emptyBody": "Enter how fast your sprinkler applies water (inches per hour).",
+      "outputRate": "Sprinkler rate (in/hr)",
+      "targetDepth": "Target water (in)",
+      "minutes": "minutes",
+      "formula": "minutes = target depth ÷ output rate × 60",
+      "how": "Find your sprinkler's output rate with a catch-cup test — place cups, run 15 min, measure the average depth. Divide your target by that rate to get the run time.",
+      "evidence": [
+        "Lawns usually want about 1 inch of water per session.",
+        "Output rate comes from a catch-cup test or the sprinkler's spec sheet.",
+        "On slopes or clay, split into shorter cycles to avoid runoff."
+      ]
     }
   }
 }
