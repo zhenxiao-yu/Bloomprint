@@ -1,0 +1,170 @@
+commonName,botanical,type,zMin,zMax,sun,nativeNA,invasiveWatch,category
+Arrowwood Viburnum,Viburnum dentatum,shrub,3,8,part,true,false,shrub
+American Cranberrybush Viburnum,Viburnum trilobum,shrub,2,7,full,true,false,shrub
+Mapleleaf Viburnum,Viburnum acerifolium,shrub,3,8,shade,true,false,shrub
+Nannyberry,Viburnum lentago,shrub,2,8,part,true,false,shrub
+Blackhaw Viburnum,Viburnum prunifolium,shrub,3,9,part,true,false,shrub
+Witherod Viburnum,Viburnum nudum,shrub,5,9,part,true,false,shrub
+Koreanspice Viburnum,Viburnum carlesii,shrub,4,7,full,false,false,shrub
+Burkwood Viburnum,Viburnum x burkwoodii,shrub,4,8,full,false,false,shrub
+Doublefile Viburnum,Viburnum plicatum f. tomentosum,shrub,5,8,part,false,false,shrub
+Judd Viburnum,Viburnum x juddii,shrub,4,8,full,false,false,shrub
+European Cranberrybush,Viburnum opulus,shrub,3,8,full,false,true,shrub
+Linden Viburnum,Viburnum dilatatum,shrub,5,8,full,false,true,shrub
+Leatherleaf Viburnum,Viburnum rhytidophyllum,shrub,5,8,part,false,false,shrub
+Bigleaf Hydrangea,Hydrangea macrophylla,shrub,5,9,part,false,false,shrub
+Panicle Hydrangea,Hydrangea paniculata,shrub,3,8,full,false,false,shrub
+Smooth Hydrangea,Hydrangea arborescens,shrub,3,9,part,true,false,shrub
+Oakleaf Hydrangea,Hydrangea quercifolia,shrub,5,9,part,true,false,shrub
+Mountain Hydrangea,Hydrangea serrata,shrub,6,9,part,false,false,shrub
+Annabelle Hydrangea,Hydrangea arborescens 'Annabelle',shrub,3,9,part,true,false,shrub
+Limelight Hydrangea,Hydrangea paniculata 'Limelight',shrub,3,8,full,false,false,shrub
+Endless Summer Hydrangea,Hydrangea macrophylla 'Bailmer',shrub,4,9,part,false,false,shrub
+Japanese Spirea,Spiraea japonica,shrub,4,9,full,false,true,shrub
+Goldflame Spirea,Spiraea japonica 'Goldflame',shrub,4,9,full,false,true,shrub
+Bridalwreath Spirea,Spiraea prunifolia,shrub,4,8,full,false,false,shrub
+Vanhoutte Spirea,Spiraea x vanhouttei,shrub,3,8,full,false,false,shrub
+Birchleaf Spirea,Spiraea betulifolia,shrub,4,8,full,true,false,shrub
+Japanese White Spirea,Spiraea albiflora,shrub,4,8,full,false,false,shrub
+Old-Fashioned Weigela,Weigela florida,shrub,4,8,full,false,false,shrub
+Wine and Roses Weigela,Weigela florida 'Alexandra',shrub,4,8,full,false,false,shrub
+Common Ninebark,Physocarpus opulifolius,shrub,2,8,full,true,false,shrub
+Diabolo Ninebark,Physocarpus opulifolius 'Monlo',shrub,3,7,full,true,false,shrub
+Redtwig Dogwood,Cornus sericea,shrub,2,7,full,true,false,shrub
+Tatarian Dogwood,Cornus alba,shrub,2,7,full,false,false,shrub
+Silky Dogwood,Cornus amomum,shrub,4,8,part,true,false,shrub
+Gray Dogwood,Cornus racemosa,shrub,3,8,part,true,false,shrub
+American Smoketree,Cotinus obovatus,shrub,4,8,full,true,false,shrub
+Smokebush,Cotinus coggygria,shrub,4,8,full,false,false,shrub
+Royal Purple Smokebush,Cotinus coggygria 'Royal Purple',shrub,4,8,full,false,false,shrub
+Common Lilac,Syringa vulgaris,shrub,3,7,full,false,false,shrub
+Dwarf Korean Lilac,Syringa meyeri 'Palibin',shrub,3,7,full,false,false,shrub
+Littleleaf Lilac,Syringa microphylla,shrub,4,7,full,false,false,shrub
+Persian Lilac,Syringa x persica,shrub,3,7,full,false,false,shrub
+Miss Kim Lilac,Syringa pubescens subsp. patula 'Miss Kim',shrub,3,8,full,false,false,shrub
+Cutleaf Lilac,Syringa x laciniata,shrub,4,8,full,false,false,shrub
+Border Forsythia,Forsythia x intermedia,shrub,5,8,full,false,false,shrub
+Weeping Forsythia,Forsythia suspensa,shrub,5,8,full,false,false,shrub
+Slender Deutzia,Deutzia gracilis,shrub,5,8,full,false,false,shrub
+Fuzzy Deutzia,Deutzia scabra,shrub,5,8,full,false,false,shrub
+Nikko Deutzia,Deutzia gracilis 'Nikko',shrub,5,8,full,false,false,shrub
+Sweet Mockorange,Philadelphus coronarius,shrub,4,8,full,false,false,shrub
+Lewis Mockorange,Philadelphus lewisii,shrub,5,9,full,true,false,shrub
+Virginal Mockorange,Philadelphus x virginalis,shrub,4,8,full,false,false,shrub
+Rose of Sharon,Hibiscus syriacus,shrub,5,9,full,false,false,shrub
+Diana Rose of Sharon,Hibiscus syriacus 'Diana',shrub,5,9,full,false,false,shrub
+Hardy Hibiscus,Hibiscus moscheutos,shrub,5,9,full,true,false,shrub
+Common Witch Hazel,Hamamelis virginiana,shrub,3,8,part,true,false,shrub
+Vernal Witch Hazel,Hamamelis vernalis,shrub,4,8,part,true,false,shrub
+Hybrid Witch Hazel,Hamamelis x intermedia 'Arnold Promise',shrub,5,8,full,false,false,shrub
+Dwarf Fothergilla,Fothergilla gardenii,shrub,5,9,full,true,false,shrub
+Large Fothergilla,Fothergilla major,shrub,4,8,full,true,false,shrub
+Mount Airy Fothergilla,Fothergilla x intermedia 'Mount Airy',shrub,5,9,full,true,false,shrub
+Virginia Sweetspire,Itea virginica,shrub,5,9,part,true,false,shrub
+Henry's Garnet Sweetspire,Itea virginica 'Henry's Garnet',shrub,5,9,part,true,false,shrub
+Summersweet,Clethra alnifolia,shrub,3,9,part,true,false,shrub
+Ruby Spice Summersweet,Clethra alnifolia 'Ruby Spice',shrub,3,9,part,true,false,shrub
+Black Chokeberry,Aronia melanocarpa,shrub,3,8,full,true,false,shrub
+Red Chokeberry,Aronia arbutifolia,shrub,4,9,full,true,false,shrub
+Brilliantissima Chokeberry,Aronia arbutifolia 'Brilliantissima',shrub,4,9,full,true,false,shrub
+Common Winterberry,Ilex verticillata,shrub,3,9,part,true,false,shrub
+Winter Red Winterberry,Ilex verticillata 'Winter Red',shrub,3,9,part,true,false,shrub
+Possumhaw,Ilex decidua,shrub,5,9,full,true,false,shrub
+American Elderberry,Sambucus canadensis,shrub,3,9,full,true,false,shrub
+Black Elderberry,Sambucus nigra,shrub,4,8,full,false,false,shrub
+Red Elderberry,Sambucus racemosa,shrub,3,7,part,true,false,shrub
+Black Lace Elderberry,Sambucus nigra 'Eva',shrub,4,7,full,false,false,shrub
+Knock Out Rose,Rosa 'Radrazz',shrub,5,9,full,false,false,shrub
+Rugosa Rose,Rosa rugosa,shrub,2,7,full,false,true,shrub
+Carolina Rose,Rosa carolina,shrub,4,9,full,true,false,shrub
+Virginia Rose,Rosa virginiana,shrub,3,7,full,true,false,shrub
+Swamp Rose,Rosa palustris,shrub,4,9,full,true,false,shrub
+Multiflora Rose,Rosa multiflora,shrub,5,8,full,false,true,shrub
+Drift Rose,Rosa 'Meijocos',shrub,4,11,full,false,false,shrub
+Shrubby Cinquefoil,Potentilla fruticosa,shrub,2,7,full,true,false,shrub
+Bluebeard,Caryopteris x clandonensis,shrub,5,9,full,false,false,shrub
+Dark Knight Bluebeard,Caryopteris x clandonensis 'Dark Knight',shrub,5,9,full,false,false,shrub
+American Beautyberry,Callicarpa americana,shrub,6,10,part,true,false,shrub
+Bodinier Beautyberry,Callicarpa bodinieri,shrub,5,8,full,false,false,shrub
+Purple Beautyberry,Callicarpa dichotoma,shrub,5,8,full,false,false,shrub
+Fragrant Sumac,Rhus aromatica,shrub,3,9,full,true,false,shrub
+Smooth Sumac,Rhus glabra,shrub,2,9,full,true,false,shrub
+Staghorn Sumac,Rhus typhina,shrub,3,8,full,true,false,shrub
+Gro-Low Sumac,Rhus aromatica 'Gro-Low',shrub,3,9,full,true,false,shrub
+Alpine Currant,Ribes alpinum,shrub,2,7,part,false,false,shrub
+Clove Currant,Ribes odoratum,shrub,4,8,full,true,false,shrub
+Red Flowering Currant,Ribes sanguineum,shrub,5,8,part,true,false,shrub
+American Black Currant,Ribes americanum,shrub,2,7,part,true,false,shrub
+Carolina Allspice,Calycanthus floridus,shrub,4,9,part,true,false,shrub
+Buttonbush,Cephalanthus occidentalis,shrub,5,9,full,true,false,shrub
+Sugar Shack Buttonbush,Cephalanthus occidentalis 'Sugar Shack',shrub,4,10,full,true,false,shrub
+Bush Honeysuckle,Diervilla lonicera,shrub,3,7,part,true,false,shrub
+Southern Bush Honeysuckle,Diervilla sessilifolia,shrub,4,8,part,true,false,shrub
+Kerria,Kerria japonica,shrub,4,9,part,false,false,shrub
+Pleniflora Kerria,Kerria japonica 'Pleniflora',shrub,4,9,part,false,false,shrub
+Flowering Quince,Chaenomeles speciosa,shrub,4,8,full,false,false,shrub
+Japanese Flowering Quince,Chaenomeles japonica,shrub,5,8,full,false,false,shrub
+Double Take Quince,Chaenomeles speciosa 'Texas Scarlet',shrub,4,8,full,false,false,shrub
+Spicebush,Lindera benzoin,shrub,4,9,part,true,false,shrub
+Japanese Barberry,Berberis thunbergii,shrub,4,8,full,false,true,shrub
+Crimson Pygmy Barberry,Berberis thunbergii 'Atropurpurea Nana',shrub,4,8,full,false,true,shrub
+Winged Euonymus,Euonymus alatus,shrub,4,8,full,false,true,shrub
+Compact Burning Bush,Euonymus alatus 'Compactus',shrub,4,8,full,false,true,shrub
+Border Privet,Ligustrum obtusifolium,shrub,3,7,full,false,true,shrub
+Chinese Privet,Ligustrum sinense,shrub,6,10,full,false,true,shrub
+Common Privet,Ligustrum vulgare,shrub,4,7,full,false,true,shrub
+Common Buckthorn,Rhamnus cathartica,shrub,3,7,full,false,true,shrub
+Glossy Buckthorn,Frangula alnus,shrub,3,7,full,false,true,shrub
+Butterfly Bush,Buddleja davidii,shrub,5,9,full,false,true,shrub
+Black Knight Butterfly Bush,Buddleja davidii 'Black Knight',shrub,5,9,full,false,true,shrub
+Beauty Bush,Kolkwitzia amabilis,shrub,4,8,full,false,false,shrub
+Sweet Pepperbush,Clethra acuminata,shrub,5,8,part,true,false,shrub
+Japanese Kerria,Rhodotypos scandens,shrub,4,8,part,false,false,shrub
+Common Pearlbush,Exochorda racemosa,shrub,4,8,full,false,false,shrub
+The Bride Pearlbush,Exochorda x macrantha 'The Bride',shrub,4,8,full,false,false,shrub
+Winter Daphne,Daphne odora,shrub,7,9,part,false,false,shrub
+Burkwood Daphne,Daphne x burkwoodii 'Carol Mackie',shrub,4,8,part,false,false,shrub
+Winter Jasmine,Jasminum nudiflorum,shrub,6,10,full,false,false,shrub
+Common Snowberry,Symphoricarpos albus,shrub,3,7,part,true,false,shrub
+Coralberry,Symphoricarpos orbiculatus,shrub,2,7,part,true,false,shrub
+New Jersey Tea,Ceanothus americanus,shrub,4,8,full,true,false,shrub
+California Lilac,Ceanothus thyrsiflorus,shrub,8,10,full,true,false,shrub
+Bottlebrush Buckeye,Aesculus parviflora,shrub,4,8,part,true,false,shrub
+Red Buckeye,Aesculus pavia,shrub,4,8,part,true,false,shrub
+Common Hazel,Corylus avellana,shrub,4,8,full,false,false,shrub
+American Hazelnut,Corylus americana,shrub,4,9,full,true,false,shrub
+Harry Lauder's Walking Stick,Corylus avellana 'Contorta',shrub,4,8,full,false,false,shrub
+Steeplebush,Spiraea tomentosa,shrub,3,8,full,true,false,shrub
+Meadowsweet,Spiraea alba,shrub,3,8,full,true,false,shrub
+Ural False Spirea,Sorbaria sorbifolia,shrub,2,8,part,false,false,shrub
+Little Princess Spirea,Spiraea japonica 'Little Princess',shrub,4,9,full,false,true,shrub
+Bumald Spirea,Spiraea x bumalda,shrub,4,8,full,false,true,shrub
+Rock Spirea,Holodiscus discolor,shrub,5,9,part,true,false,shrub
+Ocean Spray,Holodiscus dumosus,shrub,4,8,full,true,false,shrub
+Sweetfern,Comptonia peregrina,shrub,2,6,full,true,false,shrub
+Northern Bayberry,Morella pensylvanica,shrub,3,7,full,true,false,shrub
+Pussy Willow,Salix discolor,shrub,4,8,full,true,false,shrub
+Dappled Willow,Salix integra 'Hakuro-nishiki',shrub,4,9,full,false,false,shrub
+Scotch Broom,Cytisus scoparius,shrub,5,8,full,false,true,shrub
+Western Spicebush,Calycanthus occidentalis,shrub,6,9,part,true,false,shrub
+Fragrant Honeysuckle,Lonicera fragrantissima,shrub,4,8,full,false,true,shrub
+Amur Honeysuckle,Lonicera maackii,shrub,3,8,full,false,true,shrub
+Tatarian Honeysuckle,Lonicera tatarica,shrub,3,9,full,false,true,shrub
+Bloodtwig Dogwood,Cornus sanguinea,shrub,4,7,full,false,false,shrub
+Midwinter Fire Dogwood,Cornus sanguinea 'Midwinter Fire',shrub,5,7,full,false,false,shrub
+Pagoda Dogwood,Cornus alternifolia,shrub,3,7,part,true,false,shrub
+Roundleaf Dogwood,Cornus rugosa,shrub,3,7,part,true,false,shrub
+Prairie Rose,Rosa setigera,shrub,4,8,full,true,false,shrub
+Wineberry,Rubus phoenicolasius,shrub,5,8,part,false,true,shrub
+Flowering Raspberry,Rubus odoratus,shrub,3,7,part,true,false,shrub
+Thimbleberry,Rubus parviflorus,shrub,3,8,part,true,false,shrub
+Indigobush,Amorpha fruticosa,shrub,4,9,full,true,false,shrub
+Leadplant,Amorpha canescens,shrub,2,8,full,true,false,shrub
+Ruby Slippers Oakleaf Hydrangea,Hydrangea quercifolia 'Ruby Slippers',shrub,5,9,part,true,false,shrub
+Bloomerang Lilac,Syringa 'Penda',shrub,3,7,full,false,false,shrub
+Chinese Lilac,Syringa x chinensis,shrub,3,7,full,false,false,shrub
+Pinkshell Azalea,Rhododendron vaseyi,shrub,4,7,part,true,false,shrub
+Flame Azalea,Rhododendron calendulaceum,shrub,5,8,part,true,false,shrub
+Pinxterbloom Azalea,Rhododendron periclymenoides,shrub,4,9,part,true,false,shrub
+Sweet Azalea,Rhododendron arborescens,shrub,4,7,part,true,false,shrub
+Royal Azalea,Rhododendron schlippenbachii,shrub,4,7,part,false,false,shrub

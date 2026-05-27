@@ -11,9 +11,10 @@ import {
   type DragStartEvent,
   type DragEndEvent,
 } from "@dnd-kit/core";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { PlantPlacement, PlantType } from "@/domain/models";
 import { generateLayout } from "@/domain/layout";
+import { localizePlantName } from "@/lib/plantNames";
 
 const TYPE_COLOR: Record<PlantType, string> = {
   evergreen: "#2f6a3f",
@@ -86,6 +87,7 @@ function Chip({
 
 export function ConceptBoard({ plants }: { plants: PlantPlacement[] }) {
   const t = useTranslations("ConceptBoard");
+  const locale = useLocale();
   const initial = useMemo(() => {
     const map = new Map<string, Pos>();
     for (const v of generateLayout(plants)) map.set(v.plantId, { x: v.x, y: v.y, scale: v.scale });
@@ -157,7 +159,7 @@ export function ConceptBoard({ plants }: { plants: PlantPlacement[] }) {
               isActive={activeId === p.plantId}
               label={t("chipAria", {
                 quantity: p.quantity,
-                name: p.commonName,
+                name: localizePlantName(p.plantId, p.commonName, locale),
                 type: t(`types.${p.type}`),
               })}
             />

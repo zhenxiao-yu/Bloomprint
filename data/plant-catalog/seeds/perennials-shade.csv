@@ -1,0 +1,148 @@
+commonName,botanical,type,zMin,zMax,sun,nativeNA,invasiveWatch,category
+Blue Angel Hosta,Hosta 'Blue Angel',perennial,3,8,shade,false,false,shade-perennial
+Sum and Substance Hosta,Hosta 'Sum and Substance',perennial,3,9,part,false,false,shade-perennial
+Patriot Hosta,Hosta 'Patriot',perennial,3,8,shade,false,false,shade-perennial
+Frances Williams Hosta,Hosta 'Frances Williams',perennial,3,8,part,false,false,shade-perennial
+Guacamole Hosta,Hosta 'Guacamole',perennial,3,9,part,false,false,shade-perennial
+Empress Wu Hosta,Hosta 'Empress Wu',perennial,3,9,shade,false,false,shade-perennial
+Halcyon Hosta,Hosta 'Halcyon',perennial,3,9,shade,false,false,shade-perennial
+Fragrant Plantain Lily,Hosta plantaginea,perennial,3,8,part,false,false,shade-perennial
+Siebold Hosta,Hosta sieboldiana,perennial,3,8,shade,false,false,shade-perennial
+Palace Purple Coral Bells,Heuchera 'Palace Purple',perennial,4,9,part,false,false,shade-perennial
+Caramel Coral Bells,Heuchera 'Caramel',perennial,4,9,part,false,false,shade-perennial
+Obsidian Coral Bells,Heuchera 'Obsidian',perennial,4,9,part,false,false,shade-perennial
+Marmalade Coral Bells,Heuchera 'Marmalade',perennial,4,9,part,false,false,shade-perennial
+Hairy Alumroot,Heuchera villosa,perennial,3,8,part,true,false,native-perennial
+American Alumroot,Heuchera americana,perennial,4,9,part,true,false,native-perennial
+Coral Bells,Heuchera sanguinea,perennial,3,8,part,true,false,native-perennial
+Autumn Bride Coral Bells,Heuchera villosa 'Autumn Bride',perennial,3,8,part,true,false,native-perennial
+Stoplight Foamy Bells,Heucherella 'Stoplight',perennial,4,9,part,false,false,shade-perennial
+Sweet Tea Foamy Bells,Heucherella 'Sweet Tea',perennial,4,9,part,false,false,shade-perennial
+Alabama Sunrise Foamy Bells,Heucherella 'Alabama Sunrise',perennial,4,9,part,false,false,shade-perennial
+Foamflower,Tiarella cordifolia,perennial,3,9,shade,true,false,native-perennial
+Wherry's Foamflower,Tiarella wherryi,perennial,3,8,shade,true,false,native-perennial
+Spring Symphony Foamflower,Tiarella 'Spring Symphony',perennial,4,9,shade,true,false,native-perennial
+Siberian Bugloss,Brunnera macrophylla,perennial,3,8,part,false,false,shade-perennial
+Jack Frost Bugloss,Brunnera macrophylla 'Jack Frost',perennial,3,8,part,false,false,shade-perennial
+Looking Glass Bugloss,Brunnera macrophylla 'Looking Glass',perennial,3,8,part,false,false,shade-perennial
+Chinese Astilbe,Astilbe chinensis,perennial,4,8,part,false,false,shade-perennial
+Pumila Dwarf Astilbe,Astilbe chinensis 'Pumila',perennial,4,8,part,false,false,shade-perennial
+Visions Astilbe,Astilbe chinensis 'Visions',perennial,4,9,part,false,false,shade-perennial
+Fanal Astilbe,Astilbe 'Fanal',perennial,3,8,part,false,false,shade-perennial
+Japanese Astilbe,Astilbe japonica,perennial,4,8,part,false,false,shade-perennial
+Star Astilbe,Astilbe simplicifolia,perennial,4,8,part,false,false,shade-perennial
+Bethlehem Sage,Pulmonaria saccharata,perennial,3,8,shade,false,false,shade-perennial
+Mrs Moon Lungwort,Pulmonaria 'Mrs. Moon',perennial,3,8,shade,false,false,shade-perennial
+Raspberry Splash Lungwort,Pulmonaria 'Raspberry Splash',perennial,3,8,shade,false,false,shade-perennial
+Common Lungwort,Pulmonaria officinalis,perennial,3,8,shade,false,false,shade-perennial
+Fringed Bleeding Heart,Dicentra eximia,perennial,3,9,part,true,false,native-perennial
+Western Bleeding Heart,Dicentra formosa,perennial,4,8,part,true,false,native-perennial
+King of Hearts Bleeding Heart,Dicentra 'King of Hearts',perennial,3,9,part,true,false,native-perennial
+Common Bleeding Heart,Lamprocapnos spectabilis,perennial,3,9,part,false,false,shade-perennial
+Gold Heart Bleeding Heart,Lamprocapnos spectabilis 'Gold Heart',perennial,3,9,part,false,false,shade-perennial
+Fragrant Solomon's Seal,Polygonatum odoratum,perennial,3,8,shade,false,false,shade-perennial
+Variegated Solomon's Seal,Polygonatum odoratum 'Variegatum',perennial,3,8,shade,false,false,shade-perennial
+Smooth Solomon's Seal,Polygonatum biflorum,perennial,3,7,shade,true,false,native-perennial
+Great Solomon's Seal,Polygonatum commutatum,perennial,3,7,shade,true,false,native-perennial
+Toad Lily,Tricyrtis hirta,perennial,4,9,shade,false,false,shade-perennial
+Formosa Toad Lily,Tricyrtis formosana,perennial,4,9,shade,false,false,shade-perennial
+Miyazaki Toad Lily,Tricyrtis 'Miyazaki',perennial,4,8,shade,false,false,shade-perennial
+Tojen Toad Lily,Tricyrtis 'Tojen',perennial,4,9,shade,false,false,shade-perennial
+Lenten Rose,Helleborus orientalis,perennial,4,9,part,false,false,shade-perennial
+Christmas Rose,Helleborus niger,perennial,3,8,part,false,false,shade-perennial
+Hybrid Hellebore,Helleborus x hybridus,perennial,4,9,part,false,false,shade-perennial
+Bearsfoot Hellebore,Helleborus foetidus,perennial,5,9,part,false,false,shade-perennial
+Corsican Hellebore,Helleborus argutifolius,perennial,6,9,part,false,false,shade-perennial
+Bishop's Hat,Epimedium grandiflorum,perennial,5,8,shade,false,false,shade-perennial
+Red Barrenwort,Epimedium x rubrum,perennial,4,8,shade,false,false,shade-perennial
+Persian Barrenwort,Epimedium x versicolor 'Sulphureum',perennial,5,9,shade,false,false,shade-perennial
+Yellow Barrenwort,Epimedium x perralchicum 'Frohnleiten',perennial,5,9,shade,false,false,shade-perennial
+Eastern Red Columbine,Aquilegia canadensis,perennial,3,8,part,true,false,native-perennial
+Colorado Blue Columbine,Aquilegia caerulea,perennial,3,8,part,true,false,native-perennial
+Common Columbine,Aquilegia vulgaris,perennial,3,8,part,false,false,shade-perennial
+Golden Columbine,Aquilegia chrysantha,perennial,3,9,part,true,false,native-perennial
+Goatsbeard,Aruncus dioicus,perennial,3,7,part,true,false,native-perennial
+Dwarf Goatsbeard,Aruncus aethusifolius,perennial,3,9,part,false,false,shade-perennial
+Black Cohosh,Actaea racemosa,perennial,3,8,part,true,false,native-perennial
+Kamchatka Bugbane,Actaea simplex,perennial,4,8,part,false,false,shade-perennial
+White Baneberry,Actaea pachypoda,perennial,3,8,shade,true,false,native-perennial
+Red Baneberry,Actaea rubra,perennial,3,7,shade,true,false,native-perennial
+Japanese Sedge,Carex morrowii,perennial,5,9,part,false,false,shade-perennial
+Evergold Sedge,Carex oshimensis 'Evergold',perennial,5,9,part,false,false,shade-perennial
+Pennsylvania Sedge,Carex pensylvanica,perennial,3,8,shade,true,false,native-perennial
+Palm Sedge,Carex muskingumensis,perennial,4,9,part,true,false,native-perennial
+Plantain-Leaved Sedge,Carex plantaginea,perennial,4,8,shade,true,false,native-perennial
+Blue Wood Sedge,Carex flaccosperma,perennial,5,9,shade,true,false,native-perennial
+Appalachian Sedge,Carex appalachica,perennial,3,7,shade,true,false,native-perennial
+Japanese Painted Fern,Athyrium niponicum 'Pictum',perennial,3,8,shade,false,false,fern
+Lady Fern,Athyrium filix-femina,perennial,3,8,part,true,false,native-fern
+Southern Lady Fern,Athyrium asplenioides,perennial,4,9,shade,true,false,native-fern
+Ghost Fern,Athyrium 'Ghost',perennial,3,8,shade,false,false,fern
+Autumn Fern,Dryopteris erythrosora,perennial,5,9,shade,false,false,fern
+Male Fern,Dryopteris filix-mas,perennial,4,8,shade,true,false,native-fern
+Marginal Wood Fern,Dryopteris marginalis,perennial,3,8,shade,true,false,native-fern
+Goldie's Wood Fern,Dryopteris goldiana,perennial,3,8,shade,true,false,native-fern
+Intermediate Wood Fern,Dryopteris intermedia,perennial,3,8,shade,true,false,native-fern
+Ostrich Fern,Matteuccia struthiopteris,perennial,3,7,part,true,false,native-fern
+Christmas Fern,Polystichum acrostichoides,perennial,3,9,shade,true,false,native-fern
+Tassel Fern,Polystichum polyblepharum,perennial,5,8,shade,false,false,fern
+Western Sword Fern,Polystichum munitum,perennial,5,9,shade,true,false,native-fern
+Soft Shield Fern,Polystichum setiferum,perennial,5,8,shade,false,false,fern
+Northern Maidenhair Fern,Adiantum pedatum,perennial,3,8,shade,true,false,native-fern
+Southern Maidenhair Fern,Adiantum capillus-veneris,perennial,7,10,shade,true,false,native-fern
+Cinnamon Fern,Osmundastrum cinnamomeum,perennial,3,9,part,true,false,native-fern
+Royal Fern,Osmunda regalis,perennial,3,9,part,true,false,native-fern
+Interrupted Fern,Osmunda claytoniana,perennial,3,8,part,true,false,native-fern
+Sensitive Fern,Onoclea sensibilis,perennial,4,9,part,true,false,native-fern
+Hay-Scented Fern,Dennstaedtia punctilobula,perennial,3,8,part,true,false,native-fern
+Netted Chain Fern,Woodwardia areolata,perennial,4,9,shade,true,false,native-fern
+Ebony Spleenwort,Asplenium platyneuron,perennial,3,9,shade,true,false,native-fern
+New York Fern,Thelypteris noveboracensis,perennial,3,8,part,true,false,native-fern
+Holly Fern,Cyrtomium falcatum,perennial,6,10,shade,false,false,fern
+Broad Beech Fern,Phegopteris hexagonoptera,perennial,4,8,shade,true,false,native-fern
+Japanese Forest Grass,Hakonechloa macra,perennial,5,9,shade,false,false,shade-grass
+Aureola Japanese Forest Grass,Hakonechloa macra 'Aureola',perennial,5,9,shade,false,false,shade-grass
+Spotted Dead Nettle,Lamium maculatum,perennial,3,8,shade,false,true,shade-groundcover
+White Nancy Dead Nettle,Lamium maculatum 'White Nancy',perennial,3,8,shade,false,true,shade-groundcover
+Yellow Archangel,Lamium galeobdolon,perennial,4,9,shade,false,true,shade-groundcover
+Japanese Pachysandra,Pachysandra terminalis,perennial,4,8,shade,false,true,shade-groundcover
+Allegheny Spurge,Pachysandra procumbens,perennial,5,9,shade,true,false,native-groundcover
+Canadian Wild Ginger,Asarum canadense,perennial,3,8,shade,true,false,native-groundcover
+European Wild Ginger,Asarum europaeum,perennial,4,8,shade,false,false,shade-groundcover
+British Columbia Wild Ginger,Asarum caudatum,perennial,6,9,shade,true,false,native-groundcover
+Mottled Wild Ginger,Asarum shuttleworthii,perennial,5,9,shade,true,false,native-groundcover
+Virginia Spiderwort,Tradescantia virginiana,perennial,4,9,part,true,false,native-perennial
+Sweet Kate Spiderwort,Tradescantia 'Sweet Kate',perennial,4,9,part,true,false,native-perennial
+Bigleaf Ligularia,Ligularia dentata,perennial,4,8,part,false,false,shade-perennial
+Britt-Marie Crawford Ligularia,Ligularia dentata 'Britt-Marie Crawford',perennial,4,8,part,false,false,shade-perennial
+Narrow-Spiked Ligularia,Ligularia stenocephala,perennial,4,8,part,false,false,shade-perennial
+Bronzeleaf Rodgersia,Rodgersia aesculifolia,perennial,4,7,part,false,false,shade-perennial
+Featherleaf Rodgersia,Rodgersia pinnata,perennial,5,7,part,false,false,shade-perennial
+Heartleaf Bergenia,Bergenia cordifolia,perennial,3,8,part,false,false,shade-perennial
+Bressingham Ruby Bergenia,Bergenia 'Bressingham Ruby',perennial,3,8,part,false,false,shade-perennial
+Common Primrose,Primula vulgaris,perennial,4,8,part,false,false,shade-perennial
+Japanese Primrose,Primula japonica,perennial,4,8,part,false,false,shade-perennial
+Drumstick Primrose,Primula denticulata,perennial,3,8,part,false,false,shade-perennial
+Wild Blue Phlox,Phlox divaricata,perennial,3,8,part,true,false,native-perennial
+Creeping Phlox,Phlox stolonifera,perennial,5,9,shade,true,false,native-groundcover
+Great White Trillium,Trillium grandiflorum,perennial,4,8,shade,true,false,native-perennial
+Toadshade Trillium,Trillium sessile,perennial,4,8,shade,true,false,native-perennial
+Bloodroot,Sanguinaria canadensis,perennial,3,8,shade,true,false,native-perennial
+Mayapple,Podophyllum peltatum,perennial,3,8,shade,true,false,native-perennial
+Virginia Bluebells,Mertensia virginica,perennial,3,8,shade,true,false,native-perennial
+Celandine Poppy,Stylophorum diphyllum,perennial,4,9,shade,true,false,native-perennial
+Wild Geranium,Geranium maculatum,perennial,3,8,part,true,false,native-perennial
+Bigroot Geranium,Geranium macrorrhizum,perennial,3,8,part,false,false,shade-perennial
+Creeping Jacob's Ladder,Polemonium reptans,perennial,3,8,part,true,false,native-perennial
+Sweet Woodruff,Galium odoratum,perennial,4,8,shade,false,false,shade-groundcover
+Bigleaf Aster,Eurybia macrophylla,perennial,3,8,part,true,false,native-perennial
+White Wood Aster,Eurybia divaricata,perennial,3,8,part,true,false,native-perennial
+Yellow Corydalis,Pseudofumaria lutea,perennial,5,8,part,false,false,shade-perennial
+Blue Corydalis,Corydalis flexuosa,perennial,5,8,part,false,false,shade-perennial
+Hardy Begonia,Begonia grandis,perennial,6,9,shade,false,false,shade-perennial
+Lily of the Valley,Convallaria majalis,perennial,3,8,shade,false,true,shade-groundcover
+Yellow Wax Bells,Kirengeshoma palmata,perennial,5,8,shade,false,false,shade-perennial
+Hardy Cyclamen,Cyclamen hederifolium,perennial,5,9,shade,false,false,shade-perennial
+Wood Anemone,Anemone nemorosa,perennial,4,8,shade,false,false,shade-perennial
+False Solomon's Seal,Maianthemum racemosum,perennial,3,8,shade,true,false,native-perennial
+Tall Bellflower,Campanula americana,perennial,4,7,part,true,false,native-perennial

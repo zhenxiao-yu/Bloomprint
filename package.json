@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "data:synonyms": "node scripts/build-synonyms.mjs",
     "data:plants": "node scripts/build-plant-data.mjs",
+    "data:catalog": "node scripts/build-plant-catalog.mjs",
     "format": "prettier --write .",
     "db:new": "supabase migration new",
     "db:push": "supabase db push",

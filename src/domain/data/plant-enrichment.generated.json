@@ -287,5 +287,168 @@
       "introduced",
       "native"
     ]
+  },
+  "butterfly-milkweed": {
+    "usageKey": 3170305,
+    "canonicalName": "Asclepias tuberosa",
+    "family": "Apocynaceae",
+    "establishmentMeans": [
+      "uncertain"
+    ]
+  },
+  "bee-balm": {
+    "usageKey": 5341407,
+    "canonicalName": "Monarda didyma",
+    "family": "Lamiaceae",
+    "establishmentMeans": [
+      "introduced",
+      "managed",
+      "native"
+    ]
+  },
+  "blazing-star": {
+    "usageKey": 3104314,
+    "canonicalName": "Liatris spicata",
+    "family": "Asteraceae",
+    "establishmentMeans": [
+      "introduced",
+      "managed",
+      "native"
+    ]
+  },
+  "false-indigo": {
+    "usageKey": 2976091,
+    "canonicalName": "Baptisia australis",
+    "family": "Fabaceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
+  },
+  "switchgrass": {
+    "usageKey": 2705081,
+    "canonicalName": "Panicum virgatum",
+    "family": "Poaceae",
+    "establishmentMeans": []
+  },
+  "prairie-dropseed": {
+    "usageKey": 2704766,
+    "canonicalName": "Sporobolus heterolepis",
+    "family": "Poaceae",
+    "establishmentMeans": [
+      "native"
+    ]
+  },
+  "new-england-aster": {
+    "usageKey": 3151618,
+    "canonicalName": "Symphyotrichum novae-angliae",
+    "family": "Asteraceae",
+    "establishmentMeans": [
+      "introduced",
+      "native",
+      "uncertain"
+    ]
+  },
+  "goldenrod": {
+    "usageKey": 5388967,
+    "canonicalName": "Solidago rugosa",
+    "family": "Asteraceae",
+    "establishmentMeans": [
+      "introduced",
+      "native"
+    ]
+  },
+  "anise-hyssop": {
+    "usageKey": 2926406,
+    "canonicalName": "Agastache foeniculum",
+    "family": "Lamiaceae",
+    "establishmentMeans": [
+      "introduced",
+      "native"
+    ]
+  },
+  "threadleaf-bluestar": {
+    "usageKey": 3169697,
+    "canonicalName": "Amsonia hubrichtii",
+    "family": "Apocynaceae",
+    "establishmentMeans": []
+  },
+  "foamflower": {
+    "usageKey": 5371610,
+    "canonicalName": "Tiarella cordifolia",
+    "family": "Saxifragaceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
+  },
+  "siberian-bugloss": {
+    "usageKey": 2926045,
+    "canonicalName": "Brunnera macrophylla",
+    "family": "Boraginaceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
+  },
+  "solomons-seal": {
+    "usageKey": 11236627,
+    "canonicalName": "Polygonatum odoratum",
+    "family": "Asparagaceae",
+    "establishmentMeans": []
+  },
+  "japanese-painted-fern": {
+    "usageKey": 7125894,
+    "canonicalName": "Athyrium niponicum",
+    "family": "Athyriaceae",
+    "establishmentMeans": [
+      "introduced",
+      "native"
+    ]
+  },
+  "bleeding-heart": {
+    "usageKey": 2888564,
+    "canonicalName": "Lamprocapnos spectabilis",
+    "family": "Papaveraceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
+  },
+  "serviceberry": {
+    "usageKey": 3023833,
+    "canonicalName": "Amelanchier canadensis",
+    "family": "Rosaceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
+  },
+  "eastern-redbud": {
+    "usageKey": 5353583,
+    "canonicalName": "Cercis canadensis",
+    "family": "Fabaceae",
+    "establishmentMeans": []
+  },
+  "flowering-dogwood": {
+    "usageKey": 3082240,
+    "canonicalName": "Cornus florida",
+    "family": "Cornaceae",
+    "establishmentMeans": [
+      "introduced",
+      "native"
+    ]
+  },
+  "japanese-maple": {
+    "usageKey": 3189882,
+    "canonicalName": "Acer palmatum",
+    "family": "Sapindaceae",
+    "establishmentMeans": [
+      "introduced",
+      "managed"
+    ]
+  },
+  "star-magnolia": {
+    "usageKey": 3153912,
+    "canonicalName": "Magnolia stellata",
+    "family": "Magnoliaceae",
+    "establishmentMeans": [
+      "introduced"
+    ]
   }
 }
