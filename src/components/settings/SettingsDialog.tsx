@@ -75,7 +75,7 @@ export function SettingsDialog({ children }: { children: React.ReactNode }) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
         showCloseButton
-        className="top-auto bottom-0 flex h-[86dvh] w-full max-w-2xl translate-y-0 flex-col gap-0 overflow-hidden rounded-t-3xl rounded-b-none border-border bg-surface/95 p-0 backdrop-blur-2xl data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom sm:top-1/2 sm:bottom-auto sm:h-[600px] sm:max-h-[88vh] sm:-translate-y-1/2 sm:rounded-3xl"
+        className="top-auto bottom-0 flex max-h-[90dvh] w-full max-w-2xl translate-y-0 flex-col gap-0 overflow-hidden rounded-t-3xl rounded-b-none border-border bg-surface/95 p-0 backdrop-blur-2xl data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom sm:top-1/2 sm:bottom-auto sm:max-h-[85vh] sm:min-h-[22rem] sm:-translate-y-1/2 sm:rounded-3xl"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <BorderBeam size={120} duration={8} borderWidth={1.2} className="opacity-50" />
