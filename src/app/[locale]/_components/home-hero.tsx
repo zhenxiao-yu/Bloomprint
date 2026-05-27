@@ -1,20 +1,18 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { ArrowRight, ClipboardList, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { Photo } from "@/components/ui/photo";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { AuroraText } from "@/components/ui/aurora-text";
 import { BorderBeam } from "@/components/ui/border-beam";
+import { Aurora } from "@/components/ui/aurora";
 
 /**
- * Home hero — a photographic, layered hero with a staggered blur-fade entrance.
+ * Home hero — a React Bits Aurora background with a staggered blur-fade entrance.
  * Server passes already-translated strings so this stays presentation-only.
  * On-brand aurora colors (forest / blueprint blue / terracotta) feed AuroraText.
  */
-
-type Snapshot = readonly [label: string, value: string];
 
 const AURORA_COLORS = ["#9fceaa", "#4a6f8c", "#d5965d", "#244735"];
 
@@ -25,8 +23,6 @@ export function HomeHero({
   subtitle,
   startPlan,
   tryDemo,
-  snapshotLabel,
-  snapshot,
 }: {
   eyebrow: string;
   /** Short animated aurora phrase that sits above the headline. */
@@ -36,8 +32,6 @@ export function HomeHero({
   subtitle: string;
   startPlan: string;
   tryDemo: string;
-  snapshotLabel: string;
-  snapshot: readonly Snapshot[];
 }) {
   const reduce = useReducedMotion();
 
@@ -61,16 +55,43 @@ export function HomeHero({
       };
 
   return (
-    <section className="snap-section aurora page-wide">
-      <Photo
-        src="/photos/wisteria-arch.jpg"
-        alt="A garden path under an arch of blooming wisteria"
-        priority
-        scrim
-        sizes="(max-width: 1440px) 100vw, 1400px"
-        imgClassName="scale-105 transition-transform duration-[1.2s] ease-out"
-        className="group relative flex min-h-136 overflow-hidden rounded-[1.75rem] ring-1 ring-foreground/10 sm:min-h-160 lg:min-h-176"
-      >
+    <section className="snap-section page-wide">
+      <div className="group relative flex min-h-124 overflow-hidden rounded-[1.75rem] bg-surface ring-1 ring-foreground/10 sm:min-h-144 lg:min-h-156">
+        {!reduce ? (
+          <>
+            <Aurora
+              className="absolute inset-0 z-0 opacity-95 dark:hidden"
+              colorStops={["#dfead4", "#5f9b72", "#d5965d"]}
+              amplitude={0.85}
+              blend={0.72}
+              speed={0.42}
+              intensity={0.68}
+            />
+            <Aurora
+              className="absolute inset-0 z-0 hidden opacity-90 dark:block"
+              colorStops={["#244735", "#9fceaa", "#8fb5d1"]}
+              amplitude={1.08}
+              blend={0.64}
+              speed={0.46}
+              intensity={0.82}
+            />
+          </>
+        ) : (
+          <div
+            aria-hidden
+            className="absolute inset-0 z-0 bg-[radial-gradient(70%_85%_at_16%_18%,color-mix(in_srgb,var(--brand)_34%,transparent),transparent_70%),radial-gradient(58%_68%_at_84%_14%,color-mix(in_srgb,var(--blueprint)_28%,transparent),transparent_72%),linear-gradient(135deg,color-mix(in_srgb,var(--surface)_95%,var(--brand-soft))_0%,var(--surface)_100%)]"
+          />
+        )}
+
+        <div
+          aria-hidden
+          className="absolute inset-0 z-0 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--surface)_96%,transparent)_0%,color-mix(in_srgb,var(--surface)_78%,transparent)_42%,color-mix(in_srgb,var(--surface)_24%,transparent)_72%,transparent_100%)] dark:bg-[linear-gradient(90deg,color-mix(in_srgb,var(--background)_94%,transparent)_0%,color-mix(in_srgb,var(--background)_76%,transparent)_44%,color-mix(in_srgb,var(--background)_26%,transparent)_76%,transparent_100%)]"
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_18%_20%,color-mix(in_srgb,var(--surface)_78%,transparent),transparent_35%),linear-gradient(to_top,color-mix(in_srgb,var(--surface)_82%,transparent),transparent_52%)] dark:bg-[radial-gradient(circle_at_18%_20%,color-mix(in_srgb,var(--background)_78%,transparent),transparent_35%),linear-gradient(to_top,color-mix(in_srgb,var(--background)_84%,transparent),transparent_52%)]"
+        />
+
         {/* Animated beam tracing the hero frame */}
         {!reduce ? (
           <BorderBeam
@@ -87,15 +108,15 @@ export function HomeHero({
           variants={container}
           initial="hidden"
           animate="show"
-          className="mt-auto grid w-full gap-6 p-5 sm:p-9 lg:grid-cols-[1.15fr_0.85fr] lg:items-end lg:gap-12 lg:p-12"
+          className="relative z-10 flex w-full flex-col justify-end p-5 sm:p-9 lg:p-12"
         >
-          <div>
+          <div className="max-w-3xl">
             <motion.span
               variants={item}
-              className="glass-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-white"
+              className="inline-flex items-center gap-1.5 rounded-full border border-foreground/10 bg-surface/70 px-3 py-1 text-foreground shadow-sm backdrop-blur-md dark:bg-background/45"
             >
               <Sparkles className="size-3.5" aria-hidden />
-              <span className="eyebrow text-white">{eyebrow}</span>
+              <span className="eyebrow text-foreground">{eyebrow}</span>
             </motion.span>
 
             <motion.div variants={item} className="mt-4">
@@ -110,12 +131,12 @@ export function HomeHero({
 
             <motion.h1
               variants={item}
-              className="display-xl mt-1.5 max-w-3xl text-white drop-shadow-sm"
+              className="display-xl mt-1.5 max-w-3xl text-foreground drop-shadow-[0_1px_18px_color-mix(in_srgb,var(--surface)_88%,transparent)] dark:drop-shadow-[0_1px_22px_color-mix(in_srgb,var(--background)_90%,transparent)]"
             >
               {title}
             </motion.h1>
 
-            <motion.p variants={item} className="lead mt-5 max-w-xl text-white/90">
+            <motion.p variants={item} className="lead mt-5 max-w-2xl text-foreground/82">
               {subtitle}
             </motion.p>
 
@@ -131,32 +152,14 @@ export function HomeHero({
               </Link>
               <Link
                 href="/plan?demo=1"
-                className="glass-chip inline-flex min-h-12 items-center rounded-full px-6 py-2 text-base font-semibold text-white transition hover:bg-white/15"
+                className="inline-flex min-h-12 items-center rounded-full border border-foreground/12 bg-surface/70 px-6 py-2 text-base font-semibold text-foreground shadow-sm backdrop-blur-md transition hover:bg-surface/90 dark:bg-background/45 dark:hover:bg-background/65"
               >
                 {tryDemo}
               </Link>
             </motion.div>
           </div>
-
-          <motion.div variants={item} className="glass hover-lift rounded-2xl p-5">
-            <p className="mb-3 flex items-center gap-2 text-[13px] font-semibold uppercase tracking-wide text-brand">
-              <ClipboardList className="size-4" aria-hidden />
-              {snapshotLabel}
-            </p>
-            <div className="grid gap-2.5">
-              {snapshot.map(([label, value]) => (
-                <div
-                  key={label}
-                  className="rounded-xl border border-foreground/10 bg-surface/55 p-3.5 backdrop-blur-sm"
-                >
-                  <p className="text-[13px] font-semibold uppercase tracking-wide text-muted">{label}</p>
-                  <p className="mt-1 text-base text-foreground">{value}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
         </motion.div>
-      </Photo>
+      </div>
     </section>
   );
 }

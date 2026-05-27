@@ -150,65 +150,68 @@
   --animate-shiny-text: shiny-text 8s infinite;
   --animate-marquee: marquee var(--duration) infinite linear;
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
-  --animate-shine: shine var(--duration) infinite linear
-;
+  --animate-shine: shine var(--duration) infinite linear;
   @keyframes aurora {
-  0% {
-    background-position: 0% 50%;
-    transform: rotate(-5deg) scale(0.9);
+    0% {
+      background-position: 0% 50%;
+      transform: rotate(-5deg) scale(0.9);
     }
-  25% {
-    background-position: 50% 100%;
-    transform: rotate(5deg) scale(1.1);
+    25% {
+      background-position: 50% 100%;
+      transform: rotate(5deg) scale(1.1);
     }
-  50% {
-    background-position: 100% 50%;
-    transform: rotate(-3deg) scale(0.95);
+    50% {
+      background-position: 100% 50%;
+      transform: rotate(-3deg) scale(0.95);
     }
-  75% {
-    background-position: 50% 0%;
-    transform: rotate(3deg) scale(1.05);
+    75% {
+      background-position: 50% 0%;
+      transform: rotate(3deg) scale(1.05);
     }
-  100% {
-    background-position: 0% 50%;
-    transform: rotate(-5deg) scale(0.9);
+    100% {
+      background-position: 0% 50%;
+      transform: rotate(-5deg) scale(0.9);
     }
   }
   @keyframes shiny-text {
-  0%, 90%, 100% {
-    background-position: calc(-100% - var(--shiny-width)) 0;
+    0%,
+    90%,
+    100% {
+      background-position: calc(-100% - var(--shiny-width)) 0;
     }
-  30%, 60% {
-    background-position: calc(100% + var(--shiny-width)) 0;
+    30%,
+    60% {
+      background-position: calc(100% + var(--shiny-width)) 0;
     }
   }
   @keyframes marquee {
-  from {
-    transform: translateX(0);
+    from {
+      transform: translateX(0);
     }
-  to {
-    transform: translateX(calc(-100% - var(--gap)));
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
     }
   }
   @keyframes marquee-vertical {
-  from {
-    transform: translateY(0);
+    from {
+      transform: translateY(0);
     }
-  to {
-    transform: translateY(calc(-100% - var(--gap)));
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
     }
   }
   @keyframes shine {
-  0% {
-    background-position: 0% 0%;
+    0% {
+      background-position: 0% 0%;
     }
-  50% {
-    background-position: 100% 100%;
+    50% {
+      background-position: 100% 100%;
     }
-  to {
-    background-position: 0% 0%;
+    to {
+      background-position: 0% 0%;
     }
-  }}
+  }
+}
 
 /* Base readability: 17px root (vs 16) enlarges text + rem spacing ~6% for a more
    generous, less cramped feel — and easier reading for older users. Breakpoints are
@@ -220,6 +223,7 @@ html {
   /* Viewport-level guard against decorative overflow (animated aurora/marquee/beam
      transforms) creating a horizontal scrollbar. `clip` keeps sticky working. */
   overflow-x: clip;
+  max-width: 100%;
 }
 
 body {
@@ -232,10 +236,17 @@ body {
      horizontal scrollbar. `clip` (not hidden/scroll) doesn't create a scroll
      container, so sticky positioning keeps working. */
   overflow-x: clip;
+  max-width: 100%;
   /* Soft cross-fade when toggling theme */
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
+}
+
+img,
+video,
+canvas {
+  max-width: 100%;
 }
 
 /* Headings use the display face (Sora) for a premium, calm tone */
@@ -325,6 +336,19 @@ h4 {
   width: 100%;
   padding-inline: clamp(1rem, 0.5rem + 2vw, 2.5rem);
 }
+
+@media (max-width: 640px) {
+  .page-shell,
+  .page-wide,
+  .page-prose {
+    max-width: 100%;
+    padding-inline: 0.875rem;
+  }
+
+  .snap-y {
+    scroll-snap-type: none;
+  }
+}
 /* App / workspace pages — roomy but not edge-to-edge. */
 .page-shell {
   max-width: 75rem; /* ~1200px at 16px, ~1275px at our 17px root */
@@ -386,17 +410,35 @@ p {
   height: 130%;
   z-index: -1;
   background:
-    radial-gradient(42% 55% at 18% 12%, color-mix(in srgb, var(--brand) 38%, transparent), transparent 70%),
-    radial-gradient(38% 50% at 88% 8%, color-mix(in srgb, var(--blueprint) 34%, transparent), transparent 72%),
-    radial-gradient(46% 60% at 75% 92%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 70%);
+    radial-gradient(
+      42% 55% at 18% 12%,
+      color-mix(in srgb, var(--brand) 38%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      38% 50% at 88% 8%,
+      color-mix(in srgb, var(--blueprint) 34%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      46% 60% at 75% 92%,
+      color-mix(in srgb, var(--accent) 26%, transparent),
+      transparent 70%
+    );
   filter: blur(8px);
   opacity: 0.85;
   animation: bp-aurora 18s ease-in-out infinite alternate;
 }
 @keyframes bp-aurora {
-  0% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(-2%, 2%, 0) scale(1.06); }
-  100% { transform: translate3d(2%, -1%, 0) scale(1.03); }
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-2%, 2%, 0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(2%, -1%, 0) scale(1.03);
+  }
 }
 
 /* Faint blueprint grid wash, brand-tinted */

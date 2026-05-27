@@ -1,9 +1,5 @@
 import { useTranslations } from "next-intl";
-import {
-  ArrowRight,
-  Camera,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, Camera, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { Reveal } from "@/components/ui/reveal";
@@ -19,22 +15,32 @@ export default function Home() {
 
   const ctas = [
     { href: "/plan", title: t("ctas.startTitle"), desc: t("ctas.startDesc"), primary: true },
-    { href: "/plan?mode=staff", title: t("ctas.staffTitle"), desc: t("ctas.staffDesc"), primary: false },
+    {
+      href: "/plan?mode=staff",
+      title: t("ctas.staffTitle"),
+      desc: t("ctas.staffDesc"),
+      primary: false,
+    },
     { href: "/plan?demo=1", title: t("ctas.demoTitle"), desc: t("ctas.demoDesc"), primary: false },
-  ];
-
-  const snapshot: [string, string][] = [
-    [t("snapshot.confidence"), t("snapshot.confidenceValue")],
-    [t("snapshot.total"), t("snapshot.totalValue")],
-    [t("snapshot.order"), t("snapshot.orderValue")],
-    [t("snapshot.store"), t("snapshot.storeValue")],
   ];
 
   // Real yards instead of placeholders — inspiration → buildable plan.
   const showcase = [
-    { src: "/photos/garden-path.jpg", title: t("showcase.shotFrontTitle"), desc: t("showcase.shotFrontDesc") },
-    { src: "/photos/raised-bed.jpg", title: t("showcase.shotBackTitle"), desc: t("showcase.shotBackDesc") },
-    { src: "/photos/seedlings.jpg", title: t("showcase.shotPlantTitle"), desc: t("showcase.shotPlantDesc") },
+    {
+      src: "/photos/garden-path.jpg",
+      title: t("showcase.shotFrontTitle"),
+      desc: t("showcase.shotFrontDesc"),
+    },
+    {
+      src: "/photos/raised-bed.jpg",
+      title: t("showcase.shotBackTitle"),
+      desc: t("showcase.shotBackDesc"),
+    },
+    {
+      src: "/photos/seedlings.jpg",
+      title: t("showcase.shotPlantTitle"),
+      desc: t("showcase.shotPlantDesc"),
+    },
   ];
 
   // Direct, honest contrast with a general chatbot — the moat in five rows.
@@ -43,7 +49,11 @@ export default function Home() {
     { label: t("compare.sizeLabel"), them: t("compare.sizeThem"), us: t("compare.sizeUs") },
     { label: t("compare.outputLabel"), them: t("compare.outputThem"), us: t("compare.outputUs") },
     { label: t("compare.unsureLabel"), them: t("compare.unsureThem"), us: t("compare.unsureUs") },
-    { label: t("compare.offlineLabel"), them: t("compare.offlineThem"), us: t("compare.offlineUs") },
+    {
+      label: t("compare.offlineLabel"),
+      them: t("compare.offlineThem"),
+      us: t("compare.offlineUs"),
+    },
   ];
 
   return (
@@ -56,8 +66,6 @@ export default function Home() {
         subtitle={t("heroSubtitle")}
         startPlan={t("startPlan")}
         tryDemo={t("tryDemo")}
-        snapshotLabel={t("snapshot.confidence")}
-        snapshot={snapshot}
       />
 
       {/* ===== Honest, copy-derived stat band ===== */}
@@ -182,7 +190,10 @@ export default function Home() {
                 <span className="text-base leading-relaxed text-muted">{c.desc}</span>
                 <span className="mt-1 inline-flex items-center gap-1 text-base font-semibold text-brand">
                   {t("entry.go")}
-                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                  <ArrowRight
+                    className="size-4 transition-transform group-hover:translate-x-0.5"
+                    aria-hidden
+                  />
                 </span>
               </Link>
             </Reveal>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   AlertTriangle,
   ArrowDown,
@@ -12,7 +13,6 @@ import {
   ImageOff,
   Leaf,
   Loader2,
-  Maximize2,
   Ruler,
   ShieldCheck,
   Sparkles,
@@ -302,7 +302,13 @@ function readLiveFrame(canvas: HTMLCanvasElement): { signal: FrameSignal; fill: 
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   if (!ctx) {
     return {
-      signal: { brightness: null, contrast: null, tooDark: false, tooBright: false, lowDetail: false },
+      signal: {
+        brightness: null,
+        contrast: null,
+        tooDark: false,
+        tooBright: false,
+        lowDetail: false,
+      },
       fill: 1,
     };
   }
@@ -444,16 +450,19 @@ export function PhotoFirstPlanning({
   const presentTypes = new Set(photos.map((photo) => photo.type));
   const liveConfidence = Math.round(estimateConfidenceFromPhotoData(photos) * 100);
   const nextShot = EXAMPLE_SHOTS.find((shot) => !presentTypes.has(shot.type));
-  const heroPhoto = photos.find((photo) => photo.quality !== "unusable" && photo.previewUrl) ?? null;
+  const heroPhoto =
+    photos.find((photo) => photo.quality !== "unusable" && photo.previewUrl) ?? null;
 
   // Pixel-grounded "I can see…" chips: real ratios from the photo + any vision ML notes.
   const sceneChips = useMemo(() => {
     const chips: { label: string; tone: "green" | "neutral" | "sky" | "shade" }[] = [];
     if (regionSummary) {
-      if (regionSummary.greenRatio > 0.18) chips.push({ label: "Greenery / planting", tone: "green" });
+      if (regionSummary.greenRatio > 0.18)
+        chips.push({ label: "Greenery / planting", tone: "green" });
       if (regionSummary.hardscapeRatio > 0.18)
         chips.push({ label: "Paths / hard surfaces", tone: "neutral" });
-      if (regionSummary.skyRatio > 0.16) chips.push({ label: "Open sky · bright light", tone: "sky" });
+      if (regionSummary.skyRatio > 0.16)
+        chips.push({ label: "Open sky · bright light", tone: "sky" });
       if (regionSummary.shadowRatio > 0.28) chips.push({ label: "Shaded areas", tone: "shade" });
     }
     for (const obj of analysis?.detectedObjects ?? []) {
@@ -510,10 +519,7 @@ export function PhotoFirstPlanning({
   // Block capture only when light AND detail AND level are all bad — a frame this
   // poor would just be rejected on inspection, so stop it before the shutter.
   const captureBlocked =
-    cameraReady &&
-    (liveSignal.tooDark || liveSignal.tooBright) &&
-    liveSignal.lowDetail &&
-    tilted;
+    cameraReady && (liveSignal.tooDark || liveSignal.tooBright) && liveSignal.lowDetail && tilted;
 
   const analysisStatus = useMemo(() => {
     if (busy) return status;
@@ -656,11 +662,16 @@ export function PhotoFirstPlanning({
 
   useEffect(() => {
     if (!cameraOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setCameraOpen(false);
     };
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
   }, [cameraOpen]);
 
   useEffect(() => {
@@ -706,11 +717,15 @@ export function PhotoFirstPlanning({
           continue;
         }
         const inspected = await inspectAndCompress(file);
-        if (inspected.signature && knownSignatures.some((sig) => areNearDuplicates(sig, inspected.signature))) {
+        if (
+          inspected.signature &&
+          knownSignatures.some((sig) => areNearDuplicates(sig, inspected.signature))
+        ) {
           nextIssues.push({
             id: crypto.randomUUID(),
             fileName: file.name,
-            message: "This looks like a near-duplicate of a photo already added. Capture a different angle instead.",
+            message:
+              "This looks like a near-duplicate of a photo already added. Capture a different angle instead.",
             severity: "warning",
           });
           continue;
@@ -902,778 +917,818 @@ export function PhotoFirstPlanning({
 
   return (
     // Sits in the comfortable intake column alongside the form; no viewport breakout.
-    <div>
-     <div className="flex flex-col gap-4">
-      <section className="card overflow-hidden">
-        <div className="bg-brand-soft p-4 sm:p-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className="min-w-0">
+      <div className="flex min-w-0 flex-col gap-4">
+        <section className="overflow-hidden rounded-[1.5rem] border border-border bg-surface shadow-sm sm:rounded-2xl">
+          <div className="bg-brand-soft p-4 sm:p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand">
+                  Planning workspace
+                </p>
+                <h1 className="mt-1 text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
+                  Upload the yard first. Confirm the assumptions. Then build the plan.
+                </h1>
+                <p className="mt-2 line-clamp-2 max-w-2xl text-sm text-muted sm:line-clamp-none">
+                  Bloomprint checks photo quality, estimates planning zones, and turns uncertainty
+                  into editable questions before it generates anything.
+                </p>
+              </div>
+              <div className="hidden rounded-2xl border border-brand/20 bg-surface/80 p-3 text-xs text-muted shadow-sm sm:block">
+                <p className="font-semibold text-foreground">Autosave-first</p>
+                <p className="mt-1">Photos and choices are saved locally while you work.</p>
+              </div>
+            </div>
+
+            <div className="mt-5 grid grid-cols-3 gap-2">
+              {STEPS.map((step, index) => {
+                const done =
+                  step.key === "project" ||
+                  (step.key === "photos" && photos.length > 0) ||
+                  (step.key === "confirm" && Boolean(analysis));
+                const active = currentStep === step.key;
+                return (
+                  <div
+                    key={step.key}
+                    className={`rounded-2xl border px-3 py-2 text-xs transition ${
+                      active
+                        ? "border-brand bg-surface text-foreground shadow-sm"
+                        : done
+                          ? "border-brand/20 bg-surface/70 text-brand-strong"
+                          : "border-border bg-surface/50 text-muted"
+                    }`}
+                  >
+                    <span className="block font-semibold">
+                      {index + 1}. {step.label}
+                    </span>
+                    <span className="mt-0.5 block">{done ? "Ready" : "Next"}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 p-3 sm:p-5">
+            {PROJECT_TYPES.map(({ value, label, desc, icon: Icon }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => onProjectKind(value)}
+                aria-pressed={projectKind === value}
+                className={`rounded-2xl border p-2 text-left transition hover:border-brand hover:shadow-sm sm:p-3 ${
+                  projectKind === value ? "border-brand bg-brand-soft" : "border-border bg-surface"
+                }`}
+              >
+                <Icon className="mb-1 size-5 text-brand sm:mb-2" aria-hidden />
+                <span className="block text-xs font-semibold leading-tight text-foreground sm:text-sm">
+                  {label}
+                </span>
+                <span className="mt-1 hidden text-xs text-muted sm:block">{desc}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-[1.5rem] border border-border bg-surface p-4 shadow-sm sm:rounded-2xl sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-brand">
-                Planning workspace
-              </p>
-              <h1 className="mt-1 text-2xl font-semibold text-foreground sm:text-3xl">
-                Upload the yard first. Confirm the assumptions. Then build the plan.
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm text-muted">
-                Bloomprint checks photo quality, estimates planning zones, and turns uncertainty
-                into editable questions before it generates anything.
+              <h2 className="text-lg font-semibold text-foreground">Photo intake</h2>
+              <p className="mt-1 text-sm text-muted">
+                Add 2-5 photos for best results. Wide shots help layout; close-ups help risk and
+                plant notes.
               </p>
             </div>
-            <div className="rounded-xl border border-brand/20 bg-surface/80 p-3 text-xs text-muted shadow-sm">
-              <p className="font-semibold text-foreground">Autosave-first</p>
-              <p className="mt-1">Photos and choices are saved locally while you work.</p>
+            <div className="flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-2 text-xs text-muted">
+              <ShieldCheck className="size-4 text-brand" aria-hidden />
+              {usableCount} usable · {reviewCount} review · {unusableCount} retake
             </div>
           </div>
 
-          <div className="mt-5 grid grid-cols-3 gap-2">
-            {STEPS.map((step, index) => {
-              const done =
-                step.key === "project" ||
-                (step.key === "photos" && photos.length > 0) ||
-                (step.key === "confirm" && Boolean(analysis));
-              const active = currentStep === step.key;
-              return (
-                <div
-                  key={step.key}
-                  className={`rounded-xl border px-3 py-2 text-xs transition ${
-                    active
-                      ? "border-brand bg-surface text-foreground shadow-sm"
-                      : done
-                        ? "border-brand/20 bg-surface/70 text-brand-strong"
-                        : "border-border bg-surface/50 text-muted"
-                  }`}
-                >
-                  <span className="block font-semibold">
-                    {index + 1}. {step.label}
-                  </span>
-                  <span className="mt-0.5 block">{done ? "Ready" : "Next"}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="grid gap-2 p-4 sm:grid-cols-3 sm:p-5">
-          {PROJECT_TYPES.map(({ value, label, desc, icon: Icon }) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => onProjectKind(value)}
-              aria-pressed={projectKind === value}
-              className={`rounded-xl border p-3 text-left transition hover:border-brand hover:shadow-sm ${
-                projectKind === value ? "border-brand bg-brand-soft" : "border-border bg-surface"
-              }`}
-            >
-              <Icon className="mb-2 size-5 text-brand" aria-hidden />
-              <span className="block text-sm font-semibold text-foreground">{label}</span>
-              <span className="mt-1 block text-xs text-muted">{desc}</span>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="card p-4 sm:p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Photo intake</h2>
-            <p className="mt-1 text-sm text-muted">
-              Add 2-5 photos for best results. Wide shots help layout; close-ups help risk and plant
-              notes.
+          <div className="mt-4 rounded-2xl border border-border bg-background/60 p-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                Capture plan
+              </p>
+              <span className="text-xs font-semibold text-brand-strong">
+                {liveConfidence}% photo confidence
+              </span>
+            </div>
+            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-border">
+              <div
+                className="h-full rounded-full bg-brand transition-all"
+                style={{ width: `${liveConfidence}%` }}
+              />
+            </div>
+            <p className="mt-2 text-xs text-muted">
+              {nextShot
+                ? `Next best shot: ${nextShot.title.toLowerCase()} — ${nextShot.desc}`
+                : "Great coverage. Add more angles or continue to confirm."}
             </p>
+            <div className="-mx-1 mt-3 flex snap-x gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
+              {EXAMPLE_SHOTS.map((shot) => {
+                const done = presentTypes.has(shot.type);
+                return (
+                  <button
+                    key={shot.type}
+                    type="button"
+                    onClick={() => addShotOfType(shot.type)}
+                    className={`flex min-w-[10.75rem] snap-start items-center gap-2 rounded-2xl border px-3 py-2 text-left text-xs transition sm:min-w-0 ${
+                      done
+                        ? "border-brand/30 bg-brand-soft text-brand-strong"
+                        : "border-border bg-surface text-foreground hover:border-brand"
+                    }`}
+                  >
+                    {done ? (
+                      <CheckCircle2 className="size-4 shrink-0 text-brand" aria-hidden />
+                    ) : isMobile ? (
+                      <Camera className="size-4 shrink-0 text-muted" aria-hidden />
+                    ) : (
+                      <Upload className="size-4 shrink-0 text-muted" aria-hidden />
+                    )}
+                    <span className="min-w-0">
+                      <span className="block font-semibold">{shot.title}</span>
+                      <span className="block text-[11px] text-muted">
+                        {done ? "Added" : isMobile ? "Tap to add" : "Upload"}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <div className="flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-2 text-xs text-muted">
-            <ShieldCheck className="size-4 text-brand" aria-hidden />
-            {usableCount} usable · {reviewCount} review · {unusableCount} retake
-          </div>
-        </div>
 
-        <div className="mt-4 rounded-xl border border-border bg-background/60 p-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Capture plan</p>
-            <span className="text-xs font-semibold text-brand-strong">{liveConfidence}% photo confidence</span>
+          <div className="mt-4 grid gap-3 lg:grid-cols-[220px_1fr]">
+            <div className="rounded-2xl border border-border bg-background/60 p-3">
+              <label
+                htmlFor="photo-type"
+                className="text-xs font-semibold uppercase tracking-wide text-muted"
+              >
+                Label next photos
+              </label>
+              <select
+                id="photo-type"
+                value={photoType}
+                onChange={(e) => setPhotoType(e.target.value as PhotoAssetType)}
+                className="mt-2 min-h-11 w-full rounded-xl border border-border bg-surface p-2 text-sm text-foreground"
+              >
+                {PHOTO_TYPES.map((type) => (
+                  <option key={type.value} value={type.value}>
+                    {type.label}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-2 text-xs text-muted">{selectedType.hint}</p>
+              <div className="mt-3 rounded-2xl bg-brand-soft p-3 text-xs text-brand-strong">
+                Better photos: stand back, include house/walkway edges, avoid night shots, and add
+                one close-up of the problem area.
+              </div>
+            </div>
+
+            <div>
+              <input
+                ref={inputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                multiple
+                className="hidden"
+                suppressHydrationWarning
+                onChange={(e) => e.target.files && void addFiles(e.target.files)}
+              />
+
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragging(true);
+                }}
+                onDragLeave={() => setDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragging(false);
+                  void addFiles(e.dataTransfer.files);
+                }}
+                className={`flex min-h-56 w-full flex-col items-center justify-center rounded-[1.5rem] border border-dashed p-5 text-center transition sm:min-h-44 ${
+                  dragging
+                    ? "border-brand bg-brand-soft"
+                    : "border-border bg-background/60 hover:border-brand"
+                }`}
+              >
+                {busy ? (
+                  <Loader2 className="mb-2 size-7 animate-spin text-brand" aria-hidden />
+                ) : (
+                  <Camera className="mb-2 size-7 text-brand" aria-hidden />
+                )}
+                <span className="text-base font-semibold text-foreground sm:text-sm">
+                  {isMobile
+                    ? "Take guided photos or upload existing images"
+                    : "Drag photos here or upload to review"}
+                </span>
+                <span className="mt-1 max-w-md text-xs text-muted">
+                  {isMobile
+                    ? "Camera mode adds gridlines, framing templates, and live lighting hints. Uploads use the same local quality checks and review."
+                    : "Upload one or more yard photos and Bloomprint reviews each one — quality, greenery, and suggested answers — right here. The guided camera is best on a phone."}
+                </span>
+                <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={() => inputRef.current?.click()}
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
+                  >
+                    <Upload className="size-4" aria-hidden />
+                    Upload photos
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCameraOpen(true)}
+                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-border px-5 py-2 text-sm font-semibold transition hover:border-brand"
+                  >
+                    <Camera className="size-4" aria-hidden />
+                    {isMobile ? "Open guided camera" : "Use camera"}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-border">
-            <div
-              className="h-full rounded-full bg-brand transition-all"
-              style={{ width: `${liveConfidence}%` }}
-            />
-          </div>
-          <p className="mt-2 text-xs text-muted">
-            {nextShot
-              ? `Next best shot: ${nextShot.title.toLowerCase()} — ${nextShot.desc}`
-              : "Great coverage. Add more angles or continue to confirm."}
-          </p>
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-            {EXAMPLE_SHOTS.map((shot) => {
-              const done = presentTypes.has(shot.type);
-              return (
+
+          <div className="mt-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+              Example shots
+            </p>
+            <div className="-mx-1 mt-2 flex snap-x gap-3 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
+              {EXAMPLE_SHOTS.map((shot) => (
                 <button
                   key={shot.type}
                   type="button"
-                  onClick={() => addShotOfType(shot.type)}
-                  className={`flex flex-1 items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs transition ${
-                    done
-                      ? "border-brand/30 bg-brand-soft text-brand-strong"
-                      : "border-border bg-surface text-foreground hover:border-brand"
+                  onClick={() => setPhotoType(shot.type)}
+                  className={`min-w-[12rem] snap-start overflow-hidden rounded-2xl border text-left transition hover:border-brand sm:min-w-0 ${
+                    photoType === shot.type
+                      ? "border-brand bg-brand-soft"
+                      : "border-border bg-surface"
                   }`}
                 >
-                  {done ? (
-                    <CheckCircle2 className="size-4 shrink-0 text-brand" aria-hidden />
-                  ) : isMobile ? (
-                    <Camera className="size-4 shrink-0 text-muted" aria-hidden />
-                  ) : (
-                    <Upload className="size-4 shrink-0 text-muted" aria-hidden />
-                  )}
-                  <span className="min-w-0">
-                    <span className="block font-semibold">{shot.title}</span>
-                    <span className="block text-[11px] text-muted">
-                      {done ? "Added" : isMobile ? "Tap to add" : "Upload"}
-                    </span>
-                  </span>
+                  <div className="relative aspect-[4/3] bg-[linear-gradient(135deg,var(--brand-soft),var(--surface))]">
+                    <div className="absolute inset-x-4 bottom-4 h-8 rounded-t-lg border border-brand/25 bg-surface/70" />
+                    <div className="absolute bottom-4 left-8 h-12 w-7 rounded-full bg-brand/25" />
+                    <div className="absolute bottom-4 right-8 h-16 w-8 rounded-full bg-brand/30" />
+                    {shot.overlay === "wide" ? (
+                      <div className="absolute inset-5 rounded-lg border-2 border-dashed border-brand/60" />
+                    ) : null}
+                    {shot.overlay === "plant" ? (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="flex size-20 items-center justify-center rounded-full border-2 border-dashed border-brand/70 bg-surface/50">
+                          <Leaf className="size-8 text-brand" aria-hidden />
+                        </div>
+                      </div>
+                    ) : null}
+                    {shot.overlay === "measure" ? (
+                      <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 items-center gap-2">
+                        <div className="h-1 flex-1 rounded-full bg-brand/70" />
+                        <Ruler className="size-6 text-brand" aria-hidden />
+                      </div>
+                    ) : null}
+                  </div>
+                  <div className="p-3">
+                    <p className="text-sm font-semibold text-foreground">{shot.title}</p>
+                    <p className="mt-1 text-xs text-muted">{shot.desc}</p>
+                  </div>
                 </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="mt-4 grid gap-3 lg:grid-cols-[220px_1fr]">
-          <div className="rounded-xl border border-border bg-background/60 p-3">
-            <label
-              htmlFor="photo-type"
-              className="text-xs font-semibold uppercase tracking-wide text-muted"
-            >
-              Label next photos
-            </label>
-            <select
-              id="photo-type"
-              value={photoType}
-              onChange={(e) => setPhotoType(e.target.value as PhotoAssetType)}
-              className="mt-2 w-full rounded-lg border border-border bg-surface p-2 text-sm text-foreground"
-            >
-              {PHOTO_TYPES.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
               ))}
-            </select>
-            <p className="mt-2 text-xs text-muted">{selectedType.hint}</p>
-            <div className="mt-3 rounded-lg bg-brand-soft p-3 text-xs text-brand-strong">
-              Better photos: stand back, include house/walkway edges, avoid night shots, and add one
-              close-up of the problem area.
             </div>
           </div>
 
-          <div>
-            <input
-              ref={inputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              multiple
-              className="hidden"
-              suppressHydrationWarning
-              onChange={(e) => e.target.files && void addFiles(e.target.files)}
-            />
+          {issues.length > 0 ? (
+            <div className="mt-4 flex flex-col gap-2" aria-live="polite">
+              {issues.map((issue) => (
+                <div
+                  key={issue.id}
+                  className={`rounded-xl border px-3 py-2 text-sm ${
+                    issue.severity === "error"
+                      ? "border-danger/30 bg-danger/10 text-danger"
+                      : "border-[var(--warn)]/30 bg-[var(--warn)]/10 text-[var(--warn)]"
+                  }`}
+                >
+                  <span className="font-semibold">{issue.fileName}: </span>
+                  {issue.message}
+                </div>
+              ))}
+            </div>
+          ) : null}
 
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragging(true);
-              }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setDragging(false);
-                void addFiles(e.dataTransfer.files);
-              }}
-              className={`flex min-h-44 w-full flex-col items-center justify-center rounded-2xl border border-dashed p-5 text-center transition ${
-                dragging
-                  ? "border-brand bg-brand-soft"
-                  : "border-border bg-background/60 hover:border-brand"
-              }`}
-            >
+          {photos.length > 0 ? (
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {photos.map((photo, index) => (
+                <figure
+                  key={photo.id}
+                  className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm"
+                >
+                  <div className="relative">
+                    {photo.previewUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={photo.previewUrl}
+                        alt={`${PHOTO_TYPES.find((type) => type.value === photo.type)?.label ?? "Yard"} photo ${index + 1}`}
+                        className="aspect-[4/3] w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex aspect-[4/3] items-center justify-center bg-brand-soft">
+                        <ImageOff className="size-8 text-brand" aria-hidden />
+                      </div>
+                    )}
+                    <span
+                      className={`absolute left-2 top-2 rounded-full border px-2 py-1 text-[11px] font-semibold ${qualityClass(photo.quality)}`}
+                    >
+                      {qualityLabel(photo.quality)}
+                    </span>
+                  </div>
+                  <figcaption className="flex flex-col gap-2 p-3 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-full bg-brand-soft px-2 py-0.5 font-semibold text-brand-strong">
+                        {index + 1}
+                      </span>
+                      <span className="min-w-0 flex-1 truncate text-muted">
+                        {photo.fileName ?? "Yard photo"}
+                      </span>
+                    </div>
+                    <select
+                      value={photo.type}
+                      onChange={(e) => updatePhotoType(photo.id, e.target.value as PhotoAssetType)}
+                      className="min-h-11 w-full rounded-xl border border-border bg-background p-2 text-xs text-foreground"
+                      aria-label="Photo type"
+                    >
+                      {PHOTO_TYPES.map((type) => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
+                    </select>
+                    {photo.warnings && photo.warnings.length > 0 ? (
+                      <p className="rounded-lg bg-background/70 p-2 text-[11px] leading-relaxed text-muted">
+                        {photo.warnings[0]}
+                      </p>
+                    ) : null}
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => movePhoto(photo.id, -1)}
+                        disabled={index === 0}
+                        className="rounded-full border border-border p-1.5 text-muted transition hover:text-foreground disabled:opacity-40"
+                        aria-label="Move photo earlier"
+                      >
+                        <ArrowUp className="size-3.5" aria-hidden />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => movePhoto(photo.id, 1)}
+                        disabled={index === photos.length - 1}
+                        className="rounded-full border border-border p-1.5 text-muted transition hover:text-foreground disabled:opacity-40"
+                        aria-label="Move photo later"
+                      >
+                        <ArrowDown className="size-3.5" aria-hidden />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => addShotOfType(photo.type)}
+                        className={`ml-auto inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold transition ${
+                          photo.quality === "good"
+                            ? "border-border text-muted hover:border-brand hover:text-foreground"
+                            : "border-brand/40 bg-brand-soft text-brand-strong"
+                        }`}
+                      >
+                        {isMobile ? (
+                          <Camera className="size-3.5" aria-hidden />
+                        ) : (
+                          <Upload className="size-3.5" aria-hidden />
+                        )}
+                        {isMobile ? "Retake" : "Replace"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(photo.id)}
+                        className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-1 text-[11px] font-semibold text-danger transition hover:border-danger/40"
+                      >
+                        <Trash2 className="size-3.5" aria-hidden />
+                        Remove
+                      </button>
+                    </div>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          ) : null}
+        </section>
+
+        <section className="card p-4 sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-2">
               {busy ? (
-                <Loader2 className="mb-2 size-7 animate-spin text-brand" aria-hidden />
+                <Loader2 className="size-4 animate-spin text-brand" aria-hidden />
               ) : (
-                <Camera className="mb-2 size-7 text-brand" aria-hidden />
+                <CheckCircle2 className="size-4 text-brand" aria-hidden />
               )}
-              <span className="text-sm font-semibold text-foreground">
-                {isMobile ? "Take guided photos or upload existing images" : "Drag photos here or upload to review"}
-              </span>
-              <span className="mt-1 max-w-md text-xs text-muted">
-                {isMobile
-                  ? "Camera mode adds gridlines, framing templates, and live lighting hints. Uploads use the same local quality checks and review."
-                  : "Upload one or more yard photos and Bloomprint reviews each one — quality, greenery, and suggested answers — right here. The guided camera is best on a phone."}
-              </span>
-              <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={() => inputRef.current?.click()}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
-                >
-                  <Upload className="size-4" aria-hidden />
-                  Upload photos
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCameraOpen(true)}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold transition hover:border-brand"
-                >
-                  <Camera className="size-4" aria-hidden />
-                  {isMobile ? "Open guided camera" : "Use camera"}
-                </button>
-              </div>
+              <h2 className="text-lg font-semibold text-foreground">Confirm before planning</h2>
             </div>
+            <span className="text-xs text-muted sm:ml-auto">{analysisStatus}</span>
           </div>
-        </div>
 
-        <div className="mt-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Example shots</p>
-          <div className="mt-2 grid gap-3 sm:grid-cols-3">
-            {EXAMPLE_SHOTS.map((shot) => (
-              <button
-                key={shot.type}
-                type="button"
-                onClick={() => setPhotoType(shot.type)}
-                className={`overflow-hidden rounded-xl border text-left transition hover:border-brand ${
-                  photoType === shot.type
-                    ? "border-brand bg-brand-soft"
-                    : "border-border bg-surface"
-                }`}
-              >
-                <div className="relative aspect-[4/3] bg-[linear-gradient(135deg,var(--brand-soft),var(--surface))]">
-                  <div className="absolute inset-x-4 bottom-4 h-8 rounded-t-lg border border-brand/25 bg-surface/70" />
-                  <div className="absolute bottom-4 left-8 h-12 w-7 rounded-full bg-brand/25" />
-                  <div className="absolute bottom-4 right-8 h-16 w-8 rounded-full bg-brand/30" />
-                  {shot.overlay === "wide" ? (
-                    <div className="absolute inset-5 rounded-lg border-2 border-dashed border-brand/60" />
-                  ) : null}
-                  {shot.overlay === "plant" ? (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="flex size-20 items-center justify-center rounded-full border-2 border-dashed border-brand/70 bg-surface/50">
-                        <Leaf className="size-8 text-brand" aria-hidden />
+          {analysis ? (
+            <div className="mt-4 flex flex-col gap-4">
+              {draftRead ? (
+                <div className="flex items-start gap-2 rounded-xl border border-brand/25 bg-brand-soft p-3">
+                  <Sparkles className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
+                  <p className="text-sm font-medium text-brand-strong">{draftRead}</p>
+                </div>
+              ) : null}
+
+              {heroPhoto?.previewUrl && regionSummary ? (
+                <div className="rounded-xl border border-border bg-background/60 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                    What Bloomprint sees
+                  </p>
+                  <p className="mt-1 text-[11px] text-muted">
+                    A rough read of your photo — greenery, surfaces, and light. An estimate to
+                    confirm, not a measurement. Tap a tile for detail.
+                  </p>
+                  <div className="mt-2 grid gap-3 sm:grid-cols-[1.4fr_1fr]">
+                    <div className="relative overflow-hidden rounded-lg border border-border">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={heroPhoto.previewUrl}
+                        alt="Your yard with a rough greenery and surface read"
+                        className="aspect-[3/2] w-full object-cover"
+                      />
+                      <div
+                        className="absolute inset-0 grid"
+                        style={{
+                          gridTemplateColumns: `repeat(${regionSummary.cols}, 1fr)`,
+                          gridTemplateRows: `repeat(${regionSummary.rows}, 1fr)`,
+                        }}
+                      >
+                        {regionSummary.cells.map((cell, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => setSelectedCell(selectedCell === i ? null : i)}
+                            className={`transition ${selectedCell === i ? "ring-2 ring-inset ring-white" : ""}`}
+                            style={{ backgroundColor: REGION_STYLE[cell.cls].fill }}
+                            aria-label={REGION_STYLE[cell.cls].label}
+                          />
+                        ))}
+                      </div>
+                      {selectedCell !== null && regionSummary.cells[selectedCell] ? (
+                        <div className="absolute inset-x-2 bottom-2 rounded-lg bg-black/75 px-3 py-1.5 text-xs text-white">
+                          {REGION_STYLE[regionSummary.cells[selectedCell].cls].label} — about{" "}
+                          {Math.round(coverageFor(regionSummary.cells[selectedCell].cls) * 100)}% of
+                          the photo
+                        </div>
+                      ) : null}
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex flex-wrap gap-1.5">
+                        {sceneChips.length > 0 ? (
+                          sceneChips.map((chip, i) => (
+                            <span
+                              key={`${chip.label}-${i}`}
+                              className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                                chip.tone === "green"
+                                  ? "bg-brand-soft text-brand-strong"
+                                  : chip.tone === "sky"
+                                    ? "bg-sky-500/15 text-sky-700 dark:text-sky-300"
+                                    : chip.tone === "shade"
+                                      ? "bg-slate-500/15 text-slate-600 dark:text-slate-300"
+                                      : "bg-border/70 text-muted"
+                              }`}
+                            >
+                              {chip.label}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs text-muted">
+                            Not enough detail to read confidently — confirm below.
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                          Greenery vs. hard surfaces
+                        </p>
+                        <div className="mt-1 flex h-3 overflow-hidden rounded-full bg-border">
+                          <div
+                            className="bg-brand"
+                            style={{ width: `${Math.round(regionSummary.greenRatio * 100)}%` }}
+                          />
+                          <div
+                            className="bg-slate-400"
+                            style={{ width: `${Math.round(regionSummary.hardscapeRatio * 100)}%` }}
+                          />
+                        </div>
+                        <p className="mt-1 text-[11px] text-muted">
+                          ~{Math.round(regionSummary.greenRatio * 100)}% greenery · ~
+                          {Math.round(regionSummary.hardscapeRatio * 100)}% hard surface (estimate)
+                        </p>
                       </div>
                     </div>
-                  ) : null}
-                  {shot.overlay === "measure" ? (
-                    <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 items-center gap-2">
-                      <div className="h-1 flex-1 rounded-full bg-brand/70" />
-                      <Ruler className="size-6 text-brand" aria-hidden />
-                    </div>
-                  ) : null}
-                </div>
-                <div className="p-3">
-                  <p className="text-sm font-semibold text-foreground">{shot.title}</p>
-                  <p className="mt-1 text-xs text-muted">{shot.desc}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {issues.length > 0 ? (
-          <div className="mt-4 flex flex-col gap-2" aria-live="polite">
-            {issues.map((issue) => (
-              <div
-                key={issue.id}
-                className={`rounded-xl border px-3 py-2 text-sm ${
-                  issue.severity === "error"
-                    ? "border-danger/30 bg-danger/10 text-danger"
-                    : "border-[var(--warn)]/30 bg-[var(--warn)]/10 text-[var(--warn)]"
-                }`}
-              >
-                <span className="font-semibold">{issue.fileName}: </span>
-                {issue.message}
-              </div>
-            ))}
-          </div>
-        ) : null}
-
-        {photos.length > 0 ? (
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {photos.map((photo, index) => (
-              <figure
-                key={photo.id}
-                className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm"
-              >
-                <div className="relative">
-                  {photo.previewUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={photo.previewUrl}
-                      alt={`${PHOTO_TYPES.find((type) => type.value === photo.type)?.label ?? "Yard"} photo ${index + 1}`}
-                      className="aspect-[4/3] w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex aspect-[4/3] items-center justify-center bg-brand-soft">
-                      <ImageOff className="size-8 text-brand" aria-hidden />
-                    </div>
-                  )}
-                  <span
-                    className={`absolute left-2 top-2 rounded-full border px-2 py-1 text-[11px] font-semibold ${qualityClass(photo.quality)}`}
-                  >
-                    {qualityLabel(photo.quality)}
-                  </span>
-                </div>
-                <figcaption className="flex flex-col gap-2 p-3 text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full bg-brand-soft px-2 py-0.5 font-semibold text-brand-strong">
-                      {index + 1}
-                    </span>
-                    <span className="min-w-0 flex-1 truncate text-muted">
-                      {photo.fileName ?? "Yard photo"}
-                    </span>
                   </div>
-                  <select
-                    value={photo.type}
-                    onChange={(e) => updatePhotoType(photo.id, e.target.value as PhotoAssetType)}
-                    className="w-full rounded-lg border border-border bg-background p-2 text-xs text-foreground"
-                    aria-label="Photo type"
-                  >
-                    {PHOTO_TYPES.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.label}
-                      </option>
-                    ))}
-                  </select>
-                  {photo.warnings && photo.warnings.length > 0 ? (
-                    <p className="rounded-lg bg-background/70 p-2 text-[11px] leading-relaxed text-muted">
-                      {photo.warnings[0]}
+                </div>
+              ) : null}
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                <ReadinessCheck
+                  label="Details detected"
+                  value={detailsDetected}
+                  yes="Zones or constraints found"
+                  no="Add a wide context photo"
+                />
+                <ReadinessCheck
+                  label="Plant identified"
+                  value={plantIdentified}
+                  yes="Plant material visible"
+                  no="Add existing-plant close-up"
+                />
+                <ReadinessCheck
+                  label="Measurements seen"
+                  value={measurementDetected}
+                  yes="Measurement reference present"
+                  no="Add dimensions manually"
+                />
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
+                <div className="flex flex-col gap-3">
+                  <div className="rounded-xl border border-border bg-background/60 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                      Detected zones
                     </p>
-                  ) : null}
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => movePhoto(photo.id, -1)}
-                      disabled={index === 0}
-                      className="rounded-full border border-border p-1.5 text-muted transition hover:text-foreground disabled:opacity-40"
-                      aria-label="Move photo earlier"
-                    >
-                      <ArrowUp className="size-3.5" aria-hidden />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => movePhoto(photo.id, 1)}
-                      disabled={index === photos.length - 1}
-                      className="rounded-full border border-border p-1.5 text-muted transition hover:text-foreground disabled:opacity-40"
-                      aria-label="Move photo later"
-                    >
-                      <ArrowDown className="size-3.5" aria-hidden />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => addShotOfType(photo.type)}
-                      className={`ml-auto inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold transition ${
-                        photo.quality === "good"
-                          ? "border-border text-muted hover:border-brand hover:text-foreground"
-                          : "border-brand/40 bg-brand-soft text-brand-strong"
-                      }`}
-                    >
-                      {isMobile ? (
-                        <Camera className="size-3.5" aria-hidden />
+                    <ul className="mt-2 flex flex-col gap-2">
+                      {analysis.zones.length > 0 ? (
+                        analysis.zones.map((zone) => (
+                          <li
+                            key={zone.id}
+                            className="rounded-lg bg-brand-soft px-3 py-2 text-sm text-brand-strong"
+                          >
+                            Looks like: {zone.label} ({Math.round(zone.confidence * 100)}%
+                            confidence)
+                          </li>
+                        ))
                       ) : (
-                        <Upload className="size-3.5" aria-hidden />
+                        <li className="rounded-lg bg-border/50 px-3 py-2 text-sm text-muted">
+                          Not enough usable photo information yet.
+                        </li>
                       )}
-                      {isMobile ? "Retake" : "Replace"}
-                    </button>
+                    </ul>
+                  </div>
+                  <div className="rounded-xl border border-border bg-background/60 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                      Needs checking
+                    </p>
+                    <ul className="mt-2 flex flex-col gap-2 text-sm text-muted">
+                      {analysis.missingInfo.map((item) => (
+                        <li key={item} className="flex gap-2">
+                          <AlertTriangle
+                            className="mt-0.5 size-4 shrink-0 text-[var(--warn)]"
+                            aria-hidden
+                          />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-border bg-background/60 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                    Editable assumptions
+                  </p>
+                  <div className="mt-3 flex flex-col gap-3">
+                    {analysis.assumptions.map((item) => (
+                      <label key={item.id} className="flex flex-col gap-1 text-sm">
+                        <span className="flex items-center gap-2 font-medium text-foreground">
+                          {item.label}
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wide ${
+                              item.confidence === "good"
+                                ? "bg-brand-soft text-brand-strong"
+                                : item.confidence === "medium"
+                                  ? "bg-[var(--warn)]/10 text-[var(--warn)]"
+                                  : "bg-border/60 text-muted"
+                            }`}
+                          >
+                            {item.confidence}
+                          </span>
+                        </span>
+                        <textarea
+                          value={assumptionEdits[item.id] ?? item.value}
+                          onChange={(e) =>
+                            setAssumptionEdits((current) => ({
+                              ...current,
+                              [item.id]: e.target.value,
+                            }))
+                          }
+                          className="min-h-16 rounded-lg border border-border bg-surface p-2 text-sm text-foreground"
+                          disabled={!item.editable}
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 rounded-xl border border-border bg-background/60 p-4">
+              <Sparkles className="mb-2 size-5 text-brand" aria-hidden />
+              <p className="text-sm font-semibold text-foreground">No photo assumptions yet.</p>
+              <p className="mt-1 text-sm text-muted">
+                Add photos to detect planning zones, or continue without photos and answer the
+                garden details manually.
+              </p>
+            </div>
+          )}
+
+          <div className="sticky bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-20 mt-4 flex flex-col gap-2 rounded-3xl border border-border bg-surface/95 p-3 shadow-lg backdrop-blur sm:static sm:flex-row sm:items-center sm:rounded-2xl sm:shadow-none">
+            <button
+              type="button"
+              onClick={confirmAndContinue}
+              disabled={busy}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
+            >
+              <ClipboardEdit className="size-4" aria-hidden />
+              Confirm and add garden details
+            </button>
+            <button
+              type="button"
+              onClick={onSkip}
+              className="min-h-12 rounded-full border border-border px-5 py-2.5 text-sm font-semibold transition hover:border-brand"
+            >
+              Continue without photos
+            </button>
+            <span className="text-center text-[11px] text-muted sm:ml-auto sm:text-left">
+              Draft saved locally. You can safely leave and come back.
+            </span>
+          </div>
+        </section>
+
+        {cameraOpen && typeof document !== "undefined"
+          ? createPortal(
+              <div
+                className="fixed inset-0 z-50 bg-black"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Guided camera"
+              >
+                <div className="relative flex h-[100dvh] w-screen flex-col overflow-hidden bg-black text-white">
+                  <div
+                    className="absolute inset-x-0 top-0 z-20 flex items-start gap-3 bg-gradient-to-b from-black/75 via-black/35 to-transparent px-4 pb-8 pt-4"
+                    style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-white">Guided camera</p>
+                      <p className="line-clamp-2 text-xs text-white/75">
+                        {selectedType.label}: {selectedType.hint}
+                      </p>
+                    </div>
                     <button
                       type="button"
-                      onClick={() => removePhoto(photo.id)}
-                      className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-1 text-[11px] font-semibold text-danger transition hover:border-danger/40"
+                      onClick={() => setCameraOpen(false)}
+                      className="ml-auto flex size-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/45 text-white backdrop-blur transition hover:bg-white/10"
+                      aria-label="Close camera"
                     >
-                      <Trash2 className="size-3.5" aria-hidden />
-                      Remove
+                      <X className="size-5" aria-hidden />
                     </button>
                   </div>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        ) : null}
-      </section>
 
-      <section className="card p-4 sm:p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="flex items-center gap-2">
-            {busy ? (
-              <Loader2 className="size-4 animate-spin text-brand" aria-hidden />
-            ) : (
-              <CheckCircle2 className="size-4 text-brand" aria-hidden />
-            )}
-            <h2 className="text-lg font-semibold text-foreground">Confirm before planning</h2>
-          </div>
-          <span className="text-xs text-muted sm:ml-auto">{analysisStatus}</span>
-        </div>
-
-        {analysis ? (
-          <div className="mt-4 flex flex-col gap-4">
-            {draftRead ? (
-              <div className="flex items-start gap-2 rounded-xl border border-brand/25 bg-brand-soft p-3">
-                <Sparkles className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
-                <p className="text-sm font-medium text-brand-strong">{draftRead}</p>
-              </div>
-            ) : null}
-
-            {heroPhoto?.previewUrl && regionSummary ? (
-              <div className="rounded-xl border border-border bg-background/60 p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                  What Bloomprint sees
-                </p>
-                <p className="mt-1 text-[11px] text-muted">
-                  A rough read of your photo — greenery, surfaces, and light. An estimate to confirm,
-                  not a measurement. Tap a tile for detail.
-                </p>
-                <div className="mt-2 grid gap-3 sm:grid-cols-[1.4fr_1fr]">
-                  <div className="relative overflow-hidden rounded-lg border border-border">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={heroPhoto.previewUrl}
-                      alt="Your yard with a rough greenery and surface read"
-                      className="aspect-[3/2] w-full object-cover"
+                  <div className="relative min-h-0 flex-1 bg-black">
+                    <video
+                      ref={videoRef}
+                      playsInline
+                      muted
+                      className="h-full w-full object-cover"
                     />
-                    <div
-                      className="absolute inset-0 grid"
-                      style={{
-                        gridTemplateColumns: `repeat(${regionSummary.cols}, 1fr)`,
-                        gridTemplateRows: `repeat(${regionSummary.rows}, 1fr)`,
-                      }}
-                    >
-                      {regionSummary.cells.map((cell, i) => (
-                        <button
-                          key={i}
-                          type="button"
-                          onClick={() => setSelectedCell(selectedCell === i ? null : i)}
-                          className={`transition ${selectedCell === i ? "ring-2 ring-inset ring-white" : ""}`}
-                          style={{ backgroundColor: REGION_STYLE[cell.cls].fill }}
-                          aria-label={REGION_STYLE[cell.cls].label}
+
+                    <div className="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3">
+                      {Array.from({ length: 9 }).map((_, index) => (
+                        <div
+                          key={index}
+                          className={`${index % 3 !== 2 ? "border-r" : ""} ${
+                            index < 6 ? "border-b" : ""
+                          } border-white/25`}
                         />
                       ))}
                     </div>
-                    {selectedCell !== null && regionSummary.cells[selectedCell] ? (
-                      <div className="absolute inset-x-2 bottom-2 rounded-lg bg-black/75 px-3 py-1.5 text-xs text-white">
-                        {REGION_STYLE[regionSummary.cells[selectedCell].cls].label} — about{" "}
-                        {Math.round(coverageFor(regionSummary.cells[selectedCell].cls) * 100)}% of the
-                        photo
+
+                    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3">
+                      <div
+                        className={`border-2 border-dashed ${
+                          photoType === "measurement"
+                            ? "h-20 w-[min(78vw,22rem)] rounded-xl border-sky-300/80"
+                            : photoType === "existing_plants"
+                              ? "size-[min(54vw,13rem)] rounded-full border-lime-300/80"
+                              : photoType === "problem_area"
+                                ? "h-[min(44dvh,20rem)] w-[min(76vw,24rem)] rounded-[2rem] border-danger/85"
+                                : "h-[min(46dvh,22rem)] w-[min(78vw,24rem)] rounded-[2rem] border-yellow-300/80"
+                        }`}
+                      />
+                      <span className="mx-5 max-w-[21rem] rounded-full bg-black/65 px-4 py-2 text-center text-xs font-medium text-white/90 backdrop-blur-sm">
+                        Frame the {selectedType.label.toLowerCase()}: {selectedType.hint}
+                      </span>
+                    </div>
+
+                    <div className="pointer-events-none absolute left-0 right-0 top-24 z-10 flex justify-center px-3">
+                      <span className="rounded-full border border-white/15 bg-black/70 px-4 py-1.5 text-center text-xs font-semibold text-white shadow-lg backdrop-blur-md">
+                        {cameraTip}
+                      </span>
+                    </div>
+
+                    <div className="pointer-events-none absolute bottom-36 left-3 right-3 grid grid-cols-3 gap-2 text-[11px] sm:bottom-40">
+                      <LiveMetric label="Light" ok={!liveSignal.tooDark && !liveSignal.tooBright} />
+                      <LiveMetric label="Detail" ok={!liveSignal.lowDetail} />
+                      <LiveMetric label="Level" ok={!tilted} />
+                    </div>
+
+                    {(liveSignal.tooDark || liveSignal.tooBright || liveSignal.lowDetail) && (
+                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-danger/10">
+                        <span className="rounded-full bg-danger px-3 py-1 text-xs font-bold uppercase tracking-wide text-on-strong">
+                          Check photo before capture
+                        </span>
+                      </div>
+                    )}
+
+                    {!cameraReady ? (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white">
+                        <div className="text-center">
+                          <Loader2 className="mx-auto mb-2 size-6 animate-spin" aria-hidden />
+                          <p className="text-sm font-semibold">
+                            {cameraError ? "Camera unavailable" : "Opening camera..."}
+                          </p>
+                          {cameraError ? (
+                            <p className="mt-1 max-w-xs text-xs text-white/75">{cameraError}</p>
+                          ) : null}
+                        </div>
                       </div>
                     ) : null}
                   </div>
-                  <div className="flex flex-col gap-3">
-                    <div className="flex flex-wrap gap-1.5">
-                      {sceneChips.length > 0 ? (
-                        sceneChips.map((chip, i) => (
-                          <span
-                            key={`${chip.label}-${i}`}
-                            className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
-                              chip.tone === "green"
-                                ? "bg-brand-soft text-brand-strong"
-                                : chip.tone === "sky"
-                                  ? "bg-sky-500/15 text-sky-700 dark:text-sky-300"
-                                  : chip.tone === "shade"
-                                    ? "bg-slate-500/15 text-slate-600 dark:text-slate-300"
-                                    : "bg-border/70 text-muted"
-                            }`}
-                          >
-                            {chip.label}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-xs text-muted">
-                          Not enough detail to read confidently — confirm below.
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
-                        Greenery vs. hard surfaces
-                      </p>
-                      <div className="mt-1 flex h-3 overflow-hidden rounded-full bg-border">
-                        <div
-                          className="bg-brand"
-                          style={{ width: `${Math.round(regionSummary.greenRatio * 100)}%` }}
-                        />
-                        <div
-                          className="bg-slate-400"
-                          style={{ width: `${Math.round(regionSummary.hardscapeRatio * 100)}%` }}
-                        />
-                      </div>
-                      <p className="mt-1 text-[11px] text-muted">
-                        ~{Math.round(regionSummary.greenRatio * 100)}% greenery · ~
-                        {Math.round(regionSummary.hardscapeRatio * 100)}% hard surface (estimate)
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : null}
 
-            <div className="grid gap-3 sm:grid-cols-3">
-              <ReadinessCheck
-                label="Details detected"
-                value={detailsDetected}
-                yes="Zones or constraints found"
-                no="Add a wide context photo"
-              />
-              <ReadinessCheck
-                label="Plant identified"
-                value={plantIdentified}
-                yes="Plant material visible"
-                no="Add existing-plant close-up"
-              />
-              <ReadinessCheck
-                label="Measurements seen"
-                value={measurementDetected}
-                yes="Measurement reference present"
-                no="Add dimensions manually"
-              />
-            </div>
-
-            <div className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
-              <div className="flex flex-col gap-3">
-                <div className="rounded-xl border border-border bg-background/60 p-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                    Detected zones
-                  </p>
-                  <ul className="mt-2 flex flex-col gap-2">
-                    {analysis.zones.length > 0 ? (
-                      analysis.zones.map((zone) => (
-                        <li
-                          key={zone.id}
-                          className="rounded-lg bg-brand-soft px-3 py-2 text-sm text-brand-strong"
-                        >
-                          Looks like: {zone.label} ({Math.round(zone.confidence * 100)}% confidence)
-                        </li>
-                      ))
-                    ) : (
-                      <li className="rounded-lg bg-border/50 px-3 py-2 text-sm text-muted">
-                        Not enough usable photo information yet.
-                      </li>
-                    )}
-                  </ul>
-                </div>
-                <div className="rounded-xl border border-border bg-background/60 p-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                    Needs checking
-                  </p>
-                  <ul className="mt-2 flex flex-col gap-2 text-sm text-muted">
-                    {analysis.missingInfo.map((item) => (
-                      <li key={item} className="flex gap-2">
-                        <AlertTriangle
-                          className="mt-0.5 size-4 shrink-0 text-[var(--warn)]"
-                          aria-hidden
-                        />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-border bg-background/60 p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                  Editable assumptions
-                </p>
-                <div className="mt-3 flex flex-col gap-3">
-                  {analysis.assumptions.map((item) => (
-                    <label key={item.id} className="flex flex-col gap-1 text-sm">
-                      <span className="flex items-center gap-2 font-medium text-foreground">
-                        {item.label}
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wide ${
-                            item.confidence === "good"
-                              ? "bg-brand-soft text-brand-strong"
-                              : item.confidence === "medium"
-                                ? "bg-[var(--warn)]/10 text-[var(--warn)]"
-                                : "bg-border/60 text-muted"
+                  <div
+                    className="absolute inset-x-0 bottom-0 z-20 flex flex-col gap-4 bg-gradient-to-t from-black via-black/82 to-transparent px-4 pb-4 pt-10"
+                    style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+                  >
+                    <div className="-mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-1">
+                      {(
+                        [
+                          "front_yard",
+                          "problem_area",
+                          "existing_plants",
+                          "soil_drainage",
+                          "measurement",
+                        ] as PhotoAssetType[]
+                      ).map((type) => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => setPhotoType(type)}
+                          className={`min-h-10 shrink-0 snap-start rounded-full border px-3 text-xs font-semibold backdrop-blur ${
+                            photoType === type
+                              ? "border-white bg-white text-black"
+                              : "border-white/20 bg-white/10 text-white/78"
                           }`}
                         >
-                          {item.confidence}
-                        </span>
-                      </span>
-                      <textarea
-                        value={assumptionEdits[item.id] ?? item.value}
-                        onChange={(e) =>
-                          setAssumptionEdits((current) => ({
-                            ...current,
-                            [item.id]: e.target.value,
-                          }))
+                          {PHOTO_TYPES.find((item) => item.value === type)?.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => inputRef.current?.click()}
+                        className="justify-self-start rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur"
+                      >
+                        Upload
+                      </button>
+                      <button
+                        type="button"
+                        onClick={captureFromCamera}
+                        disabled={!cameraReady || busy || captureBlocked}
+                        className="flex size-20 items-center justify-center rounded-full border-4 border-white bg-white/20 shadow-[0_0_0_6px_rgba(255,255,255,0.18)] backdrop-blur transition active:scale-95 disabled:opacity-45"
+                        aria-label={
+                          captureBlocked ? "Adjust the shot to capture" : "Capture guided photo"
                         }
-                        className="min-h-16 rounded-lg border border-border bg-surface p-2 text-sm text-foreground"
-                        disabled={!item.editable}
-                      />
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="mt-4 rounded-xl border border-border bg-background/60 p-4">
-            <Sparkles className="mb-2 size-5 text-brand" aria-hidden />
-            <p className="text-sm font-semibold text-foreground">No photo assumptions yet.</p>
-            <p className="mt-1 text-sm text-muted">
-              Add photos to detect planning zones, or continue without photos and answer the garden
-              details manually.
-            </p>
-          </div>
-        )}
-
-        <div className="sticky bottom-3 mt-4 flex flex-col gap-2 rounded-2xl border border-border bg-surface/95 p-3 shadow-lg backdrop-blur sm:static sm:flex-row sm:items-center sm:shadow-none">
-          <button
-            type="button"
-            onClick={confirmAndContinue}
-            disabled={busy}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
-          >
-            <ClipboardEdit className="size-4" aria-hidden />
-            Confirm and add garden details
-          </button>
-          <button
-            type="button"
-            onClick={onSkip}
-            className="rounded-full border border-border px-5 py-2.5 text-sm font-semibold transition hover:border-brand"
-          >
-            Continue without photos
-          </button>
-          <span className="text-center text-[11px] text-muted sm:ml-auto sm:text-left">
-            Draft saved locally. You can safely leave and come back.
-          </span>
-        </div>
-      </section>
-
-      {cameraOpen ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Guided camera"
-        >
-          <div className="flex max-h-[96vh] w-full max-w-md flex-col overflow-hidden rounded-2xl bg-surface shadow-2xl">
-            <div className="flex items-center gap-3 border-b border-border p-3">
-              <div>
-                <p className="text-sm font-semibold text-foreground">Guided camera</p>
-                <p className="text-xs text-muted">
-                  {selectedType.label}: {selectedType.hint}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setCameraOpen(false)}
-                className="ml-auto rounded-full border border-border p-2 text-muted transition hover:text-foreground"
-                aria-label="Close camera"
-              >
-                <X className="size-4" aria-hidden />
-              </button>
-            </div>
-
-            <div className="relative aspect-[3/4] bg-black">
-              <video ref={videoRef} playsInline muted className="h-full w-full object-cover" />
-
-              <div className="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3">
-                {Array.from({ length: 9 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className={`${index % 3 !== 2 ? "border-r" : ""} ${
-                      index < 6 ? "border-b" : ""
-                    } border-white/25`}
-                  />
-                ))}
-              </div>
-
-              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3">
-                <div
-                  className={`border-2 border-dashed ${
-                    photoType === "measurement"
-                      ? "h-20 w-64 rounded-lg border-sky-300/80"
-                      : photoType === "existing_plants"
-                        ? "size-44 rounded-full border-lime-300/80"
-                        : "h-56 w-64 rounded-2xl border-yellow-300/80"
-                  }`}
-                />
-                <span className="max-w-[18rem] rounded-lg bg-black/65 px-3 py-1 text-center text-[11px] text-white/90 backdrop-blur-sm">
-                  Frame the {selectedType.label.toLowerCase()}: {selectedType.hint}
-                </span>
-              </div>
-
-              <div className="pointer-events-none absolute left-0 right-0 top-3 flex justify-center px-3">
-                <span className="rounded-full border border-white/15 bg-black/70 px-4 py-1.5 text-center text-xs font-semibold text-white shadow-lg backdrop-blur-md">
-                  {cameraTip}
-                </span>
-              </div>
-
-              <div className="pointer-events-none absolute bottom-3 left-3 right-3 grid grid-cols-3 gap-2 text-[11px]">
-                <LiveMetric label="Light" ok={!liveSignal.tooDark && !liveSignal.tooBright} />
-                <LiveMetric label="Detail" ok={!liveSignal.lowDetail} />
-                <LiveMetric label="Level" ok={!tilted} />
-              </div>
-
-              {(liveSignal.tooDark || liveSignal.tooBright || liveSignal.lowDetail) && (
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-danger/10">
-                  <span className="rounded-full bg-danger px-3 py-1 text-xs font-bold uppercase tracking-wide text-on-strong">
-                    Check photo before capture
-                  </span>
-                </div>
-              )}
-
-              {!cameraReady ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white">
-                  <div className="text-center">
-                    <Loader2 className="mx-auto mb-2 size-6 animate-spin" aria-hidden />
-                    <p className="text-sm font-semibold">
-                      {cameraError ? "Camera unavailable" : "Opening camera..."}
-                    </p>
-                    {cameraError ? (
-                      <p className="mt-1 max-w-xs text-xs text-white/75">{cameraError}</p>
+                      >
+                        <span className="size-14 rounded-full bg-white" />
+                      </button>
+                      <span className="justify-self-end text-right text-[11px] font-medium text-white/65">
+                        {photos.length}/{MAX_PHOTOS}
+                      </span>
+                    </div>
+                    {captureBlocked ? (
+                      <p className="text-center text-xs font-medium text-red-200">
+                        Lighting, detail, and level all need fixing before this photo is usable.
+                      </p>
                     ) : null}
                   </div>
                 </div>
-              ) : null}
-            </div>
-
-            <div className="flex flex-col gap-3 p-3">
-              <div className="grid grid-cols-3 gap-2">
-                {(["front_yard", "existing_plants", "measurement"] as PhotoAssetType[]).map(
-                  (type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setPhotoType(type)}
-                      className={`rounded-xl border px-2 py-2 text-xs font-semibold ${
-                        photoType === type
-                          ? "border-brand bg-brand-soft text-brand-strong"
-                          : "border-border text-muted"
-                      }`}
-                    >
-                      {PHOTO_TYPES.find((item) => item.value === type)?.label}
-                    </button>
-                  ),
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={captureFromCamera}
-                disabled={!cameraReady || busy || captureBlocked}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
-              >
-                <Maximize2 className="size-4" aria-hidden />
-                {captureBlocked ? "Adjust the shot to capture" : "Capture guided photo"}
-              </button>
-              {captureBlocked ? (
-                <p className="text-center text-xs font-medium text-danger">
-                  Lighting, detail, and level all need fixing before this photo is usable.
-                </p>
-              ) : null}
-              <button
-                type="button"
-                onClick={() => inputRef.current?.click()}
-                className="rounded-full border border-border px-5 py-2 text-sm font-semibold"
-              >
-                Use upload instead
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-     </div>
+              </div>,
+              document.body,
+            )
+          : null}
+      </div>
     </div>
   );
 }

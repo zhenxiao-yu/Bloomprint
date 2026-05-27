@@ -476,7 +476,7 @@ export function PlanExperience() {
 
   return (
     <main
-      className={`mx-auto w-full flex-1 px-4 pb-28 pt-8 sm:px-6 sm:py-10 ${
+      className={`mx-auto min-w-0 w-full flex-1 px-3 pb-28 pt-5 sm:px-6 sm:py-10 ${
         step === "result" ? "max-w-[75rem]" : "max-w-3xl"
       }`}
     >
