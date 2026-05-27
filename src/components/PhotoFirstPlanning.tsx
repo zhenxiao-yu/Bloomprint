@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import { z } from "zod";
 import {
   AlertTriangle,
@@ -51,95 +52,38 @@ import {
 const MAX_PHOTOS = 8;
 const MAX_FILE_MB = 12;
 
-const PHOTO_TYPES: { value: PhotoAssetType; label: string; hint: string }[] = [
-  { value: "front_yard", label: "Front yard", hint: "Best wide shot from the street or walkway." },
-  { value: "backyard", label: "Backyard", hint: "Show the main usable area and edges." },
-  {
-    value: "side_yard",
-    label: "Side yard",
-    hint: "Good for privacy, drainage, and path constraints.",
-  },
-  {
-    value: "problem_area",
-    label: "Problem area",
-    hint: "Dead shrubs, bare spots, slope, or damage.",
-  },
-  {
-    value: "existing_plants",
-    label: "Existing plants",
-    hint: "Close enough to see leaves and spacing.",
-  },
-  {
-    value: "soil_drainage",
-    label: "Soil/drainage",
-    hint: "Mud, pooling water, downspouts, or low spots.",
-  },
-  {
-    value: "measurement",
-    label: "Measurements",
-    hint: "Tape measure, sketch, or known dimensions.",
-  },
-  { value: "inspiration", label: "Inspiration", hint: "Optional style reference." },
+type Translator = ReturnType<typeof useTranslations>;
+
+// Display text (label/hint/desc/title) is resolved with t() at render — the
+// constants carry only stable keys and presentation metadata (value/icon/overlay).
+const PHOTO_TYPES: { value: PhotoAssetType }[] = [
+  { value: "front_yard" },
+  { value: "backyard" },
+  { value: "side_yard" },
+  { value: "problem_area" },
+  { value: "existing_plants" },
+  { value: "soil_drainage" },
+  { value: "measurement" },
+  { value: "inspiration" },
 ];
 
-const PROJECT_TYPES: { value: ProjectKind; label: string; desc: string; icon: typeof Home }[] = [
-  {
-    value: "my_home",
-    label: "My home",
-    desc: "Plan your own yard and continue later.",
-    icon: Home,
-  },
-  {
-    value: "client_property",
-    label: "Client property",
-    desc: "Organize photos, versions, and quote-ready notes.",
-    icon: Users,
-  },
-  {
-    value: "store_customer",
-    label: "Store customer",
-    desc: "Fast operational help for a shopper in front of you.",
-    icon: Store,
-  },
+const PROJECT_TYPES: { value: ProjectKind; icon: typeof Home }[] = [
+  { value: "my_home", icon: Home },
+  { value: "client_property", icon: Users },
+  { value: "store_customer", icon: Store },
 ];
 
-const STEPS = [
-  { key: "project", label: "Project" },
-  { key: "photos", label: "Photos" },
-  { key: "confirm", label: "Confirm" },
-] as const;
+const STEPS = [{ key: "project" }, { key: "photos" }, { key: "confirm" }] as const;
 
-const CAMERA_TIPS = [
-  "Hold steady and include the bed edges.",
-  "Keep the house, walkway, or fence line level.",
-  "Use the center box for the main problem area.",
-  "Step back if plants or bed corners are cropped.",
-];
+const CAMERA_TIP_COUNT = 4;
 
 const EXAMPLE_SHOTS: {
   type: PhotoAssetType;
-  title: string;
-  desc: string;
   overlay: "wide" | "plant" | "measure";
 }[] = [
-  {
-    type: "front_yard",
-    title: "Wide context",
-    desc: "House edge, walkway, and full planting bed visible.",
-    overlay: "wide",
-  },
-  {
-    type: "existing_plants",
-    title: "Plant close-up",
-    desc: "Leaves and branching clear enough for a cautious ID note.",
-    overlay: "plant",
-  },
-  {
-    type: "measurement",
-    title: "Measurement proof",
-    desc: "Tape, sketch, or known width visible before buying.",
-    overlay: "measure",
-  },
+  { type: "front_yard", overlay: "wide" },
+  { type: "existing_plants", overlay: "plant" },
+  { type: "measurement", overlay: "measure" },
 ];
 
 type PhotoIssue = {
@@ -181,10 +125,10 @@ function issueId(): string {
   return crypto.randomUUID?.() ?? `issue-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-function qualityLabel(quality: PhotoQuality | undefined): string {
-  if (quality === "unusable") return "Retake";
-  if (quality === "needs_review") return "Needs review";
-  return "Good";
+function qualityLabel(quality: PhotoQuality | undefined, t: Translator): string {
+  if (quality === "unusable") return t("quality_retake");
+  if (quality === "needs_review") return t("quality_needsReview");
+  return t("quality_good");
 }
 
 function qualityClass(quality: PhotoQuality | undefined): string {
@@ -199,11 +143,11 @@ function activeStep(photos: PhotoAsset[], analysis: PhotoAnalysisResult | null) 
   return "photos";
 }
 
-function sunLabel(value: string): string {
-  if (value === "full-sun") return "lots of sun";
-  if (value === "part-sun") return "some sun";
-  if (value === "shade") return "mostly shade";
-  return "unknown sun";
+function sunLabel(value: string, t: Translator): string {
+  if (value === "full-sun") return t("confidenceFullSun");
+  if (value === "part-sun") return t("confidencePartSun");
+  if (value === "shade") return t("confidenceShade");
+  return t("confidenceUnknownSun");
 }
 
 function dataUrlParts(
@@ -273,17 +217,30 @@ async function analyzeFirstPhotoRegions(photos: PhotoAsset[]): Promise<RegionSum
   }
 }
 
-const REGION_STYLE: Record<RegionClass, { fill: string; label: string }> = {
-  greenery: { fill: "rgba(34,197,94,0.30)", label: "Greenery" },
-  hardscape: { fill: "rgba(148,163,184,0.34)", label: "Hard surface" },
-  sky: { fill: "rgba(56,189,248,0.26)", label: "Sky / open light" },
-  shadow: { fill: "rgba(30,41,59,0.40)", label: "Shade" },
-  mixed: { fill: "rgba(0,0,0,0)", label: "Mixed" },
+const REGION_STYLE: Record<RegionClass, { fill: string }> = {
+  greenery: { fill: "rgba(34,197,94,0.30)" },
+  hardscape: { fill: "rgba(148,163,184,0.34)" },
+  sky: { fill: "rgba(56,189,248,0.26)" },
+  shadow: { fill: "rgba(30,41,59,0.40)" },
+  mixed: { fill: "rgba(0,0,0,0)" },
 };
+
+const REGION_LABEL_KEY: Record<RegionClass, string> = {
+  greenery: "region_greenery_label",
+  hardscape: "region_hardscape_label",
+  sky: "region_sky_label",
+  shadow: "region_shadow_label",
+  mixed: "region_mixed_label",
+};
+
+function regionLabel(cls: RegionClass, t: Translator): string {
+  return t(REGION_LABEL_KEY[cls]);
+}
 
 function mergeVisionSuggestion(
   analysis: PhotoAnalysisResult,
   suggestion: VisionSuggestion | null,
+  t: Translator,
 ): PhotoAnalysisResult {
   if (!suggestion) return analysis;
   const observations = (suggestion.observations ?? []).slice(0, 4);
@@ -297,7 +254,7 @@ function mergeVisionSuggestion(
       item.id === "sun" && suggestion.sun && suggestion.sun !== "unknown"
         ? {
             ...item,
-            value: `Photo ML estimates ${sunLabel(suggestion.sun)}. Please confirm before buying plants.`,
+            value: `Photo ML estimates ${sunLabel(suggestion.sun, t)}. Please confirm before buying plants.`,
             confidence: "medium",
           }
         : item,
@@ -342,12 +299,11 @@ function readLiveFrame(canvas: HTMLCanvasElement): { signal: FrameSignal; fill: 
   };
 }
 
-async function inspectDataUrl(source: string): Promise<ImageInspection> {
+async function inspectDataUrl(source: string, t: Translator): Promise<ImageInspection> {
   const img = await new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve(image);
-    image.onerror = () =>
-      reject(new Error("This image could not be opened. Try a different photo."));
+    image.onerror = () => reject(new Error(t("errorCouldNotOpen")));
     image.src = source;
   });
 
@@ -376,7 +332,7 @@ async function inspectDataUrl(source: string): Promise<ImageInspection> {
   canvas.width = Math.round(img.width * scale);
   canvas.height = Math.round(img.height * scale);
   const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Your browser could not process this photo.");
+  if (!ctx) throw new Error(t("errorBrowserProcess"));
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
   return {
@@ -390,22 +346,22 @@ async function inspectDataUrl(source: string): Promise<ImageInspection> {
   };
 }
 
-async function inspectAndCompress(file: File): Promise<ImageInspection> {
+async function inspectAndCompress(file: File, t: Translator): Promise<ImageInspection> {
   if (!file.type.startsWith("image/")) {
-    throw new Error("This file is not an image. Upload a JPG, PNG, HEIC, or WebP photo.");
+    throw new Error(t("errorNotImage"));
   }
   if (file.size > MAX_FILE_MB * 1024 * 1024) {
-    throw new Error(`This photo is over ${MAX_FILE_MB}MB. Use a smaller image or retake it.`);
+    throw new Error(t("errorTooLarge", { max: MAX_FILE_MB }));
   }
 
   const source = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error("Bloomprint could not read this photo."));
+    reader.onerror = () => reject(new Error(t("errorCouldNotRead")));
     reader.readAsDataURL(file);
   });
 
-  return inspectDataUrl(source);
+  return inspectDataUrl(source, t);
 }
 
 export function PhotoFirstPlanning({
@@ -429,10 +385,11 @@ export function PhotoFirstPlanning({
   onContinue: () => void;
   onSkip: () => void;
 }) {
+  const t = useTranslations("PhotoIntake");
   const [photoType, setPhotoType] = useState<PhotoAssetType>("front_yard");
   const [dragging, setDragging] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState("Draft saved locally");
+  const [status, setStatus] = useState(() => t("statusDraftSaved"));
   const [issues, setIssues] = useState<PhotoIssue[]>([]);
   const [assumptionEdits, setAssumptionEdits] = useState<Record<string, string>>({});
   const [cameraOpen, setCameraOpen] = useState(false);
@@ -486,12 +443,11 @@ export function PhotoFirstPlanning({
     const chips: { label: string; tone: "green" | "neutral" | "sky" | "shade" }[] = [];
     if (regionSummary) {
       if (regionSummary.greenRatio > 0.18)
-        chips.push({ label: "Greenery / planting", tone: "green" });
+        chips.push({ label: t("sceneChipGreenery"), tone: "green" });
       if (regionSummary.hardscapeRatio > 0.18)
-        chips.push({ label: "Paths / hard surfaces", tone: "neutral" });
-      if (regionSummary.skyRatio > 0.16)
-        chips.push({ label: "Open sky · bright light", tone: "sky" });
-      if (regionSummary.shadowRatio > 0.28) chips.push({ label: "Shaded areas", tone: "shade" });
+        chips.push({ label: t("sceneChipHardscape"), tone: "neutral" });
+      if (regionSummary.skyRatio > 0.16) chips.push({ label: t("sceneChipSky"), tone: "sky" });
+      if (regionSummary.shadowRatio > 0.28) chips.push({ label: t("sceneChipShade"), tone: "shade" });
     }
     for (const obj of analysis?.detectedObjects ?? []) {
       if (obj.toLowerCase().startsWith("photo ml observation")) {
@@ -499,21 +455,21 @@ export function PhotoFirstPlanning({
       }
     }
     return chips.slice(0, 6);
-  }, [regionSummary, analysis]);
+  }, [regionSummary, analysis, t]);
 
   const draftRead = useMemo(() => {
     if (!analysis) return null;
     const parts: string[] = [];
     if (regionSummary) {
       const { greenRatio: g, hardscapeRatio: h, skyRatio: s, shadowRatio: d } = regionSummary;
-      if (g > h && g > 0.2) parts.push("mostly greenery");
-      else if (h > g && h > 0.2) parts.push("a lot of hard surface");
-      else if (g > 0.1 || h > 0.1) parts.push("a mix of planting and paving");
-      if (s > 0.2) parts.push("bright open light");
-      else if (d > 0.3) parts.push("shadier light");
+      if (g > h && g > 0.2) parts.push(t("draftReadMostlyGreenery"));
+      else if (h > g && h > 0.2) parts.push(t("draftReadLotsHardSurface"));
+      else if (g > 0.1 || h > 0.1) parts.push(t("draftReadMix"));
+      if (s > 0.2) parts.push(t("draftReadBrightLight"));
+      else if (d > 0.3) parts.push(t("draftReadShadierLight"));
     }
-    return `Draft read: ${parts.length ? parts.join(", ") : "your yard"}. Confirm the details below before planning.`;
-  }, [analysis, regionSummary]);
+    return t("draftRead", { parts: parts.length ? parts.join(", ") : t("draftReadYourYard") });
+  }, [analysis, regionSummary, t]);
 
   const coverageFor = (cls: RegionClass): number => {
     if (!regionSummary) return 0;
@@ -534,16 +490,16 @@ export function PhotoFirstPlanning({
     analysis?.detectedObjects.some((item) => item.toLowerCase().includes("measurement")),
   );
   const cameraTip = liveSignal.tooDark
-    ? "Too dark. Move closer to daylight."
+    ? t("cameraTipTooDark")
     : liveSignal.tooBright
-      ? "Too much glare. Tilt away from direct sun."
+      ? t("cameraTipTooBright")
       : liveSignal.lowDetail
-        ? "Low detail. Hold steady and step back."
+        ? t("cameraTipLowDetail")
         : tilted
-          ? "Straighten your phone with the house or walkway."
+          ? t("cameraTipStraighten")
           : liveFill < 0.12
-            ? "Move closer so the bed or yard fills the frame."
-            : CAMERA_TIPS[tipIndex % CAMERA_TIPS.length];
+            ? t("cameraTipFillFrame")
+            : t(`cameraTip_${tipIndex % CAMERA_TIP_COUNT}`);
   // Block capture only when light AND detail AND level are all bad — a frame this
   // poor would just be rejected on inspection, so stop it before the shutter.
   const captureBlocked =
@@ -552,10 +508,10 @@ export function PhotoFirstPlanning({
   const analysisStatus = useMemo(() => {
     if (busy) return status;
     if (analysis)
-      return `${Math.round(analysis.confidence * 100)}% photo confidence. Please confirm before planning.`;
-    if (photos.length > 0) return "Photos saved. Preparing assumptions...";
-    return "Upload photos or continue without them.";
-  }, [analysis, busy, photos.length, status]);
+      return t("statusConfidence", { percent: Math.round(analysis.confidence * 100) });
+    if (photos.length > 0) return t("statusPreparing");
+    return t("statusUploadOrContinue");
+  }, [analysis, busy, photos.length, status, t]);
 
   useEffect(() => {
     // Coarse pointer ≈ phone/tablet → guided camera is useful; otherwise prefer upload.
@@ -578,17 +534,17 @@ export function PhotoFirstPlanning({
         setBusy(true);
         try {
           // Each status reflects a real step, not a faked timer.
-          setStatus("Reading your photo...");
+          setStatus(t("statusReadingPhoto"));
           const base = await analyzeYardPhotos(photos);
           if (!active) return;
-          setStatus("Mapping greenery and surfaces...");
+          setStatus(t("statusMappingSurfaces"));
           const region = await analyzeFirstPhotoRegions(photos);
           if (!active) return;
           setRegionSummary(region);
-          setStatus("Checking optional photo ML...");
+          setStatus(t("statusCheckingVision"));
           const suggestion = await readVisionSuggestion(photos);
           if (!active) return;
-          const merged = mergeVisionSuggestion(base, suggestion);
+          const merged = mergeVisionSuggestion(base, suggestion, t);
           const next: PhotoAnalysisResult = {
             ...merged,
             derived: derivePhotoIntake({
@@ -603,10 +559,10 @@ export function PhotoFirstPlanning({
             for (const item of next.assumptions) merged[item.id] = merged[item.id] ?? item.value;
             return merged;
           });
-          setStatus("Photo assumptions ready to confirm");
+          setStatus(t("statusAssumptionsReady"));
         } catch {
           // Analysis is optional — never strand the user on a spinner; let them continue manually.
-          if (active) setStatus("Couldn't read that photo automatically — you can still continue.");
+          if (active) setStatus(t("statusCouldNotRead"));
         } finally {
           if (active) setBusy(false);
         }
@@ -616,7 +572,7 @@ export function PhotoFirstPlanning({
       active = false;
       window.clearTimeout(timer);
     };
-  }, [photos, onAnalysis]);
+  }, [photos, onAnalysis, t]);
 
   useEffect(() => {
     // Tips only show in the camera modal — don't re-render the whole tree otherwise.
@@ -633,9 +589,7 @@ export function PhotoFirstPlanning({
       setCameraReady(false);
       try {
         if (!navigator.mediaDevices?.getUserMedia) {
-          throw new Error(
-            "Camera capture is not available in this browser. Use photo upload instead.",
-          );
+          throw new Error(t("cameraErrorNotAvailable"));
         }
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
@@ -656,11 +610,7 @@ export function PhotoFirstPlanning({
           setCameraReady(true);
         }
       } catch (error) {
-        setCameraError(
-          error instanceof Error
-            ? error.message
-            : "Bloomprint could not open the camera. You can still upload photos.",
-        );
+        setCameraError(error instanceof Error ? error.message : t("cameraErrorCouldNotOpen"));
       }
     }
     void startCamera();
@@ -670,7 +620,7 @@ export function PhotoFirstPlanning({
       streamRef.current = null;
       setCameraReady(false);
     };
-  }, [cameraOpen]);
+  }, [cameraOpen, t]);
 
   useEffect(() => {
     if (!cameraOpen || !cameraReady) return;
@@ -718,15 +668,15 @@ export function PhotoFirstPlanning({
     const allIncoming = Array.from(files);
     if (allIncoming.length === 0) return;
     setBusy(true);
-    setStatus("Checking and compressing photos locally...");
+    setStatus(t("statusCheckingCompressing"));
     const remaining = Math.max(0, MAX_PHOTOS - photosRef.current.length);
     const incoming = allIncoming.slice(0, remaining);
     const nextIssues: PhotoIssue[] = [];
     if (allIncoming.length > remaining) {
       nextIssues.push({
         id: issueId(),
-        fileName: "Photo limit",
-        message: `Bloomprint keeps up to ${MAX_PHOTOS} photos per planning draft. Extra photos were not added.`,
+        fileName: t("issueFileNamePhotoLimit"),
+        message: t("photoLimit", { max: MAX_PHOTOS }),
         severity: "warning",
       });
     }
@@ -742,13 +692,12 @@ export function PhotoFirstPlanning({
           nextIssues.push({
             id: issueId(),
             fileName: file.name,
-            message:
-              "A photo with this name is already in the draft. It was skipped to avoid duplicates.",
+            message: t("issueDuplicateName"),
             severity: "warning",
           });
           continue;
         }
-        const inspected = await inspectAndCompress(file);
+        const inspected = await inspectAndCompress(file, t);
         if (
           inspected.signature &&
           knownSignatures.some((sig) => areNearDuplicates(sig, inspected.signature))
@@ -756,8 +705,7 @@ export function PhotoFirstPlanning({
           nextIssues.push({
             id: issueId(),
             fileName: file.name,
-            message:
-              "This looks like a near-duplicate of a photo already added. Capture a different angle instead.",
+            message: t("issueNearDuplicate"),
             severity: "warning",
           });
           continue;
@@ -787,7 +735,7 @@ export function PhotoFirstPlanning({
         nextIssues.push({
           id: issueId(),
           fileName: file.name,
-          message: error instanceof Error ? error.message : "This photo could not be processed.",
+          message: error instanceof Error ? error.message : t("errorPhotoNotProcessed"),
           severity: "error",
         });
       }
@@ -797,7 +745,7 @@ export function PhotoFirstPlanning({
     setIssues((current) => [...nextIssues, ...current].slice(0, 6));
     // Commit against the latest committed list, not the one captured before awaits.
     if (next.length > 0) onPhotos([...photosRef.current, ...next]);
-    setStatus(next.length > 0 ? "Photos saved locally" : "No usable photos were added");
+    setStatus(next.length > 0 ? t("statusPhotosSaved") : t("statusNoUsablePhotos"));
     setBusy(false);
     if (inputRef.current) inputRef.current.value = "";
   }
@@ -807,8 +755,8 @@ export function PhotoFirstPlanning({
       setIssues((current) => [
         {
           id: issueId(),
-          fileName: "Camera capture",
-          message: `This draft already has ${MAX_PHOTOS} photos. Remove one before capturing another.`,
+          fileName: t("issueFileNameCameraCapture"),
+          message: t("cameraMaxPhotos", { max: MAX_PHOTOS }),
           severity: "warning",
         },
         ...current,
@@ -816,9 +764,9 @@ export function PhotoFirstPlanning({
       return;
     }
     setBusy(true);
-    setStatus("Checking camera photo locally...");
+    setStatus(t("statusCheckingCameraPhoto"));
     try {
-      const inspected = await inspectDataUrl(dataUrl);
+      const inspected = await inspectDataUrl(dataUrl, t);
       if (!mountedRef.current) return;
       const knownSignatures = photosRef.current
         .map((photo) => photo.signature)
@@ -831,9 +779,8 @@ export function PhotoFirstPlanning({
           [
             {
               id: issueId(),
-              fileName: "Camera capture",
-              message:
-                "This looks like a near-duplicate of a photo already added. Capture a different angle instead.",
+              fileName: t("issueFileNameCameraCapture"),
+              message: t("issueNearDuplicate"),
               severity: "warning" as const,
             },
             ...current,
@@ -843,9 +790,7 @@ export function PhotoFirstPlanning({
       }
       const warnings = [
         ...inspected.warnings,
-        ...(tilted
-          ? ["Phone looked tilted during capture. Confirm bed edges and measurements."]
-          : []),
+        ...(tilted ? [t("warningTilted")] : []),
       ];
       const asset = await saveDraftPhoto({
         sessionId,
@@ -866,7 +811,7 @@ export function PhotoFirstPlanning({
           [
             {
               id: issueId(),
-              fileName: "Camera capture",
+              fileName: t("issueFileNameCameraCapture"),
               message: warnings[0],
               severity: asset.quality === "unusable" ? ("error" as const) : ("warning" as const),
             },
@@ -875,16 +820,15 @@ export function PhotoFirstPlanning({
         );
       }
       setCameraOpen(false);
-      setStatus("Camera photo saved locally");
+      setStatus(t("statusCameraPhotoSaved"));
     } catch (error) {
       if (!mountedRef.current) return;
       setIssues((current) =>
         [
           {
             id: issueId(),
-            fileName: "Camera capture",
-            message:
-              error instanceof Error ? error.message : "This camera photo could not be processed.",
+            fileName: t("issueFileNameCameraCapture"),
+            message: error instanceof Error ? error.message : t("errorCameraPhotoNotProcessed"),
             severity: "error" as const,
           },
           ...current,
@@ -898,7 +842,7 @@ export function PhotoFirstPlanning({
   function captureFromCamera() {
     const video = videoRef.current;
     if (!video || video.videoWidth === 0 || video.videoHeight === 0) {
-      setCameraError("Camera is still warming up. Try again in a moment.");
+      setCameraError(t("cameraStillWarming"));
       return;
     }
     const canvas = document.createElement("canvas");
@@ -906,7 +850,7 @@ export function PhotoFirstPlanning({
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext("2d");
     if (!ctx) {
-      setCameraError("Your browser could not capture this frame.");
+      setCameraError(t("cameraCouldNotCapture"));
       return;
     }
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -964,19 +908,18 @@ export function PhotoFirstPlanning({
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-brand">
-                  Planning workspace
+                  {t("headerEyebrow")}
                 </p>
                 <h1 className="mt-1 text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
-                  Upload the yard first. Confirm the assumptions. Then build the plan.
+                  {t("headerTitle")}
                 </h1>
                 <p className="mt-2 line-clamp-2 max-w-2xl text-sm text-muted sm:line-clamp-none">
-                  Bloomprint checks photo quality, estimates planning zones, and turns uncertainty
-                  into editable questions before it generates anything.
+                  {t("headerSubtitle")}
                 </p>
               </div>
               <div className="hidden rounded-2xl border border-brand/20 bg-surface/80 p-3 text-xs text-muted shadow-sm sm:block">
-                <p className="font-semibold text-foreground">Autosave-first</p>
-                <p className="mt-1">Photos and choices are saved locally while you work.</p>
+                <p className="font-semibold text-foreground">{t("autosaveTitle")}</p>
+                <p className="mt-1">{t("autosaveBody")}</p>
               </div>
             </div>
 
@@ -999,9 +942,9 @@ export function PhotoFirstPlanning({
                     }`}
                   >
                     <span className="block font-semibold">
-                      {index + 1}. {step.label}
+                      {index + 1}. {t(`step_${step.key}_label`)}
                     </span>
-                    <span className="mt-0.5 block">{done ? "Ready" : "Next"}</span>
+                    <span className="mt-0.5 block">{done ? t("stepReady") : t("stepNext")}</span>
                   </div>
                 );
               })}
@@ -1009,7 +952,7 @@ export function PhotoFirstPlanning({
           </div>
 
           <div className="grid grid-cols-3 gap-2 p-3 sm:p-5">
-            {PROJECT_TYPES.map(({ value, label, desc, icon: Icon }) => (
+            {PROJECT_TYPES.map(({ value, icon: Icon }) => (
               <button
                 key={value}
                 type="button"
@@ -1021,9 +964,11 @@ export function PhotoFirstPlanning({
               >
                 <Icon className="mb-1 size-5 text-brand sm:mb-2" aria-hidden />
                 <span className="block text-xs font-semibold leading-tight text-foreground sm:text-sm">
-                  {label}
+                  {t(`projectType_${value}_label`)}
                 </span>
-                <span className="mt-1 hidden text-xs text-muted sm:block">{desc}</span>
+                <span className="mt-1 hidden text-xs text-muted sm:block">
+                  {t(`projectType_${value}_desc`)}
+                </span>
               </button>
             ))}
           </div>
@@ -1032,25 +977,26 @@ export function PhotoFirstPlanning({
         <section className="rounded-[1.5rem] border border-border bg-surface p-4 shadow-sm sm:rounded-2xl sm:p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-foreground">Photo intake</h2>
-              <p className="mt-1 text-sm text-muted">
-                Add 2-5 photos for best results. Wide shots help layout; close-ups help risk and
-                plant notes.
-              </p>
+              <h2 className="text-lg font-semibold text-foreground">{t("photoIntakeHeading")}</h2>
+              <p className="mt-1 text-sm text-muted">{t("photoIntakeSubtitle")}</p>
             </div>
             <div className="flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-2 text-xs text-muted">
               <ShieldCheck className="size-4 text-brand" aria-hidden />
-              {usableCount} usable · {reviewCount} review · {unusableCount} retake
+              {t("usableSummary", {
+                usable: usableCount,
+                review: reviewCount,
+                unusable: unusableCount,
+              })}
             </div>
           </div>
 
           <div className="mt-4 rounded-2xl border border-border bg-background/60 p-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                Capture plan
+                {t("capturePlan")}
               </p>
               <span className="text-xs font-semibold text-brand-strong">
-                {liveConfidence}% photo confidence
+                {t("photoConfidence", { percent: liveConfidence })}
               </span>
             </div>
             <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-border">
@@ -1061,8 +1007,11 @@ export function PhotoFirstPlanning({
             </div>
             <p className="mt-2 text-xs text-muted">
               {nextShot
-                ? `Next best shot: ${nextShot.title.toLowerCase()} — ${nextShot.desc}`
-                : "Great coverage. Add more angles or continue to confirm."}
+                ? t("nextBestShot", {
+                    title: t(`exampleShot_${nextShot.type}_title`).toLowerCase(),
+                    desc: t(`exampleShot_${nextShot.type}_desc`),
+                  })
+                : t("greatCoverage")}
             </p>
             <div className="-mx-1 mt-3 flex snap-x gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
               {EXAMPLE_SHOTS.map((shot) => {
@@ -1086,9 +1035,11 @@ export function PhotoFirstPlanning({
                       <Upload className="size-4 shrink-0 text-muted" aria-hidden />
                     )}
                     <span className="min-w-0">
-                      <span className="block font-semibold">{shot.title}</span>
+                      <span className="block font-semibold">
+                        {t(`exampleShot_${shot.type}_title`)}
+                      </span>
                       <span className="block text-[11px] text-muted">
-                        {done ? "Added" : isMobile ? "Tap to add" : "Upload"}
+                        {done ? t("shotAdded") : isMobile ? t("shotTapToAdd") : t("shotUpload")}
                       </span>
                     </span>
                   </button>
@@ -1103,7 +1054,7 @@ export function PhotoFirstPlanning({
                 htmlFor="photo-type"
                 className="text-xs font-semibold uppercase tracking-wide text-muted"
               >
-                Label next photos
+                {t("labelNextPhotos")}
               </label>
               <select
                 id="photo-type"
@@ -1113,14 +1064,13 @@ export function PhotoFirstPlanning({
               >
                 {PHOTO_TYPES.map((type) => (
                   <option key={type.value} value={type.value}>
-                    {type.label}
+                    {t(`photoType_${type.value}_label`)}
                   </option>
                 ))}
               </select>
-              <p className="mt-2 text-xs text-muted">{selectedType.hint}</p>
+              <p className="mt-2 text-xs text-muted">{t(`photoType_${selectedType.value}_hint`)}</p>
               <div className="mt-3 rounded-2xl bg-brand-soft p-3 text-xs text-brand-strong">
-                Better photos: stand back, include house/walkway edges, avoid night shots, and add
-                one close-up of the problem area.
+                {t("betterPhotos")}
               </div>
             </div>
 
@@ -1159,14 +1109,10 @@ export function PhotoFirstPlanning({
                   <Camera className="mb-2 size-7 text-brand" aria-hidden />
                 )}
                 <span className="text-base font-semibold text-foreground sm:text-sm">
-                  {isMobile
-                    ? "Take guided photos or upload existing images"
-                    : "Drag photos here or upload to review"}
+                  {isMobile ? t("dropzoneTitleMobile") : t("dropzoneTitleDesktop")}
                 </span>
                 <span className="mt-1 max-w-md text-xs text-muted">
-                  {isMobile
-                    ? "Camera mode adds gridlines, framing templates, and live lighting hints. Uploads use the same local quality checks and review."
-                    : "Upload one or more yard photos and Bloomprint reviews each one — quality, greenery, and suggested answers — right here. The guided camera is best on a phone."}
+                  {isMobile ? t("dropzoneBodyMobile") : t("dropzoneBodyDesktop")}
                 </span>
                 <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                   <button
@@ -1175,7 +1121,7 @@ export function PhotoFirstPlanning({
                     className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
                   >
                     <Upload className="size-4" aria-hidden />
-                    Upload photos
+                    {t("uploadPhotos")}
                   </button>
                   <button
                     type="button"
@@ -1183,7 +1129,7 @@ export function PhotoFirstPlanning({
                     className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-border px-5 py-2 text-sm font-semibold transition hover:border-brand"
                   >
                     <Camera className="size-4" aria-hidden />
-                    {isMobile ? "Open guided camera" : "Use camera"}
+                    {isMobile ? t("openGuidedCamera") : t("useCamera")}
                   </button>
                 </div>
               </div>
@@ -1192,7 +1138,7 @@ export function PhotoFirstPlanning({
 
           <div className="mt-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-              Example shots
+              {t("exampleShots")}
             </p>
             <div className="-mx-1 mt-2 flex snap-x gap-3 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
               {EXAMPLE_SHOTS.map((shot) => (
@@ -1228,8 +1174,10 @@ export function PhotoFirstPlanning({
                     ) : null}
                   </div>
                   <div className="p-3">
-                    <p className="text-sm font-semibold text-foreground">{shot.title}</p>
-                    <p className="mt-1 text-xs text-muted">{shot.desc}</p>
+                    <p className="text-sm font-semibold text-foreground">
+                      {t(`exampleShot_${shot.type}_title`)}
+                    </p>
+                    <p className="mt-1 text-xs text-muted">{t(`exampleShot_${shot.type}_desc`)}</p>
                   </div>
                 </button>
               ))}
@@ -1266,7 +1214,12 @@ export function PhotoFirstPlanning({
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={photo.previewUrl}
-                        alt={`${PHOTO_TYPES.find((type) => type.value === photo.type)?.label ?? "Yard"} photo ${index + 1}`}
+                        alt={t("photoAlt", {
+                          label: PHOTO_TYPES.some((type) => type.value === photo.type)
+                            ? t(`photoType_${photo.type}_label`)
+                            : t("yardFallback"),
+                          index: index + 1,
+                        })}
                         className="aspect-[4/3] w-full object-cover"
                       />
                     ) : (
@@ -1277,7 +1230,7 @@ export function PhotoFirstPlanning({
                     <span
                       className={`absolute left-2 top-2 rounded-full border px-2 py-1 text-[11px] font-semibold ${qualityClass(photo.quality)}`}
                     >
-                      {qualityLabel(photo.quality)}
+                      {qualityLabel(photo.quality, t)}
                     </span>
                   </div>
                   <figcaption className="flex flex-col gap-2 p-3 text-xs">
@@ -1286,18 +1239,18 @@ export function PhotoFirstPlanning({
                         {index + 1}
                       </span>
                       <span className="min-w-0 flex-1 truncate text-muted">
-                        {photo.fileName ?? "Yard photo"}
+                        {photo.fileName ?? t("yardPhotoFallback")}
                       </span>
                     </div>
                     <select
                       value={photo.type}
                       onChange={(e) => updatePhotoType(photo.id, e.target.value as PhotoAssetType)}
                       className="min-h-11 w-full rounded-xl border border-border bg-background p-2 text-xs text-foreground"
-                      aria-label="Photo type"
+                      aria-label={t("photoTypeAria")}
                     >
                       {PHOTO_TYPES.map((type) => (
                         <option key={type.value} value={type.value}>
-                          {type.label}
+                          {t(`photoType_${type.value}_label`)}
                         </option>
                       ))}
                     </select>
@@ -1312,7 +1265,7 @@ export function PhotoFirstPlanning({
                         onClick={() => movePhoto(photo.id, -1)}
                         disabled={index === 0}
                         className="rounded-full border border-border p-1.5 text-muted transition hover:text-foreground disabled:opacity-40"
-                        aria-label="Move photo earlier"
+                        aria-label={t("movePhotoEarlier")}
                       >
                         <ArrowUp className="size-3.5" aria-hidden />
                       </button>
@@ -1321,7 +1274,7 @@ export function PhotoFirstPlanning({
                         onClick={() => movePhoto(photo.id, 1)}
                         disabled={index === photos.length - 1}
                         className="rounded-full border border-border p-1.5 text-muted transition hover:text-foreground disabled:opacity-40"
-                        aria-label="Move photo later"
+                        aria-label={t("movePhotoLater")}
                       >
                         <ArrowDown className="size-3.5" aria-hidden />
                       </button>
@@ -1339,7 +1292,7 @@ export function PhotoFirstPlanning({
                         ) : (
                           <Upload className="size-3.5" aria-hidden />
                         )}
-                        {isMobile ? "Retake" : "Replace"}
+                        {isMobile ? t("retake") : t("replace")}
                       </button>
                       <button
                         type="button"
@@ -1347,7 +1300,7 @@ export function PhotoFirstPlanning({
                         className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-1 text-[11px] font-semibold text-danger transition hover:border-danger/40"
                       >
                         <Trash2 className="size-3.5" aria-hidden />
-                        Remove
+                        {t("remove")}
                       </button>
                     </div>
                   </figcaption>
@@ -1365,7 +1318,7 @@ export function PhotoFirstPlanning({
               ) : (
                 <CheckCircle2 className="size-4 text-brand" aria-hidden />
               )}
-              <h2 className="text-lg font-semibold text-foreground">Confirm before planning</h2>
+              <h2 className="text-lg font-semibold text-foreground">{t("confirmHeading")}</h2>
             </div>
             <span className="text-xs text-muted sm:ml-auto">{analysisStatus}</span>
           </div>
@@ -1382,18 +1335,15 @@ export function PhotoFirstPlanning({
               {heroPhoto?.previewUrl && regionSummary ? (
                 <div className="rounded-xl border border-border bg-background/60 p-3">
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                    What Bloomprint sees
+                    {t("whatBloomprintSees")}
                   </p>
-                  <p className="mt-1 text-[11px] text-muted">
-                    A rough read of your photo — greenery, surfaces, and light. An estimate to
-                    confirm, not a measurement. Tap a tile for detail.
-                  </p>
+                  <p className="mt-1 text-[11px] text-muted">{t("whatBloomprintSeesBody")}</p>
                   <div className="mt-2 grid gap-3 sm:grid-cols-[1.4fr_1fr]">
                     <div className="relative overflow-hidden rounded-lg border border-border">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={heroPhoto.previewUrl}
-                        alt="Your yard with a rough greenery and surface read"
+                        alt={t("heroPhotoAlt")}
                         className="aspect-[3/2] w-full object-cover"
                       />
                       <div
@@ -1411,7 +1361,12 @@ export function PhotoFirstPlanning({
                             aria-pressed={selectedCell === i}
                             className={`transition ${selectedCell === i ? "ring-2 ring-inset ring-white" : ""}`}
                             style={{ backgroundColor: REGION_STYLE[cell.cls].fill }}
-                            aria-label={`${REGION_STYLE[cell.cls].label}, cell ${i + 1} of ${regionSummary.cells.length}, about ${Math.round(coverageFor(cell.cls) * 100)}% of the photo`}
+                            aria-label={t("cellAria", {
+                              label: regionLabel(cell.cls, t),
+                              index: i + 1,
+                              total: regionSummary.cells.length,
+                              percent: Math.round(coverageFor(cell.cls) * 100),
+                            })}
                           />
                         ))}
                       </div>
@@ -1420,9 +1375,12 @@ export function PhotoFirstPlanning({
                           className="absolute inset-x-2 bottom-2 rounded-lg bg-black/75 px-3 py-1.5 text-xs text-white"
                           aria-live="polite"
                         >
-                          {REGION_STYLE[regionSummary.cells[selectedCell].cls].label} — about{" "}
-                          {Math.round(coverageFor(regionSummary.cells[selectedCell].cls) * 100)}% of
-                          the photo
+                          {t("cellDetail", {
+                            label: regionLabel(regionSummary.cells[selectedCell].cls, t),
+                            percent: Math.round(
+                              coverageFor(regionSummary.cells[selectedCell].cls) * 100,
+                            ),
+                          })}
                         </div>
                       ) : null}
                     </div>
@@ -1446,14 +1404,12 @@ export function PhotoFirstPlanning({
                             </span>
                           ))
                         ) : (
-                          <span className="text-xs text-muted">
-                            Not enough detail to read confidently — confirm below.
-                          </span>
+                          <span className="text-xs text-muted">{t("notEnoughDetail")}</span>
                         )}
                       </div>
                       <div>
                         <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
-                          Greenery vs. hard surfaces
+                          {t("greeneryVsHard")}
                         </p>
                         <div className="mt-1 flex h-3 overflow-hidden rounded-full bg-border">
                           <div
@@ -1466,8 +1422,10 @@ export function PhotoFirstPlanning({
                           />
                         </div>
                         <p className="mt-1 text-[11px] text-muted">
-                          ~{Math.round(regionSummary.greenRatio * 100)}% greenery · ~
-                          {Math.round(regionSummary.hardscapeRatio * 100)}% hard surface (estimate)
+                          {t("greeneryHardSummary", {
+                            green: Math.round(regionSummary.greenRatio * 100),
+                            hard: Math.round(regionSummary.hardscapeRatio * 100),
+                          })}
                         </p>
                       </div>
                     </div>
@@ -1477,22 +1435,25 @@ export function PhotoFirstPlanning({
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <ReadinessCheck
-                  label="Details detected"
+                  label={t("readinessDetailsLabel")}
                   value={detailsDetected}
-                  yes="Zones or constraints found"
-                  no="Add a wide context photo"
+                  yes={t("readinessDetailsYes")}
+                  no={t("readinessDetailsNo")}
+                  t={t}
                 />
                 <ReadinessCheck
-                  label="Plant identified"
+                  label={t("readinessPlantLabel")}
                   value={plantIdentified}
-                  yes="Plant material visible"
-                  no="Add existing-plant close-up"
+                  yes={t("readinessPlantYes")}
+                  no={t("readinessPlantNo")}
+                  t={t}
                 />
                 <ReadinessCheck
-                  label="Measurements seen"
+                  label={t("readinessMeasureLabel")}
                   value={measurementDetected}
-                  yes="Measurement reference present"
-                  no="Add dimensions manually"
+                  yes={t("readinessMeasureYes")}
+                  no={t("readinessMeasureNo")}
+                  t={t}
                 />
               </div>
 
@@ -1500,7 +1461,7 @@ export function PhotoFirstPlanning({
                 <div className="flex flex-col gap-3">
                   <div className="rounded-xl border border-border bg-background/60 p-3">
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                      Detected zones
+                      {t("detectedZones")}
                     </p>
                     <ul className="mt-2 flex flex-col gap-2">
                       {analysis.zones.length > 0 ? (
@@ -1509,20 +1470,22 @@ export function PhotoFirstPlanning({
                             key={zone.id}
                             className="rounded-lg bg-brand-soft px-3 py-2 text-sm text-brand-strong"
                           >
-                            Looks like: {zone.label} ({Math.round(zone.confidence * 100)}%
-                            confidence)
+                            {t("zoneItem", {
+                              label: zone.label,
+                              percent: Math.round(zone.confidence * 100),
+                            })}
                           </li>
                         ))
                       ) : (
                         <li className="rounded-lg bg-border/50 px-3 py-2 text-sm text-muted">
-                          Not enough usable photo information yet.
+                          {t("noUsableInfo")}
                         </li>
                       )}
                     </ul>
                   </div>
                   <div className="rounded-xl border border-border bg-background/60 p-3">
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                      Needs checking
+                      {t("needsChecking")}
                     </p>
                     <ul className="mt-2 flex flex-col gap-2 text-sm text-muted">
                       {analysis.missingInfo.map((item) => (
@@ -1540,7 +1503,7 @@ export function PhotoFirstPlanning({
 
                 <div className="rounded-xl border border-border bg-background/60 p-3">
                   <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                    Editable assumptions
+                    {t("editableAssumptions")}
                   </p>
                   <div className="mt-3 flex flex-col gap-3">
                     {analysis.assumptions.map((item) => (
@@ -1579,11 +1542,8 @@ export function PhotoFirstPlanning({
           ) : (
             <div className="mt-4 rounded-xl border border-border bg-background/60 p-4">
               <Sparkles className="mb-2 size-5 text-brand" aria-hidden />
-              <p className="text-sm font-semibold text-foreground">No photo assumptions yet.</p>
-              <p className="mt-1 text-sm text-muted">
-                Add photos to detect planning zones, or continue without photos and answer the
-                garden details manually.
-              </p>
+              <p className="text-sm font-semibold text-foreground">{t("noAssumptionsTitle")}</p>
+              <p className="mt-1 text-sm text-muted">{t("noAssumptionsBody")}</p>
             </div>
           )}
 
@@ -1595,17 +1555,17 @@ export function PhotoFirstPlanning({
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
             >
               <ClipboardEdit className="size-4" aria-hidden />
-              Confirm and add garden details
+              {t("confirmAndContinue")}
             </button>
             <button
               type="button"
               onClick={onSkip}
               className="min-h-12 rounded-full border border-border px-5 py-2.5 text-sm font-semibold transition hover:border-brand"
             >
-              Continue without photos
+              {t("continueWithoutPhotos")}
             </button>
             <span className="text-center text-[11px] text-muted sm:ml-auto sm:text-left">
-              Draft saved locally. You can safely leave and come back.
+              {t("draftSafeToLeave")}
             </span>
           </div>
         </section>
@@ -1616,7 +1576,7 @@ export function PhotoFirstPlanning({
                 className="fixed inset-0 z-50 bg-black"
                 role="dialog"
                 aria-modal="true"
-                aria-label="Guided camera"
+                aria-label={t("guidedCamera")}
               >
                 <div className="relative flex h-[100dvh] w-screen flex-col overflow-hidden bg-black text-white">
                   <div
@@ -1624,16 +1584,19 @@ export function PhotoFirstPlanning({
                     style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-white">Guided camera</p>
+                      <p className="text-sm font-semibold text-white">{t("guidedCamera")}</p>
                       <p className="line-clamp-2 text-xs text-white/75">
-                        {selectedType.label}: {selectedType.hint}
+                        {t("selectedTypeLine", {
+                          label: t(`photoType_${selectedType.value}_label`),
+                          hint: t(`photoType_${selectedType.value}_hint`),
+                        })}
                       </p>
                     </div>
                     <button
                       type="button"
                       onClick={() => setCameraOpen(false)}
                       className="ml-auto flex size-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/45 text-white backdrop-blur transition hover:bg-white/10"
-                      aria-label="Close camera"
+                      aria-label={t("closeCamera")}
                     >
                       <X className="size-5" aria-hidden />
                     </button>
@@ -1671,7 +1634,10 @@ export function PhotoFirstPlanning({
                         }`}
                       />
                       <span className="mx-5 max-w-[21rem] rounded-full bg-black/65 px-4 py-2 text-center text-xs font-medium text-white/90 backdrop-blur-sm">
-                        Frame the {selectedType.label.toLowerCase()}: {selectedType.hint}
+                        {t("frameLine", {
+                          label: t(`photoType_${selectedType.value}_label`).toLowerCase(),
+                          hint: t(`photoType_${selectedType.value}_hint`),
+                        })}
                       </span>
                     </div>
 
@@ -1685,15 +1651,19 @@ export function PhotoFirstPlanning({
                     </div>
 
                     <div className="pointer-events-none absolute bottom-36 left-3 right-3 grid grid-cols-3 gap-2 text-[11px] sm:bottom-40">
-                      <LiveMetric label="Light" ok={!liveSignal.tooDark && !liveSignal.tooBright} />
-                      <LiveMetric label="Detail" ok={!liveSignal.lowDetail} />
-                      <LiveMetric label="Level" ok={!tilted} />
+                      <LiveMetric
+                        label={t("metricLight")}
+                        ok={!liveSignal.tooDark && !liveSignal.tooBright}
+                        t={t}
+                      />
+                      <LiveMetric label={t("metricDetail")} ok={!liveSignal.lowDetail} t={t} />
+                      <LiveMetric label={t("metricLevel")} ok={!tilted} t={t} />
                     </div>
 
                     {(liveSignal.tooDark || liveSignal.tooBright || liveSignal.lowDetail) && (
                       <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-danger/10">
                         <span className="rounded-full bg-danger px-3 py-1 text-xs font-bold uppercase tracking-wide text-on-strong">
-                          Check photo before capture
+                          {t("checkPhotoBeforeCapture")}
                         </span>
                       </div>
                     )}
@@ -1706,7 +1676,7 @@ export function PhotoFirstPlanning({
                         <div className="text-center">
                           <Loader2 className="mx-auto mb-2 size-6 animate-spin" aria-hidden />
                           <p className="text-sm font-semibold">
-                            {cameraError ? "Camera unavailable" : "Opening camera..."}
+                            {cameraError ? t("cameraUnavailable") : t("openingCamera")}
                           </p>
                           {cameraError ? (
                             <p className="mt-1 max-w-xs text-xs text-white/75">{cameraError}</p>
@@ -1740,7 +1710,7 @@ export function PhotoFirstPlanning({
                               : "border-white/20 bg-white/10 text-white/78"
                           }`}
                         >
-                          {PHOTO_TYPES.find((item) => item.value === type)?.label}
+                          {t(`photoType_${type}_label`)}
                         </button>
                       ))}
                     </div>
@@ -1750,7 +1720,7 @@ export function PhotoFirstPlanning({
                         onClick={() => inputRef.current?.click()}
                         className="justify-self-start rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur"
                       >
-                        Upload
+                        {t("uploadShort")}
                       </button>
                       <button
                         type="button"
@@ -1758,18 +1728,18 @@ export function PhotoFirstPlanning({
                         disabled={!cameraReady || busy || captureBlocked}
                         className="flex size-20 items-center justify-center rounded-full border-4 border-white bg-white/20 shadow-[0_0_0_6px_rgba(255,255,255,0.18)] backdrop-blur transition active:scale-95 disabled:opacity-45"
                         aria-label={
-                          captureBlocked ? "Adjust the shot to capture" : "Capture guided photo"
+                          captureBlocked ? t("adjustShotToCapture") : t("captureGuidedPhoto")
                         }
                       >
                         <span className="size-14 rounded-full bg-white" />
                       </button>
                       <span className="justify-self-end text-right text-[11px] font-medium text-white/65">
-                        {photos.length}/{MAX_PHOTOS}
+                        {t("photoCount", { count: photos.length, max: MAX_PHOTOS })}
                       </span>
                     </div>
                     {captureBlocked ? (
                       <p className="text-center text-xs font-medium text-red-200">
-                        Lighting, detail, and level all need fixing before this photo is usable.
+                        {t("captureBlockedNote")}
                       </p>
                     ) : null}
                   </div>
@@ -1788,11 +1758,13 @@ function ReadinessCheck({
   value,
   yes,
   no,
+  t,
 }: {
   label: string;
   value: boolean;
   yes: string;
   no: string;
+  t: Translator;
 }) {
   return (
     <div className="rounded-xl border border-border bg-background/60 p-3">
@@ -1804,19 +1776,21 @@ function ReadinessCheck({
         )}
         <p className="text-sm font-semibold text-foreground">{label}</p>
       </div>
-      <p className="mt-1 text-xs text-muted">{value ? `Yes — ${yes}` : `No — ${no}`}</p>
+      <p className="mt-1 text-xs text-muted">
+        {value ? t("readinessYes", { text: yes }) : t("readinessNo", { text: no })}
+      </p>
     </div>
   );
 }
 
-function LiveMetric({ label, ok }: { label: string; ok: boolean }) {
+function LiveMetric({ label, ok, t }: { label: string; ok: boolean; t: Translator }) {
   return (
     <div
       className={`rounded-full border px-2 py-1 text-center font-semibold ${
         ok ? "border-white/20 bg-black/55 text-white" : "border-danger/40 bg-danger text-on-strong"
       }`}
     >
-      {label}: {ok ? "OK" : "Fix"}
+      {t("metricLabel", { label, state: ok ? t("metricOk") : t("metricFix") })}
     </div>
   );
 }
