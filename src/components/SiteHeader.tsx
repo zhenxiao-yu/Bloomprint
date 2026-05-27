@@ -24,11 +24,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const NAV = [
-  { href: "/dashboard", key: "dashboard" },
+// The working surface stays inline; business + info pages tuck into a "More"
+// overflow so the bar reads as one calm row instead of eight flat links.
+const PRIMARY_NAV = [
   { href: "/plan", key: "plan" },
+  { href: "/dashboard", key: "dashboard" },
   { href: "/plans", key: "saved" },
   { href: "/toolbox", key: "toolbox" },
+] as const;
+
+const MORE_NAV = [
   { href: "/pro", key: "pro" },
   { href: "/pricing", key: "pricing" },
   { href: "/guide", key: "guide" },
@@ -40,6 +45,8 @@ export function SiteHeader() {
   const account = useAccount();
   const t = useTranslations("Nav");
   const [scrolled, setScrolled] = useState(false);
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const moreActive = MORE_NAV.some((n) => isActive(n.href));
 
   // Scroll-aware elevation: the header firms up (more opaque + a soft shadow)
   // once the page scrolls, the way native apps lift a top bar over content.
@@ -80,9 +87,8 @@ export function SiteHeader() {
 
         {/* Primary nav is hidden on mobile — the fixed bottom MobileNav carries it there. */}
         <nav className="ml-3 hidden items-center gap-1 text-base lg:gap-1.5 sm:flex">
-          {NAV.map((n) => {
-            const href = n.href as string;
-            const active = pathname === href || pathname.startsWith(`${href}/`);
+          {PRIMARY_NAV.map((n) => {
+            const active = isActive(n.href);
             return (
               <Link
                 key={n.href}
@@ -105,6 +111,42 @@ export function SiteHeader() {
               </Link>
             );
           })}
+
+          {/* Secondary pages (business + info) tuck into a calm overflow menu. */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              aria-label={t("moreDescription")}
+              className={`group relative inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1 rounded-full px-3.5 font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand/50 ${
+                moreActive ? "text-brand-strong" : "text-muted hover:text-foreground"
+              }`}
+            >
+              <span
+                className={`absolute inset-0 -z-10 rounded-full transition ${
+                  moreActive
+                    ? "bg-brand-soft"
+                    : "scale-90 bg-foreground/[0.04] opacity-0 group-hover:scale-100 group-hover:opacity-100 group-data-[state=open]:scale-100 group-data-[state=open]:opacity-100"
+                }`}
+              />
+              {t("more")}
+              <ChevronDown
+                className="size-3.5 transition-transform duration-200 group-data-[state=open]:rotate-180"
+                aria-hidden
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              sideOffset={8}
+              className="w-44 rounded-xl border-border bg-surface/95 backdrop-blur-xl"
+            >
+              {MORE_NAV.map((n) => (
+                <DropdownMenuItem key={n.href} asChild className="cursor-pointer rounded-lg">
+                  <Link href={n.href} aria-current={isActive(n.href) ? "page" : undefined}>
+                    {t(n.key)}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
