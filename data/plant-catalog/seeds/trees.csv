@@ -1,0 +1,181 @@
+commonName,botanical,type,zMin,zMax,sun,nativeNA,invasiveWatch,category
+Red Maple,Acer rubrum,tree,3,9,full,true,false,shade-tree
+Sugar Maple,Acer saccharum,tree,3,8,full,true,false,shade-tree
+Silver Maple,Acer saccharinum,tree,3,9,full,true,false,shade-tree
+Japanese Maple,Acer palmatum,tree,5,8,part,false,false,ornamental-tree
+Paperbark Maple,Acer griseum,tree,4,8,part,false,false,ornamental-tree
+Freeman Maple,Acer x freemanii,tree,3,8,full,true,false,shade-tree
+Black Maple,Acer nigrum,tree,3,8,full,true,false,shade-tree
+Hedge Maple,Acer campestre,tree,5,8,full,false,false,small-tree
+Trident Maple,Acer buergerianum,tree,5,9,full,false,false,small-tree
+Bigleaf Maple,Acer macrophyllum,tree,6,7,full,true,false,shade-tree
+Vine Maple,Acer circinatum,tree,5,8,part,true,false,small-tree
+Tatarian Maple,Acer tataricum,tree,3,8,full,false,false,small-tree
+Boxelder,Acer negundo,tree,2,9,full,true,false,shade-tree
+Norway Maple,Acer platanoides,tree,3,7,full,false,true,shade-tree
+Amur Maple,Acer ginnala,tree,2,8,full,false,true,small-tree
+Northern Red Oak,Quercus rubra,tree,3,8,full,true,false,shade-tree
+White Oak,Quercus alba,tree,3,9,full,true,false,shade-tree
+Pin Oak,Quercus palustris,tree,4,8,full,true,false,shade-tree
+Swamp White Oak,Quercus bicolor,tree,3,8,full,true,false,shade-tree
+Bur Oak,Quercus macrocarpa,tree,3,8,full,true,false,shade-tree
+Scarlet Oak,Quercus coccinea,tree,4,9,full,true,false,shade-tree
+Willow Oak,Quercus phellos,tree,5,9,full,true,false,shade-tree
+Shumard Oak,Quercus shumardii,tree,5,9,full,true,false,shade-tree
+Chestnut Oak,Quercus montana,tree,4,8,full,true,false,shade-tree
+Live Oak,Quercus virginiana,tree,8,10,full,true,false,shade-tree
+Chinkapin Oak,Quercus muehlenbergii,tree,3,7,full,true,false,shade-tree
+Southern Red Oak,Quercus falcata,tree,6,9,full,true,false,shade-tree
+Black Oak,Quercus velutina,tree,3,9,full,true,false,shade-tree
+Post Oak,Quercus stellata,tree,5,9,full,true,false,shade-tree
+Sawtooth Oak,Quercus acutissima,tree,5,9,full,false,false,shade-tree
+River Birch,Betula nigra,tree,4,9,full,true,false,ornamental-tree
+Paper Birch,Betula papyrifera,tree,2,7,full,true,false,ornamental-tree
+Sweet Birch,Betula lenta,tree,3,7,full,true,false,ornamental-tree
+Yellow Birch,Betula alleghaniensis,tree,3,7,part,true,false,shade-tree
+Gray Birch,Betula populifolia,tree,3,6,full,true,false,small-tree
+European White Birch,Betula pendula,tree,2,7,full,false,false,ornamental-tree
+Eastern Redbud,Cercis canadensis,tree,4,9,part,true,false,flowering-tree
+Western Redbud,Cercis occidentalis,tree,7,9,full,true,false,flowering-tree
+Chinese Redbud,Cercis chinensis,tree,6,9,part,false,false,flowering-tree
+Flowering Dogwood,Cornus florida,tree,5,9,part,true,false,flowering-tree
+Kousa Dogwood,Cornus kousa,tree,5,8,part,false,false,flowering-tree
+Cornelian Cherry Dogwood,Cornus mas,tree,4,8,part,false,false,flowering-tree
+Pacific Dogwood,Cornus nuttallii,tree,7,9,part,true,false,flowering-tree
+Pagoda Dogwood,Cornus alternifolia,tree,3,7,part,true,false,small-tree
+Downy Serviceberry,Amelanchier arborea,tree,4,9,part,true,false,flowering-tree
+Allegheny Serviceberry,Amelanchier laevis,tree,4,8,part,true,false,flowering-tree
+Apple Serviceberry,Amelanchier x grandiflora,tree,4,9,part,true,false,flowering-tree
+Canadian Serviceberry,Amelanchier canadensis,tree,4,8,part,true,false,small-tree
+Saskatoon Serviceberry,Amelanchier alnifolia,tree,2,7,full,true,false,small-tree
+Star Magnolia,Magnolia stellata,tree,4,8,full,false,false,flowering-tree
+Sweetbay Magnolia,Magnolia virginiana,tree,5,10,part,true,false,flowering-tree
+Saucer Magnolia,Magnolia x soulangeana,tree,4,9,full,false,false,flowering-tree
+Southern Magnolia,Magnolia grandiflora,tree,7,9,full,true,false,flowering-tree
+Cucumbertree Magnolia,Magnolia acuminata,tree,4,8,full,true,false,shade-tree
+Lily Magnolia,Magnolia liliiflora,tree,6,9,full,false,false,flowering-tree
+Bigleaf Magnolia,Magnolia macrophylla,tree,5,8,part,true,false,ornamental-tree
+Sargent Crabapple,Malus sargentii,tree,4,8,full,false,false,flowering-tree
+Japanese Flowering Crabapple,Malus floribunda,tree,4,8,full,false,false,flowering-tree
+Tea Crabapple,Malus hupehensis,tree,4,8,full,false,false,flowering-tree
+Prairifire Crabapple,Malus 'Prairifire',tree,4,8,full,false,false,flowering-tree
+Sugar Tyme Crabapple,Malus 'Sutyzam',tree,4,8,full,false,false,flowering-tree
+Sweet Crabapple,Malus coronaria,tree,4,8,full,true,false,flowering-tree
+Japanese Flowering Cherry,Prunus serrulata,tree,5,8,full,false,false,flowering-tree
+Cherry Plum,Prunus cerasifera,tree,4,8,full,false,false,flowering-tree
+Chokecherry,Prunus virginiana,tree,2,7,full,true,false,small-tree
+Yoshino Cherry,Prunus x yedoensis,tree,5,8,full,false,false,flowering-tree
+Higan Cherry,Prunus subhirtella,tree,4,8,full,false,false,flowering-tree
+Black Cherry,Prunus serotina,tree,3,9,full,true,false,shade-tree
+American Plum,Prunus americana,tree,3,8,full,true,false,small-tree
+Sargent Cherry,Prunus sargentii,tree,4,7,full,false,false,flowering-tree
+American Hornbeam,Carpinus caroliniana,tree,3,9,part,true,false,small-tree
+European Hornbeam,Carpinus betulus,tree,4,8,full,false,false,shade-tree
+Eastern Hophornbeam,Ostrya virginiana,tree,3,9,part,true,false,small-tree
+Honeylocust,Gleditsia triacanthos,tree,3,9,full,true,false,shade-tree
+Kentucky Coffeetree,Gymnocladus dioicus,tree,3,8,full,true,false,shade-tree
+Black Tupelo,Nyssa sylvatica,tree,3,9,full,true,false,shade-tree
+Water Tupelo,Nyssa aquatica,tree,6,9,full,true,false,shade-tree
+American Sweetgum,Liquidambar styraciflua,tree,5,9,full,true,false,shade-tree
+Tulip Tree,Liriodendron tulipifera,tree,4,9,full,true,false,shade-tree
+American Linden,Tilia americana,tree,2,8,full,true,false,shade-tree
+Littleleaf Linden,Tilia cordata,tree,3,7,full,false,false,shade-tree
+Silver Linden,Tilia tomentosa,tree,4,7,full,false,false,shade-tree
+American Beech,Fagus grandifolia,tree,3,9,part,true,false,shade-tree
+European Beech,Fagus sylvatica,tree,4,7,full,false,false,shade-tree
+Ginkgo,Ginkgo biloba,tree,3,8,full,false,false,shade-tree
+Katsura Tree,Cercidiphyllum japonicum,tree,4,8,full,false,false,shade-tree
+White Fringetree,Chionanthus virginicus,tree,3,9,part,true,false,flowering-tree
+Chinese Fringetree,Chionanthus retusus,tree,5,9,full,false,false,flowering-tree
+Japanese Tree Lilac,Syringa reticulata,tree,3,7,full,false,false,flowering-tree
+American Yellowwood,Cladrastis kentukea,tree,4,8,full,true,false,flowering-tree
+Goldenrain Tree,Koelreuteria paniculata,tree,5,9,full,false,false,flowering-tree
+Persian Ironwood,Parrotia persica,tree,4,8,full,false,false,ornamental-tree
+Japanese Stewartia,Stewartia pseudocamellia,tree,5,8,part,false,false,ornamental-tree
+Korean Stewartia,Stewartia koreana,tree,5,7,part,false,false,ornamental-tree
+Sourwood,Oxydendrum arboreum,tree,5,9,full,true,false,flowering-tree
+Carolina Silverbell,Halesia carolina,tree,5,8,part,true,false,flowering-tree
+Two-wing Silverbell,Halesia diptera,tree,6,9,part,true,false,flowering-tree
+Bald Cypress,Taxodium distichum,tree,4,10,full,true,false,shade-tree
+Pond Cypress,Taxodium ascendens,tree,5,9,full,true,false,shade-tree
+Dawn Redwood,Metasequoia glyptostroboides,tree,4,8,full,false,false,shade-tree
+American Sycamore,Platanus occidentalis,tree,4,9,full,true,false,shade-tree
+London Planetree,Platanus x acerifolia,tree,5,9,full,false,false,shade-tree
+California Sycamore,Platanus racemosa,tree,7,10,full,true,false,shade-tree
+Japanese Zelkova,Zelkova serrata,tree,5,8,full,false,false,shade-tree
+Northern Catalpa,Catalpa speciosa,tree,4,8,full,true,false,shade-tree
+Southern Catalpa,Catalpa bignonioides,tree,5,9,full,true,false,shade-tree
+American Mountain Ash,Sorbus americana,tree,2,6,full,true,false,small-tree
+European Mountain Ash,Sorbus aucuparia,tree,3,6,full,false,false,small-tree
+Showy Mountain Ash,Sorbus decora,tree,2,5,full,true,false,small-tree
+Washington Hawthorn,Crataegus phaenopyrum,tree,4,8,full,true,false,flowering-tree
+Cockspur Hawthorn,Crataegus crus-galli,tree,4,7,full,true,false,flowering-tree
+Green Hawthorn,Crataegus viridis,tree,4,7,full,true,false,flowering-tree
+Downy Hawthorn,Crataegus mollis,tree,3,6,full,true,false,small-tree
+Ohio Buckeye,Aesculus glabra,tree,3,7,part,true,false,shade-tree
+Yellow Buckeye,Aesculus flava,tree,4,8,part,true,false,shade-tree
+Red Buckeye,Aesculus pavia,tree,4,8,part,true,false,small-tree
+Horse Chestnut,Aesculus hippocastanum,tree,3,8,full,false,false,shade-tree
+Common Hackberry,Celtis occidentalis,tree,2,9,full,true,false,shade-tree
+Sugar Hackberry,Celtis laevigata,tree,5,9,full,true,false,shade-tree
+Callery Pear,Pyrus calleryana,tree,5,9,full,false,true,flowering-tree
+Tree of Heaven,Ailanthus altissima,tree,4,8,full,false,true,shade-tree
+Mimosa,Albizia julibrissin,tree,6,9,full,false,true,flowering-tree
+Royal Paulownia,Paulownia tomentosa,tree,5,9,full,false,true,flowering-tree
+Siberian Elm,Ulmus pumila,tree,4,9,full,false,true,shade-tree
+White Mulberry,Morus alba,tree,4,8,full,false,true,small-tree
+Russian Olive,Elaeagnus angustifolia,tree,3,7,full,false,true,small-tree
+American Elm,Ulmus americana,tree,2,9,full,true,false,shade-tree
+Lacebark Elm,Ulmus parvifolia,tree,4,9,full,false,false,shade-tree
+Slippery Elm,Ulmus rubra,tree,3,9,full,true,false,shade-tree
+White Ash,Fraxinus americana,tree,3,9,full,true,false,shade-tree
+Green Ash,Fraxinus pennsylvanica,tree,3,9,full,true,false,shade-tree
+Blue Ash,Fraxinus quadrangulata,tree,4,7,full,true,false,shade-tree
+Shagbark Hickory,Carya ovata,tree,4,8,full,true,false,shade-tree
+Pignut Hickory,Carya glabra,tree,4,9,full,true,false,shade-tree
+Bitternut Hickory,Carya cordiformis,tree,4,9,full,true,false,shade-tree
+Pecan,Carya illinoinensis,tree,5,9,full,true,false,shade-tree
+Black Walnut,Juglans nigra,tree,4,9,full,true,false,shade-tree
+Butternut,Juglans cinerea,tree,3,7,full,true,false,shade-tree
+American Basswood,Tilia heterophylla,tree,4,8,full,true,false,shade-tree
+Quaking Aspen,Populus tremuloides,tree,1,7,full,true,false,shade-tree
+Eastern Cottonwood,Populus deltoides,tree,2,9,full,true,false,shade-tree
+Bigtooth Aspen,Populus grandidentata,tree,3,6,full,true,false,shade-tree
+Sweetbay,Persea borbonia,tree,7,11,part,true,false,small-tree
+Sassafras,Sassafras albidum,tree,4,9,part,true,false,small-tree
+Franklin Tree,Franklinia alatamaha,tree,5,8,part,true,false,flowering-tree
+Chinese Pistache,Pistacia chinensis,tree,6,9,full,false,false,shade-tree
+Crapemyrtle,Lagerstroemia indica,tree,7,9,full,false,false,flowering-tree
+Japanese Snowbell,Styrax japonicus,tree,5,8,part,false,false,flowering-tree
+American Snowbell,Styrax americanus,tree,5,9,part,true,false,small-tree
+Seven-son Flower,Heptacodium miconioides,tree,5,9,full,false,false,flowering-tree
+Amur Maackia,Maackia amurensis,tree,3,7,full,false,false,small-tree
+Japanese Pagoda Tree,Styphnolobium japonicum,tree,4,8,full,false,false,shade-tree
+Chinese Chestnut,Castanea mollissima,tree,4,8,full,false,false,shade-tree
+American Chestnut,Castanea dentata,tree,4,8,full,true,false,shade-tree
+Tanoak,Notholithocarpus densiflorus,tree,7,9,part,true,false,shade-tree
+Pacific Madrone,Arbutus menziesii,tree,7,9,full,true,false,ornamental-tree
+Texas Madrone,Arbutus xalapensis,tree,7,9,full,true,false,small-tree
+Desert Willow,Chilopsis linearis,tree,6,9,full,true,false,flowering-tree
+Eastern Redcedar,Juniperus virginiana,tree,2,9,full,true,false,small-tree
+Witch Hazel,Hamamelis virginiana,tree,3,8,part,true,false,small-tree
+Vernal Witch Hazel,Hamamelis vernalis,tree,4,8,part,true,false,small-tree
+American Smoketree,Cotinus obovatus,tree,4,8,full,true,false,small-tree
+Common Smoketree,Cotinus coggygria,tree,5,8,full,false,false,small-tree
+Black Locust,Robinia pseudoacacia,tree,3,8,full,true,false,shade-tree
+Yellowwood Buckeye,Aesculus parviflora,tree,4,8,part,true,false,small-tree
+Carolina Buckthorn,Frangula caroliniana,tree,5,9,part,true,false,small-tree
+Loblolly Bay,Gordonia lasianthus,tree,7,9,part,true,false,flowering-tree
+Two-flowered Cherry,Prunus mahaleb,tree,5,8,full,false,false,small-tree
+Amur Chokecherry,Prunus maackii,tree,3,7,full,false,false,small-tree
+Japanese Apricot,Prunus mume,tree,6,9,full,false,false,flowering-tree
+Chinese Dogwood,Cornus controversa,tree,5,8,part,false,false,small-tree
+Hardy Rubber Tree,Eucommia ulmoides,tree,5,7,full,false,false,shade-tree
+Corktree,Phellodendron amurense,tree,4,7,full,false,false,shade-tree
+Japanese Hornbeam,Carpinus japonica,tree,4,8,part,false,false,small-tree
+Turkish Filbert,Corylus colurna,tree,4,7,full,false,false,shade-tree
+Sweet Crabapple Dolgo,Malus 'Dolgo',tree,3,8,full,false,false,flowering-tree
+October Glory Maple,Acer rubrum 'October Glory',tree,4,9,full,false,false,shade-tree
+Bloodgood Japanese Maple,Acer palmatum 'Bloodgood',tree,5,8,part,false,false,ornamental-tree
+Coral Bark Maple,Acer palmatum 'Sango-kaku',tree,5,8,part,false,false,ornamental-tree
+Forest Pansy Redbud,Cercis canadensis 'Forest Pansy',tree,5,9,part,false,false,flowering-tree

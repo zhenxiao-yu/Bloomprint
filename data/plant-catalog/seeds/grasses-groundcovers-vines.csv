@@ -1,0 +1,164 @@
+commonName,botanical,type,zMin,zMax,sun,nativeNA,invasiveWatch,category
+Feather reed grass,Calamagrostis x acutiflora 'Karl Foerster',grass,4,9,full,false,false,ornamental-grass
+Switchgrass,Panicum virgatum,grass,4,9,full,true,false,ornamental-grass
+Heavy Metal switchgrass,Panicum virgatum 'Heavy Metal',grass,4,9,full,true,false,ornamental-grass
+Shenandoah switchgrass,Panicum virgatum 'Shenandoah',grass,4,9,full,true,false,ornamental-grass
+Northwind switchgrass,Panicum virgatum 'Northwind',grass,4,9,full,true,false,ornamental-grass
+Little bluestem,Schizachyrium scoparium,grass,3,9,full,true,false,ornamental-grass
+Standing Ovation little bluestem,Schizachyrium scoparium 'Standing Ovation',grass,3,9,full,true,false,ornamental-grass
+The Blues little bluestem,Schizachyrium scoparium 'The Blues',grass,3,9,full,true,false,ornamental-grass
+Maiden grass,Miscanthus sinensis,grass,5,9,full,false,true,ornamental-grass
+Morning Light maiden grass,Miscanthus sinensis 'Morning Light',grass,5,9,full,false,true,ornamental-grass
+Zebra grass,Miscanthus sinensis 'Zebrinus',grass,5,9,full,false,true,ornamental-grass
+Giant Chinese silver grass,Miscanthus x giganteus,grass,4,9,full,false,true,ornamental-grass
+Dwarf fountain grass,Pennisetum alopecuroides 'Hameln',grass,5,9,full,false,true,ornamental-grass
+Purple fountain grass,Cenchrus setaceus 'Rubrum',grass,9,11,full,false,true,ornamental-grass
+Oriental fountain grass,Pennisetum orientale,grass,6,9,full,false,false,ornamental-grass
+Japanese forest grass,Hakonechloa macra,grass,5,9,shade,false,false,ornamental-grass
+Aureola Japanese forest grass,Hakonechloa macra 'Aureola',grass,5,9,shade,false,false,ornamental-grass
+All Gold Japanese forest grass,Hakonechloa macra 'All Gold',grass,5,9,shade,false,false,ornamental-grass
+Blue fescue,Festuca glauca,grass,4,8,full,false,false,ornamental-grass
+Elijah Blue fescue,Festuca glauca 'Elijah Blue',grass,4,8,full,false,false,ornamental-grass
+Idaho fescue,Festuca idahoensis,grass,4,8,full,true,false,ornamental-grass
+Prairie dropseed,Sporobolus heterolepis,grass,3,9,full,true,false,ornamental-grass
+Big bluestem,Andropogon gerardii,grass,4,9,full,true,false,ornamental-grass
+Blackhawks big bluestem,Andropogon gerardii 'Blackhawks',grass,3,9,full,true,false,ornamental-grass
+Indian grass,Sorghastrum nutans,grass,4,9,full,true,false,ornamental-grass
+Blue grama,Bouteloua gracilis,grass,3,10,full,true,false,ornamental-grass
+Blonde Ambition blue grama,Bouteloua gracilis 'Blonde Ambition',grass,3,10,full,true,false,ornamental-grass
+Sideoats grama,Bouteloua curtipendula,grass,4,9,full,true,false,ornamental-grass
+Pink muhly grass,Muhlenbergia capillaris,grass,6,10,full,true,false,ornamental-grass
+Lindheimer muhly,Muhlenbergia lindheimeri,grass,7,11,full,true,false,ornamental-grass
+Tufted hair grass,Deschampsia cespitosa,grass,4,9,part,true,false,ornamental-grass
+Northern sea oats,Chasmanthium latifolium,grass,3,8,part,true,false,ornamental-grass
+Blue moor grass,Sesleria caerulea,grass,4,8,full,false,false,ornamental-grass
+Autumn moor grass,Sesleria autumnalis,grass,5,8,full,false,false,ornamental-grass
+Cogon grass,Imperata cylindrica,grass,5,9,full,false,true,ornamental-grass
+Japanese blood grass,Imperata cylindrica 'Rubra',grass,5,9,full,false,true,ornamental-grass
+Reed canary grass,Phalaris arundinacea,grass,4,9,part,false,true,ornamental-grass
+Ribbon grass,Phalaris arundinacea 'Picta',grass,4,9,part,false,true,ornamental-grass
+Pampas grass,Cortaderia selloana,grass,7,11,full,false,true,ornamental-grass
+Mexican feather grass,Nassella tenuissima,grass,7,11,full,false,true,ornamental-grass
+Purple moor grass,Molinia caerulea,grass,4,9,full,false,false,ornamental-grass
+Tall purple moor grass,Molinia caerulea subsp. arundinacea 'Skyracer',grass,4,9,full,false,false,ornamental-grass
+Frosted Curls sedge,Carex comans 'Frosted Curls',grass,7,9,part,false,false,sedge
+Bowles golden sedge,Carex elata 'Aurea',grass,5,9,part,false,false,sedge
+Pennsylvania sedge,Carex pensylvanica,grass,3,8,shade,true,false,sedge
+Appalachian sedge,Carex appalachica,grass,3,7,shade,true,false,sedge
+Plantain-leaved sedge,Carex plantaginea,grass,4,8,shade,true,false,sedge
+Palm sedge,Carex muskingumensis,grass,4,9,part,true,false,sedge
+Variegated Japanese sedge,Carex oshimensis 'Evergold',grass,5,9,part,false,false,sedge
+Everillo sedge,Carex oshimensis 'Everillo',grass,5,9,part,false,false,sedge
+Tussock sedge,Carex stricta,grass,3,8,part,true,false,sedge
+Fox sedge,Carex vulpinoidea,grass,3,8,full,true,false,sedge
+Leatherleaf sedge,Carex buchananii,grass,6,9,full,false,false,sedge
+Common rush,Juncus effusus,grass,4,9,full,true,false,rush
+Big Twister rush,Juncus effusus 'Big Twister',grass,4,9,full,true,false,rush
+Blue Arrows rush,Juncus inflexus 'Blue Arrows',grass,4,9,full,false,false,rush
+Greater wood rush,Luzula sylvatica,grass,4,9,shade,false,false,rush
+Snowy wood rush,Luzula nivea,grass,4,9,shade,false,false,rush
+River oats Eragrostis,Eragrostis spectabilis,grass,5,9,full,true,false,ornamental-grass
+Japanese pachysandra,Pachysandra terminalis,groundcover,4,8,shade,false,false,groundcover
+Allegheny spurge,Pachysandra procumbens,groundcover,5,9,shade,true,false,groundcover
+Common periwinkle,Vinca minor,groundcover,4,8,part,false,true,groundcover
+Bowles periwinkle,Vinca minor 'Bowles',groundcover,4,8,part,false,true,groundcover
+Bigleaf periwinkle,Vinca major,groundcover,7,9,part,false,true,groundcover
+Carpet bugle,Ajuga reptans,groundcover,3,9,part,false,true,groundcover
+Black Scallop bugleweed,Ajuga reptans 'Black Scallop',groundcover,3,9,part,false,true,groundcover
+Chocolate Chip bugleweed,Ajuga reptans 'Chocolate Chip',groundcover,4,9,part,false,true,groundcover
+Goutweed,Aegopodium podagraria,groundcover,4,9,part,false,true,groundcover
+Variegated bishop's weed,Aegopodium podagraria 'Variegatum',groundcover,4,9,part,false,true,groundcover
+Two-row stonecrop,Sedum spurium,groundcover,3,8,full,false,false,groundcover
+Dragon's Blood stonecrop,Sedum spurium 'Dragon's Blood',groundcover,3,8,full,false,false,groundcover
+Goldmoss stonecrop,Sedum acre,groundcover,3,8,full,false,false,groundcover
+Russian stonecrop,Sedum kamtschaticum,groundcover,3,8,full,false,false,groundcover
+Angelina stonecrop,Sedum rupestre 'Angelina',groundcover,5,9,full,false,false,groundcover
+Woodland stonecrop,Sedum ternatum,groundcover,4,8,shade,true,false,groundcover
+Creeping thyme,Thymus serpyllum,groundcover,4,9,full,false,false,groundcover
+Mother of thyme,Thymus praecox,groundcover,4,8,full,false,false,groundcover
+Elfin thyme,Thymus serpyllum 'Elfin',groundcover,4,9,full,false,false,groundcover
+Red Creeping thyme,Thymus serpyllum 'Coccineus',groundcover,4,9,full,false,false,groundcover
+Creeping phlox,Phlox subulata,groundcover,3,9,full,true,false,groundcover
+Emerald Blue moss phlox,Phlox subulata 'Emerald Blue',groundcover,3,9,full,true,false,groundcover
+Creeping woodland phlox,Phlox stolonifera,groundcover,4,8,part,true,false,groundcover
+Sherwood Purple creeping phlox,Phlox stolonifera 'Sherwood Purple',groundcover,4,8,part,true,false,groundcover
+Spotted dead nettle,Lamium maculatum,groundcover,3,8,shade,false,false,groundcover
+White Nancy dead nettle,Lamium maculatum 'White Nancy',groundcover,3,8,shade,false,false,groundcover
+Yellow archangel,Lamium galeobdolon,groundcover,4,9,shade,false,true,groundcover
+Canadian wild ginger,Asarum canadense,groundcover,3,8,shade,true,false,groundcover
+European wild ginger,Asarum europaeum,groundcover,4,8,shade,false,false,groundcover
+Sweet woodruff,Galium odoratum,groundcover,4,8,shade,false,false,groundcover
+Barren strawberry,Waldsteinia ternata,groundcover,4,7,part,false,false,groundcover
+Creeping mazus,Mazus reptans,groundcover,5,8,part,false,false,groundcover
+Creeping speedwell,Veronica repens,groundcover,5,8,full,false,false,groundcover
+Georgia Blue speedwell,Veronica peduncularis 'Georgia Blue',groundcover,4,9,full,false,false,groundcover
+Creeping juniper Blue Rug,Juniperus horizontalis 'Wiltonii',groundcover,3,9,full,true,false,groundcover-conifer
+Blue Chip juniper,Juniperus horizontalis 'Blue Chip',groundcover,3,9,full,true,false,groundcover-conifer
+Japanese garden juniper,Juniperus procumbens 'Nana',groundcover,4,9,full,false,false,groundcover-conifer
+Shore juniper,Juniperus conferta,groundcover,6,9,full,false,false,groundcover-conifer
+Big blue lilyturf,Liriope muscari,groundcover,5,10,part,false,false,groundcover
+Variegated lilyturf,Liriope muscari 'Variegata',groundcover,5,10,part,false,false,groundcover
+Creeping lilyturf,Liriope spicata,groundcover,4,10,part,false,true,groundcover
+Dwarf mondo grass,Ophiopogon japonicus 'Nana',groundcover,7,10,part,false,false,groundcover
+Mondo grass,Ophiopogon japonicus,groundcover,7,10,part,false,false,groundcover
+Black mondo grass,Ophiopogon planiscapus 'Nigrescens',groundcover,5,9,part,false,false,groundcover
+Bearberry,Arctostaphylos uva-ursi,groundcover,2,7,full,true,false,groundcover
+Bunchberry,Cornus canadensis,groundcover,2,6,shade,true,false,groundcover
+Partridgeberry,Mitchella repens,groundcover,3,9,shade,true,false,groundcover
+Creeping wintergreen,Gaultheria procumbens,groundcover,3,8,shade,true,false,groundcover
+Green and Gold,Chrysogonum virginianum,groundcover,5,9,part,true,false,groundcover
+Foamflower,Tiarella cordifolia,groundcover,4,9,shade,true,false,groundcover
+Creeping raspberry,Rubus calycinoides,groundcover,7,9,part,false,false,groundcover
+Golden creeping Jenny,Lysimachia nummularia 'Aurea',groundcover,4,9,part,false,true,groundcover
+Creeping Jenny,Lysimachia nummularia,groundcover,4,9,part,false,true,groundcover
+Roman chamomile,Chamaemelum nobile,groundcover,4,9,full,false,false,groundcover
+Blue star creeper,Isotoma fluviatilis,groundcover,6,9,part,false,false,groundcover
+Irish moss,Sagina subulata,groundcover,4,8,part,false,false,groundcover
+Creeping mahonia,Mahonia repens,groundcover,5,8,part,true,false,groundcover
+Wall rock cress,Aubrieta deltoidea,groundcover,4,8,full,false,false,groundcover
+Snow-in-summer,Cerastium tomentosum,groundcover,3,7,full,false,false,groundcover
+Ice plant,Delosperma cooperi,groundcover,6,10,full,false,false,groundcover
+Yellow ice plant,Delosperma nubigenum,groundcover,4,9,full,false,false,groundcover
+Lamb's ear,Stachys byzantina,groundcover,4,8,full,false,false,groundcover
+Bigroot geranium,Geranium macrorrhizum,groundcover,4,8,part,false,false,groundcover
+Cranesbill Biokovo,Geranium x cantabrigiense 'Biokovo',groundcover,5,8,part,false,false,groundcover
+Spotted geranium,Geranium maculatum,groundcover,3,8,part,true,false,groundcover
+Sweet box,Sarcococca hookeriana var. humilis,groundcover,6,9,shade,false,false,groundcover
+Robb's bonnet spurge,Euphorbia amygdaloides var. robbiae,groundcover,6,9,shade,false,false,groundcover
+Catlin's Giant bugleweed,Ajuga reptans 'Catlin's Giant',groundcover,3,9,part,false,true,groundcover
+Sweet autumn clematis,Clematis terniflora,vine,4,9,full,false,true,vine
+Jackman clematis,Clematis 'Jackmanii',vine,4,8,full,false,false,vine
+Sweet autumn virgin's bower,Clematis virginiana,vine,3,8,full,true,false,vine
+Scarlet clematis,Clematis texensis,vine,4,9,full,true,false,vine
+Italian leather flower,Clematis viticella,vine,4,9,full,false,false,vine
+Climbing hydrangea,Hydrangea anomala subsp. petiolaris,vine,4,8,part,false,false,vine
+Japanese hydrangea vine,Schizophragma hydrangeoides,vine,5,8,part,false,false,vine
+Trumpet honeysuckle,Lonicera sempervirens,vine,4,9,full,true,false,vine
+Major Wheeler honeysuckle,Lonicera sempervirens 'Major Wheeler',vine,4,9,full,true,false,vine
+Goldflame honeysuckle,Lonicera x heckrottii,vine,5,9,full,false,false,vine
+Japanese honeysuckle,Lonicera japonica,vine,4,9,full,false,true,vine
+Virginia creeper,Parthenocissus quinquefolia,vine,3,9,any,true,false,vine
+Boston ivy,Parthenocissus tricuspidata,vine,4,8,any,false,false,vine
+Trumpet vine,Campsis radicans,vine,4,9,full,true,false,vine
+Madame Galen trumpet vine,Campsis x tagliabuana 'Madame Galen',vine,5,9,full,false,false,vine
+American wisteria,Wisteria frutescens,vine,5,9,full,true,false,vine
+Amethyst Falls wisteria,Wisteria frutescens 'Amethyst Falls',vine,5,9,full,true,false,vine
+Kentucky wisteria,Wisteria macrostachya,vine,4,9,full,true,false,vine
+Chinese wisteria,Wisteria sinensis,vine,5,8,full,false,true,vine
+Carolina jessamine,Gelsemium sempervirens,vine,7,9,full,true,false,vine
+Crossvine,Bignonia capreolata,vine,5,9,full,true,false,vine
+Purple passionflower,Passiflora incarnata,vine,5,9,full,true,false,vine
+Yellow passionflower,Passiflora lutea,vine,6,11,part,true,false,vine
+Chocolate vine,Akebia quinata,vine,4,8,part,false,true,vine
+American bittersweet,Celastrus scandens,vine,3,8,full,true,false,vine
+Oriental bittersweet,Celastrus orbiculatus,vine,4,8,full,false,true,vine
+English ivy,Hedera helix,vine,4,9,shade,false,true,vine
+Wintercreeper,Euonymus fortunei,vine,5,9,part,false,true,vine
+Climbing fig,Ficus pumila,vine,8,11,part,false,false,vine
+Confederate jasmine,Trachelospermum jasminoides,vine,7,10,part,false,false,vine
+Dutchman's pipe,Aristolochia macrophylla,vine,4,8,part,true,false,vine
+Hardy kiwi,Actinidia arguta,vine,4,8,full,false,false,vine
+Coral vine,Antigonon leptopus,vine,8,11,full,false,true,vine
+Hyacinth bean,Lablab purpureus,vine,9,11,full,false,false,vine
+Climbing aster,Ampelaster carolinianus,vine,7,9,full,true,false,vine
+Western virgin's bower,Clematis ligusticifolia,vine,4,8,full,true,false,vine

@@ -1,0 +1,165 @@
+commonName,botanical,type,zMin,zMax,sun,nativeNA,invasiveWatch,category
+Eastern arborvitae,Thuja occidentalis,evergreen,2,7,full,true,false,conifer
+Emerald Green arborvitae,Thuja occidentalis 'Smaragd',evergreen,3,7,full,true,false,conifer
+Green Giant arborvitae,Thuja x 'Green Giant',evergreen,5,8,full,false,false,conifer
+Western redcedar,Thuja plicata,evergreen,5,7,full,true,false,conifer
+Eastern redcedar,Juniperus virginiana,evergreen,2,9,full,true,false,conifer
+Rocky Mountain juniper,Juniperus scopulorum,evergreen,3,7,full,true,false,conifer
+Creeping juniper,Juniperus horizontalis,evergreen,3,9,full,true,false,groundcover-conifer
+Blue Star juniper,Juniperus squamata 'Blue Star',evergreen,4,8,full,false,false,dwarf-conifer
+Chinese juniper,Juniperus chinensis,evergreen,4,9,full,false,false,conifer
+Hollywood juniper,Juniperus chinensis 'Torulosa',evergreen,4,9,full,false,false,conifer
+Shore juniper,Juniperus conferta,evergreen,6,9,full,false,false,groundcover-conifer
+Savin juniper,Juniperus sabina,evergreen,3,7,full,false,false,conifer
+Common juniper,Juniperus communis,evergreen,2,8,full,true,false,conifer
+Singleseed juniper,Juniperus squamata,evergreen,4,8,full,false,false,conifer
+Skyrocket juniper,Juniperus scopulorum 'Skyrocket',evergreen,3,7,full,true,false,conifer
+Norway spruce,Picea abies,evergreen,2,7,full,false,false,conifer
+Colorado blue spruce,Picea pungens,evergreen,2,7,full,true,false,conifer
+White spruce,Picea glauca,evergreen,2,6,full,true,false,conifer
+Dwarf Alberta spruce,Picea glauca 'Conica',evergreen,2,6,full,true,false,dwarf-conifer
+Serbian spruce,Picea omorika,evergreen,4,7,full,false,false,conifer
+Bird's Nest spruce,Picea abies 'Nidiformis',evergreen,3,7,full,false,false,dwarf-conifer
+Oriental spruce,Picea orientalis,evergreen,4,7,full,false,false,conifer
+Eastern white pine,Pinus strobus,evergreen,3,8,full,true,false,conifer
+Mugo pine,Pinus mugo,evergreen,2,7,full,false,false,dwarf-conifer
+Austrian pine,Pinus nigra,evergreen,4,7,full,false,false,conifer
+Scots pine,Pinus sylvestris,evergreen,3,7,full,false,false,conifer
+Japanese black pine,Pinus thunbergii,evergreen,5,8,full,false,false,conifer
+Lacebark pine,Pinus bungeana,evergreen,4,8,full,false,false,conifer
+Ponderosa pine,Pinus ponderosa,evergreen,3,7,full,true,false,conifer
+Limber pine,Pinus flexilis,evergreen,4,7,full,true,false,conifer
+Bristlecone pine,Pinus aristata,evergreen,3,7,full,true,false,conifer
+Japanese white pine,Pinus parviflora,evergreen,5,7,full,false,false,conifer
+Loblolly pine,Pinus taeda,evergreen,6,9,full,true,false,conifer
+Balsam fir,Abies balsamea,evergreen,3,6,full,true,false,conifer
+Fraser fir,Abies fraseri,evergreen,4,7,full,true,false,conifer
+White fir,Abies concolor,evergreen,3,7,full,true,false,conifer
+Korean fir,Abies koreana,evergreen,5,7,full,false,false,conifer
+Douglas fir,Pseudotsuga menziesii,evergreen,4,6,full,true,false,conifer
+Canadian hemlock,Tsuga canadensis,evergreen,3,7,part,true,false,conifer
+Carolina hemlock,Tsuga caroliniana,evergreen,5,7,part,true,false,conifer
+Hinoki falsecypress,Chamaecyparis obtusa,evergreen,4,8,full,false,false,conifer
+Dwarf Hinoki falsecypress,Chamaecyparis obtusa 'Nana Gracilis',evergreen,4,8,full,false,false,dwarf-conifer
+Japanese falsecypress,Chamaecyparis pisifera,evergreen,4,8,full,false,false,conifer
+Golden Mop falsecypress,Chamaecyparis pisifera 'Filifera Aurea',evergreen,4,8,full,false,false,dwarf-conifer
+Atlantic white cedar,Chamaecyparis thyoides,evergreen,4,8,full,true,false,conifer
+Japanese yew,Taxus cuspidata,evergreen,4,7,any,false,false,conifer-shrub
+Anglojap yew,Taxus x media,evergreen,4,7,any,false,false,conifer-shrub
+Hicks yew,Taxus x media 'Hicksii',evergreen,4,7,any,false,false,conifer-shrub
+Canada yew,Taxus canadensis,evergreen,2,6,shade,true,false,conifer-shrub
+Common boxwood,Buxus sempervirens,evergreen,5,8,part,false,false,shrub
+Littleleaf boxwood,Buxus microphylla,evergreen,6,9,part,false,false,shrub
+Korean boxwood,Buxus microphylla var. koreana,evergreen,4,9,part,false,false,shrub
+Green Velvet boxwood,Buxus 'Green Velvet',evergreen,4,9,part,false,false,shrub
+Wintergreen boxwood,Buxus microphylla 'Wintergreen',evergreen,4,9,part,false,false,shrub
+American holly,Ilex opaca,evergreen,5,9,part,true,false,broadleaf-evergreen
+English holly,Ilex aquifolium,evergreen,6,9,part,false,true,broadleaf-evergreen
+Japanese holly,Ilex crenata,evergreen,5,8,part,false,false,broadleaf-evergreen
+Sky Pencil holly,Ilex crenata 'Sky Pencil',evergreen,5,8,part,false,false,broadleaf-evergreen
+Inkberry holly,Ilex glabra,evergreen,4,9,full,true,false,broadleaf-evergreen
+Yaupon holly,Ilex vomitoria,evergreen,7,9,full,true,false,broadleaf-evergreen
+Blue Princess holly,Ilex x meserveae 'Blue Princess',evergreen,5,8,part,false,false,broadleaf-evergreen
+Nellie Stevens holly,Ilex x 'Nellie R. Stevens',evergreen,6,9,part,false,false,broadleaf-evergreen
+Chinese holly,Ilex cornuta,evergreen,7,9,part,false,false,broadleaf-evergreen
+Foster's holly,Ilex x attenuata 'Fosteri',evergreen,6,9,full,true,false,broadleaf-evergreen
+Catawba rhododendron,Rhododendron catawbiense,evergreen,4,8,part,true,false,broadleaf-evergreen
+Rosebay rhododendron,Rhododendron maximum,evergreen,3,7,shade,true,false,broadleaf-evergreen
+PJM rhododendron,Rhododendron 'PJM',evergreen,4,8,part,false,false,broadleaf-evergreen
+Carolina rhododendron,Rhododendron carolinianum,evergreen,5,8,part,true,false,broadleaf-evergreen
+Korean rhododendron,Rhododendron yakushimanum,evergreen,5,8,part,false,false,broadleaf-evergreen
+Kurume azalea,Rhododendron obtusum,evergreen,6,9,part,false,false,broadleaf-evergreen
+Hino Crimson azalea,Rhododendron 'Hino Crimson',evergreen,5,8,part,false,false,broadleaf-evergreen
+Encore azalea Autumn Embers,Rhododendron 'Conlec',evergreen,6,10,part,false,false,broadleaf-evergreen
+Japanese pieris,Pieris japonica,evergreen,5,8,part,false,false,broadleaf-evergreen
+Mountain pieris,Pieris floribunda,evergreen,4,6,part,true,false,broadleaf-evergreen
+Mountain laurel,Kalmia latifolia,evergreen,4,9,part,true,false,broadleaf-evergreen
+Sheep laurel,Kalmia angustifolia,evergreen,2,8,part,true,false,broadleaf-evergreen
+Drooping leucothoe,Leucothoe fontanesiana,evergreen,5,8,shade,true,false,broadleaf-evergreen
+Coast leucothoe,Leucothoe axillaris,evergreen,6,9,shade,true,false,broadleaf-evergreen
+Rainbow leucothoe,Leucothoe fontanesiana 'Rainbow',evergreen,5,8,shade,true,false,broadleaf-evergreen
+Leatherleaf mahonia,Mahonia bealei,evergreen,7,9,part,false,true,broadleaf-evergreen
+Oregon grape holly,Mahonia aquifolium,evergreen,5,8,part,true,false,broadleaf-evergreen
+Heavenly bamboo,Nandina domestica,evergreen,6,9,any,false,true,broadleaf-evergreen
+Firepower nandina,Nandina domestica 'Firepower',evergreen,6,9,any,false,true,broadleaf-evergreen
+Wintercreeper euonymus,Euonymus fortunei,evergreen,5,9,any,false,true,broadleaf-evergreen
+Emerald Gaiety euonymus,Euonymus fortunei 'Emerald Gaiety',evergreen,5,9,any,false,true,broadleaf-evergreen
+Japanese euonymus,Euonymus japonicus,evergreen,7,9,part,false,true,broadleaf-evergreen
+Japanese cedar,Cryptomeria japonica,evergreen,5,9,full,false,false,conifer
+Siberian cypress,Microbiota decussata,evergreen,3,7,part,false,false,groundcover-conifer
+Japanese plum yew,Cephalotaxus harringtonia,evergreen,6,9,part,false,false,conifer-shrub
+Cherry laurel,Prunus laurocerasus,evergreen,6,8,part,false,false,broadleaf-evergreen
+Otto Luyken cherry laurel,Prunus laurocerasus 'Otto Luyken',evergreen,6,8,part,false,false,broadleaf-evergreen
+Portuguese laurel,Prunus lusitanica,evergreen,7,9,part,false,false,broadleaf-evergreen
+Carolina cherry laurel,Prunus caroliniana,evergreen,7,10,full,true,false,broadleaf-evergreen
+Sweet osmanthus,Osmanthus fragrans,evergreen,7,9,part,false,false,broadleaf-evergreen
+Holly tea olive,Osmanthus heterophyllus,evergreen,6,9,part,false,false,broadleaf-evergreen
+Cape jasmine gardenia,Gardenia jasminoides,evergreen,7,10,part,false,false,broadleaf-evergreen
+Frostproof gardenia,Gardenia jasminoides 'Frostproof',evergreen,7,10,part,false,false,broadleaf-evergreen
+Glossy abelia,Abelia x grandiflora,evergreen,6,9,full,false,false,broadleaf-evergreen
+Japanese aucuba,Aucuba japonica,evergreen,7,10,shade,false,false,broadleaf-evergreen
+Camellia japonica,Camellia japonica,evergreen,7,9,part,false,false,broadleaf-evergreen
+Sasanqua camellia,Camellia sasanqua,evergreen,7,9,part,false,false,broadleaf-evergreen
+Japanese privet,Ligustrum japonicum,evergreen,7,10,full,false,true,broadleaf-evergreen
+Japanese skimmia,Skimmia japonica,evergreen,7,9,shade,false,false,broadleaf-evergreen
+David viburnum,Viburnum davidii,evergreen,7,9,part,false,false,broadleaf-evergreen
+Leatherleaf viburnum,Viburnum rhytidophyllum,evergreen,5,8,part,false,false,broadleaf-evergreen
+Wax myrtle,Morella cerifera,evergreen,7,11,full,true,false,broadleaf-evergreen
+Indian hawthorn,Rhaphiolepis indica,evergreen,8,10,full,false,false,broadleaf-evergreen
+Japanese pittosporum,Pittosporum tobira,evergreen,8,11,part,false,false,broadleaf-evergreen
+Texas sage,Leucophyllum frutescens,evergreen,8,11,full,true,false,broadleaf-evergreen
+Bayberry,Morella pensylvanica,evergreen,3,7,full,true,false,broadleaf-evergreen
+Mountain andromeda,Andromeda polifolia,evergreen,2,6,part,true,false,broadleaf-evergreen
+Loropetalum,Loropetalum chinense,evergreen,7,10,part,false,false,broadleaf-evergreen
+Italian cypress,Cupressus sempervirens,evergreen,7,11,full,false,false,conifer
+Arizona cypress,Cupressus arizonica,evergreen,7,9,full,true,false,conifer
+Leyland cypress,x Cuprocyparis leylandii,evergreen,6,10,full,false,false,conifer
+Incense cedar,Calocedrus decurrens,evergreen,5,8,full,true,false,conifer
+Deodar cedar,Cedrus deodara,evergreen,7,9,full,false,false,conifer
+Blue Atlas cedar,Cedrus atlantica 'Glauca',evergreen,6,9,full,false,false,conifer
+Umbrella pine,Sciadopitys verticillata,evergreen,5,8,part,false,false,conifer
+Tam juniper,Juniperus sabina 'Tamariscifolia',evergreen,3,7,full,false,false,groundcover-conifer
+Pfitzer juniper,Juniperus x pfitzeriana,evergreen,4,9,full,false,false,conifer
+Spartan juniper,Juniperus chinensis 'Spartan',evergreen,4,9,full,false,false,conifer
+Globe arborvitae,Thuja occidentalis 'Danica',evergreen,3,7,full,true,false,dwarf-conifer
+Dwarf Japanese garden juniper,Juniperus procumbens 'Nana',evergreen,4,9,full,false,false,groundcover-conifer
+Steeds holly,Ilex crenata 'Steeds',evergreen,5,8,part,false,false,broadleaf-evergreen
+Coast silktassel,Garrya elliptica,evergreen,7,9,part,true,false,broadleaf-evergreen
+California lilac,Ceanothus thyrsiflorus,evergreen,7,10,full,true,false,broadleaf-evergreen
+Kinnikinnick,Arctostaphylos uva-ursi,evergreen,2,7,full,true,false,groundcover
+Salal,Gaultheria shallon,evergreen,6,8,shade,true,false,broadleaf-evergreen
+Wintergreen,Gaultheria procumbens,evergreen,3,8,shade,true,false,groundcover
+Florida anise,Illicium floridanum,evergreen,6,9,shade,true,false,broadleaf-evergreen
+Sweet box,Sarcococca hookeriana,evergreen,6,8,shade,false,false,broadleaf-evergreen
+Japanese spurge,Pachysandra terminalis,evergreen,4,8,shade,false,false,groundcover
+Yucca,Yucca filamentosa,evergreen,4,11,full,true,false,broadleaf-evergreen
+Soft caress mahonia,Mahonia eurybracteata 'Soft Caress',evergreen,7,9,part,false,false,broadleaf-evergreen
+Blue Prince holly,Ilex x meserveae 'Blue Prince',evergreen,5,8,part,false,false,broadleaf-evergreen
+Longstalk holly,Ilex pedunculosa,evergreen,5,8,part,true,false,broadleaf-evergreen
+Autumn olive,Elaeagnus umbellata,evergreen,4,8,full,false,true,broadleaf-evergreen
+Thorny olive,Elaeagnus pungens,evergreen,7,9,full,false,true,broadleaf-evergreen
+Russian olive,Elaeagnus angustifolia,evergreen,3,7,full,false,true,broadleaf-evergreen
+Glossy privet,Ligustrum lucidum,evergreen,8,10,full,false,true,broadleaf-evergreen
+Chinese privet,Ligustrum sinense,evergreen,7,10,full,false,true,broadleaf-evergreen
+Gem Box inkberry,Ilex glabra 'SMNIGAB17',evergreen,5,9,full,true,false,broadleaf-evergreen
+Montgomery blue spruce,Picea pungens 'Montgomery',evergreen,2,7,full,true,false,dwarf-conifer
+Dwarf mugo pine,Pinus mugo var. pumilio,evergreen,2,7,full,false,false,dwarf-conifer
+Pinyon pine,Pinus edulis,evergreen,5,8,full,true,false,conifer
+Nordmann fir,Abies nordmanniana,evergreen,4,6,full,false,false,conifer
+Western hemlock,Tsuga heterophylla,evergreen,6,8,part,true,false,conifer
+Nootka falsecypress,Callitropsis nootkatensis,evergreen,4,7,full,true,false,conifer
+Densa Siberian cypress,Microbiota decussata 'Densa',evergreen,3,7,part,false,false,groundcover-conifer
+Densiformis yew,Taxus x media 'Densiformis',evergreen,4,7,any,false,false,conifer-shrub
+English yew,Taxus baccata,evergreen,6,7,any,false,false,conifer-shrub
+Creeping mahonia,Mahonia repens,evergreen,5,8,part,true,false,groundcover
+Bar Harbor juniper,Juniperus horizontalis 'Bar Harbor',evergreen,3,9,full,true,false,groundcover-conifer
+Brouwers Beauty pieris,Pieris 'Brouwers Beauty',evergreen,4,8,part,false,false,broadleaf-evergreen
+Florida leucothoe,Agarista populifolia,evergreen,7,9,shade,true,false,broadleaf-evergreen
+Bog laurel,Kalmia polifolia,evergreen,2,6,full,true,false,broadleaf-evergreen
+Beaked yucca,Yucca rostrata,evergreen,5,11,full,true,false,broadleaf-evergreen
+Red yucca,Hesperaloe parviflora,evergreen,5,11,full,true,false,broadleaf-evergreen
+Toyon,Heteromeles arbutifolia,evergreen,7,11,full,true,false,broadleaf-evergreen
+California coffeeberry,Frangula californica,evergreen,7,10,part,true,false,broadleaf-evergreen
+Williamsii camellia,Camellia x williamsii,evergreen,7,9,part,false,false,broadleaf-evergreen
+Carolina jessamine,Gelsemium sempervirens,evergreen,7,9,full,true,false,broadleaf-evergreen
+Cleyera,Ternstroemia gymnanthera,evergreen,7,10,part,false,false,broadleaf-evergreen

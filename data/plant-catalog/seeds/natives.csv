@@ -1,0 +1,281 @@
+commonName,botanical,type,zMin,zMax,sun,nativeNA,invasiveWatch,category
+Butterfly Milkweed,Asclepias tuberosa,perennial,3,9,full,true,false,native-perennial
+Swamp Milkweed,Asclepias incarnata,perennial,3,9,full,true,false,native-perennial
+Common Milkweed,Asclepias syriaca,perennial,3,9,full,true,true,native-perennial
+Showy Milkweed,Asclepias speciosa,perennial,3,9,full,true,false,native-perennial
+Whorled Milkweed,Asclepias verticillata,perennial,4,9,full,true,false,native-perennial
+Purple Milkweed,Asclepias purpurascens,perennial,4,8,part,true,false,native-perennial
+Green Antelopehorn Milkweed,Asclepias viridis,perennial,5,9,full,true,false,native-perennial
+Narrowleaf Milkweed,Asclepias fascicularis,perennial,6,10,full,true,false,native-perennial
+Heartleaf Milkweed,Asclepias cordifolia,perennial,6,9,full,true,false,native-perennial
+Purple Coneflower,Echinacea purpurea,perennial,3,8,full,true,false,native-perennial
+Pale Purple Coneflower,Echinacea pallida,perennial,3,8,full,true,false,native-perennial
+Narrowleaf Coneflower,Echinacea angustifolia,perennial,3,8,full,true,false,native-perennial
+Yellow Coneflower,Echinacea paradoxa,perennial,4,8,full,true,false,native-perennial
+Tennessee Coneflower,Echinacea tennesseensis,perennial,4,8,full,true,false,native-perennial
+Black-Eyed Susan,Rudbeckia hirta,perennial,3,9,full,true,false,native-perennial
+Orange Coneflower,Rudbeckia fulgida,perennial,3,9,full,true,false,native-perennial
+Sweet Coneflower,Rudbeckia subtomentosa,perennial,4,8,full,true,false,native-perennial
+Brown-Eyed Susan,Rudbeckia triloba,perennial,4,8,full,true,false,native-perennial
+Giant Coneflower,Rudbeckia maxima,perennial,4,9,full,true,false,native-perennial
+Cutleaf Coneflower,Rudbeckia laciniata,perennial,3,9,part,true,false,native-perennial
+Scarlet Beebalm,Monarda didyma,perennial,4,9,full,true,false,native-perennial
+Wild Bergamot,Monarda fistulosa,perennial,3,9,full,true,false,native-perennial
+Spotted Beebalm,Monarda punctata,perennial,3,8,full,true,false,native-perennial
+Lemon Beebalm,Monarda citriodora,perennial,5,10,full,true,false,native-perennial
+Eastern Beebalm,Monarda bradburiana,perennial,5,8,full,true,false,native-perennial
+Dense Blazing Star,Liatris spicata,perennial,3,9,full,true,false,native-perennial
+Rough Blazing Star,Liatris aspera,perennial,3,8,full,true,false,native-perennial
+Prairie Blazing Star,Liatris pycnostachya,perennial,3,9,full,true,false,native-perennial
+Scaly Blazing Star,Liatris squarrosa,perennial,4,9,full,true,false,native-perennial
+Meadow Blazing Star,Liatris ligulistylis,perennial,3,7,full,true,false,native-perennial
+Wild Blue Indigo,Baptisia australis,perennial,3,9,full,true,false,native-perennial
+White Wild Indigo,Baptisia alba,perennial,4,8,full,true,false,native-perennial
+Yellow Wild Indigo,Baptisia sphaerocarpa,perennial,5,9,full,true,false,native-perennial
+Cream Wild Indigo,Baptisia bracteata,perennial,4,8,full,true,false,native-perennial
+Foxglove Beardtongue,Penstemon digitalis,perennial,3,8,full,true,false,native-perennial
+Hairy Beardtongue,Penstemon hirsutus,perennial,3,8,full,true,false,native-perennial
+Large Beardtongue,Penstemon grandiflorus,perennial,3,7,full,true,false,native-perennial
+Rocky Mountain Penstemon,Penstemon strictus,perennial,3,9,full,true,false,native-perennial
+Firecracker Penstemon,Penstemon eatonii,perennial,4,9,full,true,false,native-perennial
+Pineleaf Penstemon,Penstemon pinifolius,perennial,4,10,full,true,false,native-perennial
+Palmer's Penstemon,Penstemon palmeri,perennial,4,9,full,true,false,native-perennial
+Showy Penstemon,Penstemon spectabilis,perennial,7,10,full,true,false,native-perennial
+Smooth Penstemon,Penstemon laevigatus,perennial,5,8,full,true,false,native-perennial
+Spotted Joe-Pye Weed,Eutrochium maculatum,perennial,3,8,part,true,false,native-perennial
+Sweet Joe-Pye Weed,Eutrochium purpureum,perennial,4,9,part,true,false,native-perennial
+Hollow Joe-Pye Weed,Eutrochium fistulosum,perennial,4,9,part,true,false,native-perennial
+New York Ironweed,Vernonia noveboracensis,perennial,5,9,full,true,false,native-perennial
+Giant Ironweed,Vernonia gigantea,perennial,4,9,full,true,false,native-perennial
+Prairie Ironweed,Vernonia fasciculata,perennial,3,7,full,true,false,native-perennial
+Western Ironweed,Vernonia baldwinii,perennial,4,8,full,true,false,native-perennial
+Maximilian Sunflower,Helianthus maximiliani,perennial,3,9,full,true,true,native-perennial
+Western Sunflower,Helianthus occidentalis,perennial,4,8,full,true,false,native-perennial
+Woodland Sunflower,Helianthus divaricatus,perennial,3,8,part,true,false,native-perennial
+Swamp Sunflower,Helianthus angustifolius,perennial,5,9,full,true,false,native-perennial
+Ashy Sunflower,Helianthus mollis,perennial,4,8,full,true,true,native-perennial
+Jerusalem Artichoke,Helianthus tuberosus,perennial,3,9,full,true,true,native-perennial
+Lanceleaf Coreopsis,Coreopsis lanceolata,perennial,3,9,full,true,false,native-perennial
+Threadleaf Coreopsis,Coreopsis verticillata,perennial,4,9,full,true,false,native-perennial
+Tall Tickseed,Coreopsis tripteris,perennial,3,8,full,true,false,native-perennial
+Plains Coreopsis,Coreopsis tinctoria,perennial,2,11,full,true,false,native-perennial
+Pink Tickseed,Coreopsis rosea,perennial,4,8,full,true,false,native-perennial
+Largeflower Tickseed,Coreopsis grandiflora,perennial,4,9,full,true,false,native-perennial
+Whorled Tickseed,Coreopsis major,perennial,5,9,full,true,false,native-perennial
+Oxeye Sunflower,Heliopsis helianthoides,perennial,3,9,full,true,false,native-perennial
+Common Mountain Mint,Pycnanthemum virginianum,perennial,3,7,full,true,false,native-perennial
+Slender Mountain Mint,Pycnanthemum tenuifolium,perennial,4,8,full,true,false,native-perennial
+Hoary Mountain Mint,Pycnanthemum incanum,perennial,4,8,part,true,false,native-perennial
+Clustered Mountain Mint,Pycnanthemum muticum,perennial,4,8,full,true,false,native-perennial
+Anise Hyssop,Agastache foeniculum,perennial,4,9,full,true,false,native-perennial
+Purple Giant Hyssop,Agastache scrophulariifolia,perennial,4,8,full,true,false,native-perennial
+Sunset Hyssop,Agastache rupestris,perennial,4,9,full,true,false,native-perennial
+Golden Alexanders,Zizia aurea,perennial,3,8,full,true,false,native-perennial
+Heartleaf Golden Alexanders,Zizia aptera,perennial,3,8,part,true,false,native-perennial
+Golden Ragwort,Packera aurea,perennial,3,8,part,true,false,native-perennial
+Roundleaf Ragwort,Packera obovata,perennial,4,8,part,true,false,native-perennial
+Virginia Spiderwort,Tradescantia virginiana,perennial,4,9,part,true,false,native-perennial
+Ohio Spiderwort,Tradescantia ohiensis,perennial,4,9,full,true,false,native-perennial
+Western Spiderwort,Tradescantia occidentalis,perennial,4,9,full,true,false,native-perennial
+Eastern Red Columbine,Aquilegia canadensis,perennial,3,8,part,true,false,native-perennial
+Golden Columbine,Aquilegia chrysantha,perennial,3,9,part,true,false,native-perennial
+Western Columbine,Aquilegia formosa,perennial,4,8,part,true,false,native-perennial
+Cardinal Flower,Lobelia cardinalis,perennial,3,9,part,true,false,native-perennial
+Great Blue Lobelia,Lobelia siphilitica,perennial,4,9,part,true,false,native-perennial
+Pink Turtlehead,Chelone lyonii,perennial,3,8,part,true,false,native-perennial
+White Turtlehead,Chelone glabra,perennial,3,8,part,true,false,native-perennial
+Red Turtlehead,Chelone obliqua,perennial,5,9,part,true,false,native-perennial
+Garden Phlox,Phlox paniculata,perennial,4,8,full,true,false,native-perennial
+Wild Blue Phlox,Phlox divaricata,perennial,3,8,part,true,false,native-perennial
+Creeping Phlox,Phlox stolonifera,perennial,5,9,shade,true,false,native-perennial
+Moss Phlox,Phlox subulata,perennial,3,9,full,true,false,native-perennial
+Smooth Phlox,Phlox glaberrima,perennial,4,8,part,true,false,native-perennial
+Prairie Phlox,Phlox pilosa,perennial,4,9,full,true,false,native-perennial
+Wild Geranium,Geranium maculatum,perennial,3,8,part,true,false,native-perennial
+Coral Bells,Heuchera americana,perennial,4,9,part,true,false,native-perennial
+Hairy Alumroot,Heuchera villosa,perennial,4,9,part,true,false,native-perennial
+Crevice Alumroot,Heuchera micrantha,perennial,4,9,part,true,false,native-perennial
+Foamflower,Tiarella cordifolia,perennial,3,8,shade,true,false,native-perennial
+Eastern Bluestar,Amsonia tabernaemontana,perennial,3,9,full,true,false,native-perennial
+Arkansas Bluestar,Amsonia hubrichtii,perennial,5,8,full,true,false,native-perennial
+Fringed Bluestar,Amsonia ciliata,perennial,5,9,full,true,false,native-perennial
+New England Aster,Symphyotrichum novae-angliae,perennial,3,8,full,true,false,native-perennial
+New York Aster,Symphyotrichum novi-belgii,perennial,4,8,full,true,false,native-perennial
+Smooth Blue Aster,Symphyotrichum laeve,perennial,3,8,full,true,false,native-perennial
+Aromatic Aster,Symphyotrichum oblongifolium,perennial,3,8,full,true,false,native-perennial
+Calico Aster,Symphyotrichum lateriflorum,perennial,4,8,part,true,false,native-perennial
+Heath Aster,Symphyotrichum ericoides,perennial,3,8,full,true,false,native-perennial
+Sky Blue Aster,Symphyotrichum oolentangiense,perennial,3,8,full,true,false,native-perennial
+Blue Wood Aster,Symphyotrichum cordifolium,perennial,3,8,part,true,false,native-perennial
+Silky Aster,Symphyotrichum sericeum,perennial,3,8,full,true,false,native-perennial
+Frost Aster,Symphyotrichum pilosum,perennial,3,8,full,true,false,native-perennial
+Heartleaf Aster,Symphyotrichum drummondii,perennial,4,8,part,true,false,native-perennial
+White Wood Aster,Eurybia divaricata,perennial,3,8,shade,true,false,native-perennial
+Bigleaf Aster,Eurybia macrophylla,perennial,3,8,shade,true,false,native-perennial
+Eastern Showy Aster,Eurybia spectabilis,perennial,4,8,part,true,false,native-perennial
+Canada Goldenrod,Solidago canadensis,perennial,3,9,full,true,true,native-perennial
+Showy Goldenrod,Solidago speciosa,perennial,3,8,full,true,false,native-perennial
+Stiff Goldenrod,Solidago rigida,perennial,3,9,full,true,false,native-perennial
+Zigzag Goldenrod,Solidago flexicaulis,perennial,4,8,shade,true,false,native-perennial
+Gray Goldenrod,Solidago nemoralis,perennial,3,9,full,true,false,native-perennial
+Wreath Goldenrod,Solidago caesia,perennial,4,8,part,true,false,native-perennial
+Seaside Goldenrod,Solidago sempervirens,perennial,4,9,full,true,false,native-perennial
+Rough-Stemmed Goldenrod,Solidago rugosa,perennial,4,9,full,true,true,native-perennial
+Ohio Goldenrod,Solidago ohioensis,perennial,3,7,full,true,false,native-perennial
+Purple Prairie Clover,Dalea purpurea,perennial,3,8,full,true,false,native-perennial
+White Prairie Clover,Dalea candida,perennial,3,8,full,true,false,native-perennial
+Partridge Pea,Chamaecrista fasciculata,perennial,3,9,full,true,false,native-perennial
+Wild Lupine,Lupinus perennis,perennial,3,8,full,true,false,native-perennial
+Texas Bluebonnet,Lupinus texensis,perennial,7,10,full,true,false,native-perennial
+Prairie Coneflower,Ratibida pinnata,perennial,3,8,full,true,false,native-perennial
+Mexican Hat,Ratibida columnifera,perennial,4,9,full,true,false,native-perennial
+Rattlesnake Master,Eryngium yuccifolium,perennial,4,9,full,true,false,native-perennial
+Cup Plant,Silphium perfoliatum,perennial,3,9,full,true,true,native-perennial
+Compass Plant,Silphium laciniatum,perennial,3,9,full,true,false,native-perennial
+Prairie Dock,Silphium terebinthinaceum,perennial,4,8,full,true,false,native-perennial
+Culver's Root,Veronicastrum virginicum,perennial,3,8,full,true,false,native-perennial
+Wild Quinine,Parthenium integrifolium,perennial,4,8,full,true,false,native-perennial
+Obedient Plant,Physostegia virginiana,perennial,3,9,full,true,true,native-perennial
+Blanketflower,Gaillardia aristata,perennial,3,10,full,true,false,native-perennial
+Firewheel,Gaillardia pulchella,perennial,2,11,full,true,false,native-perennial
+Prairie Smoke,Geum triflorum,perennial,3,7,full,true,false,native-perennial
+Wild Strawberry,Fragaria virginiana,perennial,3,9,part,true,false,native-perennial
+Field Pussytoes,Antennaria neglecta,perennial,3,8,full,true,false,native-perennial
+Common Boneset,Eupatorium perfoliatum,perennial,3,8,part,true,false,native-perennial
+Blue Mistflower,Conoclinium coelestinum,perennial,5,10,part,true,true,native-perennial
+Hairy Wood Mint,Blephilia hirsuta,perennial,4,8,part,true,false,native-perennial
+Royal Catchfly,Silene regia,perennial,4,8,full,true,false,native-perennial
+Fire Pink,Silene virginica,perennial,4,8,part,true,false,native-perennial
+Showy Evening Primrose,Oenothera speciosa,perennial,4,9,full,true,true,native-perennial
+Missouri Evening Primrose,Oenothera macrocarpa,perennial,4,8,full,true,false,native-perennial
+Narrowleaf Sundrops,Oenothera fruticosa,perennial,4,8,full,true,false,native-perennial
+Standing Cypress,Ipomopsis rubra,perennial,6,10,full,true,false,native-perennial
+Scarlet Gilia,Ipomopsis aggregata,perennial,4,8,full,true,false,native-perennial
+Indian Pink,Spigelia marilandica,perennial,5,9,part,true,false,native-perennial
+Wild Senna,Senna hebecarpa,perennial,4,7,full,true,false,native-perennial
+Maryland Senna,Senna marilandica,perennial,4,8,full,true,false,native-perennial
+Blue Wild Petunia,Ruellia humilis,perennial,4,9,full,true,false,native-perennial
+Hoary Vervain,Verbena stricta,perennial,3,8,full,true,false,native-perennial
+Blue Vervain,Verbena hastata,perennial,3,8,full,true,false,native-perennial
+Rose Verbena,Glandularia canadensis,perennial,5,9,full,true,false,native-perennial
+Dwarf Crested Iris,Iris cristata,perennial,3,8,part,true,false,native-perennial
+Blue Flag Iris,Iris versicolor,perennial,3,9,full,true,false,native-perennial
+Southern Blue Flag,Iris virginica,perennial,5,9,full,true,false,native-perennial
+Copper Iris,Iris fulva,perennial,5,9,part,true,false,native-perennial
+Eastern Blue-Eyed Grass,Sisyrinchium angustifolium,perennial,4,9,full,true,false,native-perennial
+Wild Ginger,Asarum canadense,perennial,3,8,shade,true,false,native-perennial
+Mayapple,Podophyllum peltatum,perennial,3,8,shade,true,false,native-perennial
+Bloodroot,Sanguinaria canadensis,perennial,3,9,shade,true,false,native-perennial
+Virginia Bluebells,Mertensia virginica,perennial,3,8,shade,true,false,native-perennial
+Solomon's Seal,Polygonatum biflorum,perennial,3,8,shade,true,false,native-perennial
+False Solomon's Seal,Maianthemum racemosum,perennial,3,8,shade,true,false,native-perennial
+Green and Gold,Chrysogonum virginianum,perennial,5,9,part,true,false,native-perennial
+Allegheny Spurge,Pachysandra procumbens,perennial,4,9,shade,true,false,native-perennial
+Tall Thimbleweed,Anemone virginiana,perennial,3,8,part,true,false,native-perennial
+Canada Anemone,Anemone canadensis,perennial,3,7,part,true,true,native-perennial
+Common Yarrow,Achillea millefolium,perennial,3,9,full,true,false,native-perennial
+Christmas Fern,Polystichum acrostichoides,perennial,3,9,shade,true,false,native-perennial
+Cinnamon Fern,Osmundastrum cinnamomeum,perennial,3,9,shade,true,false,native-perennial
+Ostrich Fern,Matteuccia struthiopteris,perennial,3,7,shade,true,true,native-perennial
+Maidenhair Fern,Adiantum pedatum,perennial,3,8,shade,true,false,native-perennial
+Lady Fern,Athyrium filix-femina,perennial,4,9,shade,true,false,native-perennial
+California Poppy,Eschscholzia californica,perennial,6,10,full,true,false,native-perennial
+Stokes Aster,Stokesia laevis,perennial,5,9,full,true,false,native-perennial
+Autumn Sage,Salvia greggii,shrub,6,9,full,true,false,native-shrub
+Cleveland Sage,Salvia clevelandii,shrub,8,11,full,true,false,native-shrub
+Blue Sage,Salvia azurea,perennial,4,9,full,true,false,native-perennial
+Lyreleaf Sage,Salvia lyrata,perennial,5,8,part,true,false,native-perennial
+Hummingbird Sage,Salvia spathacea,perennial,8,10,part,true,false,native-perennial
+Scarlet Sage,Salvia coccinea,perennial,8,11,full,true,false,native-perennial
+California Fuchsia,Epilobium canum,perennial,7,10,full,true,false,native-perennial
+Scarlet Monkeyflower,Erythranthe cardinalis,perennial,6,10,part,true,false,native-perennial
+Douglas Iris,Iris douglasiana,perennial,8,10,part,true,false,native-perennial
+Pacific Bleeding Heart,Dicentra formosa,perennial,4,8,shade,true,false,native-perennial
+Globe Gilia,Gilia capitata,perennial,5,10,full,true,false,native-perennial
+Coyote Mint,Monardella villosa,perennial,7,10,full,true,false,native-perennial
+Little Bluestem,Schizachyrium scoparium,grass,3,9,full,true,false,native-grass
+Switchgrass,Panicum virgatum,grass,4,9,full,true,false,native-grass
+Indiangrass,Sorghastrum nutans,grass,4,9,full,true,false,native-grass
+Blue Grama,Bouteloua gracilis,grass,3,10,full,true,false,native-grass
+Sideoats Grama,Bouteloua curtipendula,grass,4,9,full,true,false,native-grass
+Prairie Dropseed,Sporobolus heterolepis,grass,3,9,full,true,false,native-grass
+Sand Dropseed,Sporobolus cryptandrus,grass,4,9,full,true,false,native-grass
+Big Bluestem,Andropogon gerardii,grass,3,9,full,true,false,native-grass
+Broomsedge Bluestem,Andropogon virginicus,grass,5,9,full,true,true,native-grass
+Bushy Bluestem,Andropogon glomeratus,grass,5,9,full,true,false,native-grass
+Pink Muhly Grass,Muhlenbergia capillaris,grass,5,9,full,true,false,native-grass
+Bamboo Muhly,Muhlenbergia dumosa,grass,7,11,full,true,false,native-grass
+Deer Grass,Muhlenbergia rigens,grass,6,9,full,true,false,native-grass
+Pennsylvania Sedge,Carex pensylvanica,grass,3,8,shade,true,false,native-grass
+Plantainleaf Sedge,Carex plantaginea,grass,4,8,shade,true,false,native-grass
+Palm Sedge,Carex muskingumensis,grass,4,9,part,true,false,native-grass
+Tussock Sedge,Carex stricta,grass,3,8,full,true,false,native-grass
+Cherokee Sedge,Carex cherokeensis,grass,5,9,part,true,false,native-grass
+Northern Sea Oats,Chasmanthium latifolium,grass,3,8,part,true,true,native-grass
+Purple Lovegrass,Eragrostis spectabilis,grass,5,9,full,true,false,native-grass
+Prairie Junegrass,Koeleria macrantha,grass,3,8,full,true,false,native-grass
+Tufted Hairgrass,Deschampsia cespitosa,grass,4,9,part,true,false,native-grass
+Canada Wildrye,Elymus canadensis,grass,3,8,full,true,false,native-grass
+Virginia Wildrye,Elymus virginicus,grass,3,8,part,true,false,native-grass
+Bottlebrush Grass,Elymus hystrix,grass,4,8,part,true,false,native-grass
+Prairie Cordgrass,Spartina pectinata,grass,4,9,full,true,true,native-grass
+Smooth Hydrangea,Hydrangea arborescens,shrub,3,9,part,true,false,native-shrub
+Oakleaf Hydrangea,Hydrangea quercifolia,shrub,5,9,part,true,false,native-shrub
+Buttonbush,Cephalanthus occidentalis,shrub,5,9,full,true,false,native-shrub
+New Jersey Tea,Ceanothus americanus,shrub,4,8,full,true,false,native-shrub
+Blueblossom,Ceanothus thyrsiflorus,shrub,8,10,full,true,false,native-shrub
+Buckbrush,Ceanothus cuneatus,shrub,7,10,full,true,false,native-shrub
+Ninebark,Physocarpus opulifolius,shrub,3,7,full,true,false,native-shrub
+Red Chokeberry,Aronia arbutifolia,shrub,4,9,full,true,false,native-shrub
+Black Chokeberry,Aronia melanocarpa,shrub,3,8,full,true,false,native-shrub
+Spicebush,Lindera benzoin,shrub,4,9,part,true,false,native-shrub
+Summersweet,Clethra alnifolia,shrub,3,9,part,true,false,native-shrub
+Winterberry,Ilex verticillata,shrub,3,9,full,true,false,native-shrub
+Inkberry,Ilex glabra,shrub,4,9,part,true,false,native-shrub
+American Beautyberry,Callicarpa americana,shrub,6,10,part,true,false,native-shrub
+Highbush Blueberry,Vaccinium corymbosum,shrub,3,8,full,true,false,native-shrub
+Common Elderberry,Sambucus canadensis,shrub,3,9,full,true,false,native-shrub
+Red Elderberry,Sambucus racemosa,shrub,3,7,part,true,false,native-shrub
+Arrowwood Viburnum,Viburnum dentatum,shrub,3,8,full,true,false,native-shrub
+Mapleleaf Viburnum,Viburnum acerifolium,shrub,3,8,shade,true,false,native-shrub
+American Cranberrybush,Viburnum trilobum,shrub,2,7,full,true,false,native-shrub
+Nannyberry,Viburnum lentago,shrub,2,8,full,true,false,native-shrub
+Red Twig Dogwood,Cornus sericea,shrub,3,8,full,true,false,native-shrub
+Gray Dogwood,Cornus racemosa,shrub,4,8,full,true,false,native-shrub
+Silky Dogwood,Cornus amomum,shrub,4,8,part,true,false,native-shrub
+Fragrant Sumac,Rhus aromatica,shrub,3,9,full,true,false,native-shrub
+Smooth Sumac,Rhus glabra,shrub,3,9,full,true,true,native-shrub
+Bottlebrush Buckeye,Aesculus parviflora,shrub,4,8,part,true,false,native-shrub
+Virginia Sweetspire,Itea virginica,shrub,5,9,part,true,false,native-shrub
+American Hazelnut,Corylus americana,shrub,4,9,part,true,false,native-shrub
+Pussy Willow,Salix discolor,shrub,4,8,full,true,false,native-shrub
+Coralberry,Symphoricarpos orbiculatus,shrub,2,7,part,true,true,native-shrub
+Common Snowberry,Symphoricarpos albus,shrub,3,7,part,true,false,native-shrub
+Mountain Laurel,Kalmia latifolia,shrub,4,9,part,true,false,native-shrub
+Saskatoon Serviceberry,Amelanchier alnifolia,shrub,2,7,full,true,false,native-shrub
+Southern Wax Myrtle,Morella cerifera,shrub,7,11,full,true,false,native-shrub
+Flame Azalea,Rhododendron calendulaceum,shrub,5,8,part,true,false,native-shrub
+Pinxterbloom Azalea,Rhododendron periclymenoides,shrub,4,9,part,true,false,native-shrub
+Leadplant,Amorpha canescens,shrub,2,8,full,true,false,native-shrub
+False Indigo Bush,Amorpha fruticosa,shrub,4,9,full,true,true,native-shrub
+Shrubby St Johnswort,Hypericum prolificum,shrub,4,8,full,true,false,native-shrub
+Carolina Allspice,Calycanthus floridus,shrub,4,9,part,true,false,native-shrub
+Dwarf Fothergilla,Fothergilla gardenii,shrub,5,9,part,true,false,native-shrub
+American Witchhazel,Hamamelis virginiana,shrub,3,8,part,true,false,native-shrub
+Steeplebush,Spiraea tomentosa,shrub,3,8,full,true,false,native-shrub
+American Plum,Prunus americana,shrub,3,8,full,true,false,native-shrub
+Chickasaw Plum,Prunus angustifolia,shrub,5,9,full,true,false,native-shrub
+Silver Buffaloberry,Shepherdia argentea,shrub,2,6,full,true,false,native-shrub
+Toyon,Heteromeles arbutifolia,shrub,7,11,full,true,false,native-shrub
+Common Manzanita,Arctostaphylos manzanita,shrub,7,11,full,true,false,native-shrub
+Bearberry,Arctostaphylos uva-ursi,shrub,2,6,full,true,false,native-shrub
+Flannelbush,Fremontodendron californicum,shrub,8,10,full,true,false,native-shrub
+Western Redbud,Cercis occidentalis,shrub,7,9,full,true,false,native-shrub
+Oregon Grape,Mahonia aquifolium,shrub,5,9,part,true,false,native-shrub
+Red Flowering Currant,Ribes sanguineum,shrub,6,9,part,true,false,native-shrub
+Golden Currant,Ribes aureum,shrub,4,8,full,true,false,native-shrub
+Desert Willow,Chilopsis linearis,shrub,7,11,full,true,false,native-shrub
+Apache Plume,Fallugia paradoxa,shrub,5,10,full,true,false,native-shrub
+Chuparosa,Justicia californica,shrub,8,11,full,true,false,native-shrub
+Texas Lantana,Lantana urticoides,shrub,8,11,full,true,false,native-shrub
+Sticky Monkeyflower,Diplacus aurantiacus,shrub,7,11,full,true,false,native-shrub

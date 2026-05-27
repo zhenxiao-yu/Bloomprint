@@ -1,0 +1,172 @@
+commonName,botanical,type,zMin,zMax,sun,nativeNA,invasiveWatch,category
+Cape Jasmine Gardenia,Gardenia jasminoides 'August Beauty',shrub,8,11,part,false,false,warm-zone-shrub
+Dwarf Pittosporum,Pittosporum tobira 'Wheeler's Dwarf',shrub,8,11,any,false,false,warm-zone-shrub
+Weeping Yaupon Holly,Ilex vomitoria 'Pendula',tree,7,10,full,true,false,warm-zone-tree
+Florida Anise,Illicium floridanum 'Halley's Comet',shrub,7,9,shade,true,false,warm-zone-shrub
+Yellow Anise Tree,Illicium parviflorum,shrub,7,10,part,true,false,warm-zone-shrub
+Yellow Bells,Tecoma stans,shrub,8,11,full,true,false,warm-zone-shrub
+Texas Sage,Leucophyllum frutescens 'Green Cloud',shrub,8,11,full,true,false,warm-zone-shrub
+Chihuahuan Sage,Leucophyllum laevigatum,shrub,8,11,full,true,false,warm-zone-shrub
+Autumn Sage,Salvia greggii 'Furman's Red',perennial,7,10,full,true,false,warm-zone-perennial
+Mountain Sage,Salvia regla,shrub,8,10,full,true,false,warm-zone-shrub
+Mexican Bush Sage,Salvia leucantha,perennial,8,11,full,false,false,warm-zone-perennial
+Anise-Scented Sage,Salvia coccinea,perennial,8,11,full,true,false,warm-zone-perennial
+Chinese Hibiscus,Hibiscus rosa-sinensis,shrub,9,11,full,false,false,warm-zone-shrub
+Bougainvillea,Bougainvillea spectabilis,vine,9,11,full,false,false,warm-zone-vine
+Bottlebrush,Callistemon citrinus,shrub,8,11,full,false,false,warm-zone-shrub
+Giant Hesperaloe,Hesperaloe funifera,perennial,7,11,full,true,false,xeric-succulent
+Indian Hawthorn,Rhaphiolepis indica 'Snow White',shrub,8,11,full,false,false,warm-zone-shrub
+Sweet Olive,Osmanthus fragrans 'Fudingzhu',shrub,8,11,part,false,false,warm-zone-shrub
+Wax Myrtle,Morella cerifera 'Don's Dwarf',shrub,7,11,any,true,false,warm-zone-shrub
+Banana Shrub,Magnolia figo,shrub,7,10,part,false,false,warm-zone-shrub
+Texas Mountain Laurel,Dermatophyllum secundiflorum,evergreen,7,10,full,true,false,warm-zone-evergreen
+Flame Acanthus,Anisacanthus quadrifidus var. wrightii,shrub,7,10,full,true,false,warm-zone-shrub
+Pineapple Guava,Feijoa sellowiana,shrub,8,11,full,false,false,warm-zone-shrub
+Firebush,Hamelia patens,shrub,8,11,full,true,false,warm-zone-shrub
+Turk's Cap,Malvaviscus arboreus var. drummondii,shrub,7,11,part,true,false,warm-zone-shrub
+American Beautyberry,Callicarpa americana 'Welch's Pink',shrub,6,11,part,true,false,warm-zone-shrub
+Dwarf Palmetto,Sabal minor,evergreen,7,11,any,true,false,warm-zone-palm
+Saw Palmetto,Serenoa repens,evergreen,7,11,any,true,false,warm-zone-palm
+Cabbage Palm,Sabal palmetto,tree,8,11,full,true,false,warm-zone-palm
+Mexican Fan Palm,Washingtonia robusta,tree,9,11,full,false,false,warm-zone-palm
+California Fan Palm,Washingtonia filifera,tree,8,11,full,true,false,warm-zone-palm
+Windmill Palm,Trachycarpus fortunei,tree,7,11,part,false,false,warm-zone-palm
+Pindo Palm,Butia capitata,tree,8,11,full,false,false,warm-zone-palm
+Mediterranean Fan Palm,Chamaerops humilis,evergreen,8,11,full,false,false,warm-zone-palm
+Century Plant,Agave americana,perennial,8,11,full,true,false,xeric-succulent
+Queen Victoria Agave,Agave victoriae-reginae,perennial,9,11,full,false,false,xeric-succulent
+Whale's Tongue Agave,Agave ovatifolia,perennial,7,11,full,true,false,xeric-succulent
+Parry's Agave,Agave parryi,perennial,5,11,full,true,false,xeric-succulent
+Octopus Agave,Agave vilmoriniana,perennial,9,11,full,false,false,xeric-succulent
+Soft-Leaf Yucca,Yucca recurvifolia,shrub,7,11,full,true,false,xeric-succulent
+Twistleaf Yucca,Yucca rupicola,perennial,7,10,full,true,false,xeric-succulent
+Soaptree Yucca,Yucca elata,shrub,7,11,full,true,false,xeric-succulent
+Green Desert Spoon,Dasylirion acrotrichum,perennial,8,11,full,false,false,xeric-succulent
+Desert Spoon,Dasylirion wheeleri,perennial,7,11,full,true,false,xeric-succulent
+Texas Sotol,Dasylirion texanum,perennial,7,11,full,true,false,xeric-succulent
+Prickly Pear,Opuntia engelmannii,perennial,7,11,full,true,false,xeric-succulent
+Spineless Prickly Pear,Opuntia ficus-indica,perennial,8,11,full,false,false,xeric-succulent
+Soap Aloe,Aloe maculata,perennial,8,11,full,false,false,xeric-succulent
+Candelabra Aloe,Aloe arborescens,shrub,9,11,full,false,false,xeric-succulent
+Coral Aloe,Aloe striata,perennial,9,11,full,false,false,xeric-succulent
+Mexican Sedum,Sedum palmeri,perennial,8,11,full,false,false,xeric-succulent
+Mexican Snowball,Echeveria elegans,perennial,9,11,full,false,false,xeric-succulent
+Sticks on Fire,Euphorbia tirucalli 'Sticks on Fire',shrub,9,11,full,false,false,xeric-succulent
+Gopher Plant,Euphorbia rigida,perennial,7,11,full,false,false,xeric-succulent
+Ocotillo,Fouquieria splendens,shrub,8,11,full,true,false,xeric-succulent
+Golden Barrel Cactus,Echinocactus grusonii,perennial,9,11,full,false,false,xeric-succulent
+Organ Pipe Cactus,Stenocereus thurberi,perennial,9,11,full,true,false,xeric-succulent
+Compass Barrel Cactus,Ferocactus wislizeni,perennial,8,11,full,true,false,xeric-succulent
+Pink Muhly Grass,Muhlenbergia capillaris,grass,6,10,full,true,false,warm-zone-grass
+Lindheimer's Muhly,Muhlenbergia lindheimeri,grass,7,11,full,true,false,warm-zone-grass
+Deer Grass,Muhlenbergia rigens,grass,7,10,full,true,false,warm-zone-grass
+Bamboo Muhly,Muhlenbergia dumosa,grass,8,11,full,true,false,warm-zone-grass
+Mexican Feather Grass,Nassella tenuissima,grass,7,11,full,true,true,warm-zone-grass
+Sideoats Grama,Bouteloua curtipendula,grass,4,9,full,true,false,warm-zone-grass
+Purple Fountain Grass,Pennisetum setaceum 'Rubrum',grass,9,11,full,false,true,warm-zone-grass
+Inland Sea Oats,Chasmanthium latifolium,grass,5,9,part,true,false,warm-zone-grass
+Gulf Coast Muhly,Muhlenbergia reverchonii 'Undaunted',grass,5,9,full,true,false,warm-zone-grass
+Trailing Lantana,Lantana montevidensis,groundcover,8,11,full,false,false,warm-zone-groundcover
+Common Lantana,Lantana camara,shrub,8,11,full,false,true,warm-zone-shrub
+Texas Lantana,Lantana urticoides,shrub,8,11,full,true,false,warm-zone-shrub
+Indian Blanket,Gaillardia pulchella 'Arizona Sun',perennial,3,10,full,true,false,warm-zone-perennial
+Plains Coreopsis,Coreopsis tinctoria,perennial,2,11,full,true,false,warm-zone-perennial
+Tropical Sage,Salvia roemeriana,perennial,7,10,part,true,false,warm-zone-perennial
+Cedar Sage,Salvia farinacea 'Henry Duelberg',perennial,7,10,full,true,false,warm-zone-perennial
+Indigo Spires Sage,Salvia 'Indigo Spires',perennial,7,11,full,false,false,warm-zone-perennial
+Blackfoot Daisy,Melampodium leucanthum,perennial,5,11,full,true,false,warm-zone-perennial
+Damianita,Chrysactinia mexicana,perennial,8,11,full,true,false,warm-zone-perennial
+Skullcap,Scutellaria suffrutescens,perennial,7,10,full,true,false,warm-zone-perennial
+Gregg's Mistflower,Conoclinium greggii,perennial,7,10,full,true,false,warm-zone-perennial
+Calylophus,Oenothera berlandieri,perennial,6,11,full,true,false,warm-zone-perennial
+Globe Mallow,Sphaeralcea ambigua,perennial,6,11,full,true,false,warm-zone-perennial
+Desert Marigold,Baileya multiradiata,perennial,7,11,full,true,false,warm-zone-perennial
+Brittlebush,Encelia farinosa,perennial,8,11,full,true,false,warm-zone-perennial
+Firewheel Coneflower,Echinacea purpurea 'Cheyenne Spirit',perennial,3,9,full,true,false,warm-zone-perennial
+Whirling Butterflies,Oenothera lindheimeri 'Whirling Butterflies',perennial,5,9,full,true,false,warm-zone-perennial
+Black-Eyed Susan,Rudbeckia hirta 'Indian Summer',perennial,3,9,full,true,false,warm-zone-perennial
+Verbena Homestead Purple,Verbena canadensis 'Homestead Purple',perennial,6,10,full,true,false,warm-zone-perennial
+Moss Verbena,Verbena tenuisecta,groundcover,7,11,full,false,false,warm-zone-groundcover
+Mexican Petunia,Ruellia simplex,perennial,8,11,full,false,true,warm-zone-perennial
+Dwarf Mexican Petunia,Ruellia simplex 'Katie',perennial,8,11,full,false,false,warm-zone-perennial
+Wild Petunia,Ruellia humilis,perennial,4,9,full,true,false,warm-zone-perennial
+Globe Amaranth,Gomphrena globosa,perennial,9,11,full,false,false,warm-zone-perennial
+Rock Penstemon,Penstemon baccharifolius,perennial,7,10,full,true,false,warm-zone-perennial
+Parry's Penstemon,Penstemon parryi,perennial,7,11,full,true,false,warm-zone-perennial
+Copper Canyon Daisy,Tagetes lemmonii,shrub,8,11,full,false,false,warm-zone-shrub
+Yellow Columbine,Aquilegia chrysantha 'Texas Gold',perennial,3,9,part,true,false,warm-zone-perennial
+Esperanza Gold Star,Tecoma stans 'Gold Star',shrub,8,11,full,true,false,warm-zone-shrub
+Crape Myrtle Natchez,Lagerstroemia indica x fauriei 'Natchez',tree,7,10,full,false,false,warm-zone-tree
+Crape Myrtle Muskogee,Lagerstroemia 'Muskogee',tree,7,10,full,false,false,warm-zone-tree
+Dwarf Crape Myrtle,Lagerstroemia indica 'Pocomoke',shrub,7,10,full,false,false,warm-zone-shrub
+Southern Magnolia,Magnolia grandiflora 'Little Gem',tree,7,10,full,true,false,warm-zone-tree
+Sweetbay Magnolia,Magnolia virginiana,tree,5,10,part,true,false,warm-zone-tree
+Southern Live Oak,Quercus virginiana,tree,8,10,full,true,false,warm-zone-tree
+Escarpment Live Oak,Quercus fusiformis,tree,7,10,full,true,false,warm-zone-tree
+Monterrey Oak,Quercus polymorpha,tree,7,10,full,true,false,warm-zone-tree
+Mexican Redbud,Cercis canadensis var. mexicana,tree,6,9,part,true,false,warm-zone-tree
+Texas Redbud,Cercis canadensis var. texensis,tree,6,9,part,true,false,warm-zone-tree
+Desert Willow,Chilopsis linearis 'Bubba',tree,7,11,full,true,false,warm-zone-tree
+Blue Palo Verde,Parkinsonia florida,tree,8,11,full,true,false,warm-zone-tree
+Foothill Palo Verde,Parkinsonia microphylla,tree,8,11,full,true,false,warm-zone-tree
+Desert Museum Palo Verde,Parkinsonia x 'Desert Museum',tree,8,11,full,true,false,warm-zone-tree
+European Olive,Olea europaea 'Arbequina',tree,8,11,full,false,false,warm-zone-tree
+Meyer Lemon,Citrus x meyeri,tree,9,11,full,false,false,warm-zone-tree
+Chaste Tree,Vitex agnus-castus 'Shoal Creek',tree,6,9,full,false,false,warm-zone-tree
+Chinese Pistache,Pistacia chinensis,tree,6,9,full,false,false,warm-zone-tree
+Chinese Elm,Ulmus parvifolia 'Allee',tree,5,10,full,false,false,warm-zone-tree
+Cedar Elm,Ulmus crassifolia,tree,6,9,full,true,false,warm-zone-tree
+Texas Ebony,Ebenopsis ebano,tree,9,11,full,true,false,warm-zone-tree
+Anacacho Orchid Tree,Bauhinia lunarioides,tree,8,10,full,true,false,warm-zone-tree
+Mexican Olive,Cordia boissieri,tree,9,11,full,true,false,warm-zone-tree
+Sweet Acacia,Vachellia farnesiana,tree,8,11,full,true,false,warm-zone-tree
+Velvet Mesquite,Prosopis velutina,tree,8,11,full,true,false,warm-zone-tree
+Possumhaw Holly,Ilex decidua 'Warren's Red',tree,5,9,full,true,false,warm-zone-tree
+Eve's Necklace,Styphnolobium affine,tree,7,9,part,true,false,warm-zone-tree
+Mexican Plum,Prunus mexicana,tree,6,9,part,true,false,warm-zone-tree
+Carolina Cherry Laurel,Prunus caroliniana 'Compacta',shrub,7,10,part,true,false,warm-zone-shrub
+Star Jasmine,Trachelospermum jasminoides,vine,8,11,part,false,false,warm-zone-vine
+Asiatic Jasmine,Trachelospermum asiaticum,groundcover,7,11,any,false,false,warm-zone-groundcover
+Prostrate Rosemary,Salvia rosmarinus 'Prostratus',groundcover,8,11,full,false,false,warm-zone-groundcover
+Trailing Ice Plant,Delosperma cooperi 'Jewel of Desert',groundcover,5,9,full,false,false,xeric-succulent
+Silver Ponyfoot,Dichondra argentea 'Silver Falls',groundcover,9,11,full,true,false,warm-zone-groundcover
+Frogfruit,Phyla nodiflora,groundcover,7,11,full,true,false,warm-zone-groundcover
+Coral Honeysuckle,Lonicera sempervirens 'Major Wheeler',vine,4,9,full,true,false,warm-zone-vine
+Crossvine,Bignonia capreolata 'Tangerine Beauty',vine,6,9,full,true,false,warm-zone-vine
+Coral Vine,Antigonon leptopus,vine,8,11,full,false,true,warm-zone-vine
+Passionflower,Passiflora incarnata,vine,6,11,full,true,false,warm-zone-vine
+Pride of Barbados,Caesalpinia pulcherrima,shrub,8,11,full,false,false,warm-zone-shrub
+Yellow Bird of Paradise,Erythrostemon gilliesii,shrub,8,11,full,false,false,warm-zone-shrub
+Texas Ranger Rio Bravo,Leucophyllum langmaniae 'Rio Bravo',shrub,8,11,full,true,false,warm-zone-shrub
+Cherry Sage,Salvia microphylla,perennial,7,10,full,false,false,warm-zone-perennial
+Mexican Honeysuckle,Justicia spicigera,shrub,9,11,part,false,false,warm-zone-shrub
+Shrimp Plant,Justicia brandegeeana,shrub,9,11,part,false,false,warm-zone-shrub
+Plumbago,Plumbago auriculata,shrub,9,11,full,false,false,warm-zone-shrub
+Fairy Duster,Calliandra eriophylla,shrub,8,11,full,true,false,warm-zone-shrub
+Creosote Bush,Larrea tridentata,shrub,8,11,full,true,false,warm-zone-shrub
+Apache Plume,Fallugia paradoxa,shrub,4,9,full,true,false,warm-zone-shrub
+Texas Kidneywood,Eysenhardtia texana,shrub,7,10,full,true,false,warm-zone-shrub
+Cape Honeysuckle,Tecoma capensis,shrub,9,11,full,false,false,warm-zone-shrub
+Oleander,Nerium oleander 'Hardy Pink',shrub,8,11,full,false,false,warm-zone-shrub
+Italian Cypress,Cupressus sempervirens 'Tiny Tower',tree,7,11,full,false,false,warm-zone-tree
+Arizona Cypress,Hesperocyparis arizonica 'Blue Ice',tree,7,11,full,true,false,warm-zone-tree
+Eastern Redcedar Brodie,Juniperus virginiana 'Brodie',tree,3,9,full,true,false,warm-zone-tree
+Wax Leaf Privet,Ligustrum japonicum 'Texanum',shrub,7,10,any,false,true,warm-zone-shrub
+Heavenly Bamboo,Nandina domestica 'Gulf Stream',shrub,6,10,any,false,true,warm-zone-shrub
+Brazilian Pepper,Schinus terebinthifolius,tree,9,11,full,false,true,warm-zone-tree
+Camphor Tree,Cinnamomum camphora,tree,9,11,full,false,true,warm-zone-tree
+Chinese Tallow,Triadica sebifera,tree,8,11,full,false,true,warm-zone-tree
+Coral Ardisia,Ardisia crenata,shrub,8,11,shade,false,true,warm-zone-shrub
+Sago Palm,Cycas revoluta,evergreen,8,11,part,false,false,warm-zone-palm
+Cardboard Palm,Zamia furfuracea,evergreen,9,11,part,false,false,warm-zone-palm
+Coontie,Zamia integrifolia,shrub,8,11,part,true,false,warm-zone-shrub
+Foxtail Fern,Asparagus densiflorus 'Myersii',perennial,9,11,part,false,false,warm-zone-perennial
+Aztec Grass,Liriope muscari 'Variegata',grass,7,11,part,false,false,warm-zone-grass
+Society Garlic,Tulbaghia violacea,perennial,7,11,full,false,false,warm-zone-perennial
+Confederate Rose,Hibiscus mutabilis,shrub,7,11,full,false,false,warm-zone-shrub
+Rock Rose,Pavonia lasiopetala,perennial,7,10,full,true,false,warm-zone-perennial
+Bush Germander,Teucrium fruticans,shrub,8,11,full,false,false,warm-zone-shrub
+Mexican Heather,Cuphea hyssopifolia,perennial,9,11,full,false,false,warm-zone-perennial
+New Zealand Flax,Phormium tenax,perennial,8,11,full,false,false,warm-zone-perennial
+Lily of the Nile,Agapanthus africanus,perennial,8,11,full,false,false,warm-zone-perennial
+Mexican Marigold,Tagetes lucida,perennial,8,11,full,false,false,warm-zone-perennial
