@@ -37,6 +37,7 @@ import {
   estimateConfidenceFromPhotoData,
 } from "@/lib/workspace/photoAnalysis";
 import { saveDraftPhoto } from "@/lib/workspace/draftStore";
+import { ConfidenceBadge } from "@/components/plan/TrustBadges";
 import {
   analyzeRegions,
   areNearDuplicates,
@@ -1508,19 +1509,11 @@ export function PhotoFirstPlanning({
                   <div className="mt-3 flex flex-col gap-3">
                     {analysis.assumptions.map((item) => (
                       <label key={item.id} className="flex flex-col gap-1 text-sm">
-                        <span className="flex items-center gap-2 font-medium text-foreground">
+                        <span className="flex flex-wrap items-center gap-2 font-medium text-foreground">
                           {item.label}
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wide ${
-                              item.confidence === "good"
-                                ? "bg-brand-soft text-brand-strong"
-                                : item.confidence === "medium"
-                                  ? "bg-[var(--warn)]/10 text-[var(--warn)]"
-                                  : "bg-border/60 text-muted"
-                            }`}
-                          >
-                            {item.confidence}
-                          </span>
+                          {/* Shared trust language with the plan workspace (Phase 4) — same
+                              calm confidence read, with a tooltip explainer. */}
+                          <ConfidenceBadge level={item.confidence} />
                         </span>
                         <textarea
                           value={assumptionEdits[item.id] ?? item.value}
