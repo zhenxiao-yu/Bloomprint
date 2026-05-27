@@ -1236,5 +1236,21 @@
     "clearConfirm": "Tap again to permanently delete",
     "resetAll": "Reset settings to defaults",
     "savedHint": "Settings are saved on this device only."
+  },
+  "Trust": {
+    "confidence": "Confidence",
+    "confidence_low": "Low",
+    "confidence_medium": "Medium",
+    "confidence_good": "Good",
+    "confidence_high": "High",
+    "confidenceTip": "Our honest read on how well this fits your site. Lower confidence means more local checks — never a worse plan.",
+    "assumption": "Assumption",
+    "assumptionTip": "We assumed this because it wasn't specified. Confirm your site details to sharpen the plan.",
+    "verifiedLabel": "Verified",
+    "verifyLabel": "Verify locally",
+    "estimateLabel": "Estimate",
+    "verifiedTip": "Confirmed against a trusted source.",
+    "verifyTip": "Approximate — confirm locally (stock, price, fit, or measurements) before you rely on it.",
+    "estimateTip": "A planning estimate, not a guaranteed exact figure."
   }
 }
