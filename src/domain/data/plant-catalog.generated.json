@@ -1,0 +1,1438 @@
+{
+  "generatedAt": "2026-05-27T01:23:23.415Z",
+  "count": 71,
+  "plants": [
+    {
+      "commonName": "Doublefile Viburnum",
+      "botanical": "Viburnum plicatum",
+      "type": "shrub",
+      "zoneMin": 5,
+      "zoneMax": 8,
+      "sun": "part",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 2888622,
+        "canonicalName": "Viburnum plicatum",
+        "family": "Viburnaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Arrowwood Viburnum",
+      "botanical": "Viburnum dentatum",
+      "type": "shrub",
+      "zoneMin": 3,
+      "zoneMax": 8,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 2888594,
+        "canonicalName": "Viburnum dentatum",
+        "family": "Viburnaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Oakleaf Hydrangea",
+      "botanical": "Hydrangea quercifolia",
+      "type": "shrub",
+      "zoneMin": 5,
+      "zoneMax": 9,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 2985993,
+        "canonicalName": "Hydrangea quercifolia",
+        "family": "Hydrangeaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Smooth Hydrangea",
+      "botanical": "Hydrangea arborescens",
+      "type": "shrub",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 2985986,
+        "canonicalName": "Hydrangea arborescens",
+        "family": "Hydrangeaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Summersweet",
+      "botanical": "Clethra alnifolia",
+      "type": "shrub",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 2888323,
+        "canonicalName": "Clethra alnifolia",
+        "family": "Clethraceae",
+        "establishmentMeans": [
+          "introduced",
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Virginia Sweetspire",
+      "botanical": "Itea virginica",
+      "type": "shrub",
+      "zoneMin": 5,
+      "zoneMax": 9,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 5362113,
+        "canonicalName": "Itea virginica",
+        "family": "Iteaceae",
+        "establishmentMeans": []
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Dwarf Fothergilla",
+      "botanical": "Fothergilla gardenii",
+      "type": "shrub",
+      "zoneMin": 5,
+      "zoneMax": 8,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 5406815,
+        "canonicalName": "Fothergilla gardenii",
+        "family": "Hamamelidaceae",
+        "establishmentMeans": []
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Bluebeard",
+      "botanical": "Caryopteris x clandonensis",
+      "type": "shrub",
+      "zoneMin": 5,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 8654143,
+        "canonicalName": "Caryopteris clandonensis",
+        "family": "Lamiaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Glossy Abelia",
+      "botanical": "Abelia x grandiflora",
+      "type": "shrub",
+      "zoneMin": 6,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 5334278,
+        "canonicalName": "Abelia grandiflora",
+        "family": "Caprifoliaceae",
+        "establishmentMeans": [
+          "introduced",
+          "managed"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Japanese Spirea",
+      "botanical": "Spiraea japonica",
+      "type": "shrub",
+      "zoneMin": 4,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": true,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 8170635,
+        "canonicalName": "Spiraea japonica",
+        "family": "Rosaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "American Elderberry",
+      "botanical": "Sambucus canadensis",
+      "type": "shrub",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 6369819,
+        "canonicalName": "Sambucus canadensis",
+        "family": "Viburnaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Red Chokeberry",
+      "botanical": "Aronia arbutifolia",
+      "type": "shrub",
+      "zoneMin": 4,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 5363629,
+        "canonicalName": "Aronia arbutifolia",
+        "family": "Rosaceae",
+        "establishmentMeans": [
+          "introduced",
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Winterberry Holly",
+      "botanical": "Ilex verticillata",
+      "type": "shrub",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 5414267,
+        "canonicalName": "Ilex verticillata",
+        "family": "Aquifoliaceae",
+        "establishmentMeans": [
+          "introduced",
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Common Lilac",
+      "botanical": "Syringa vulgaris",
+      "type": "shrub",
+      "zoneMin": 3,
+      "zoneMax": 7,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 5415039,
+        "canonicalName": "Syringa vulgaris",
+        "family": "Oleaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Burning Bush",
+      "botanical": "Euonymus alatus",
+      "type": "shrub",
+      "zoneMin": 4,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": true,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 3169120,
+        "canonicalName": "Euonymus alatus",
+        "family": "Celastraceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Butterfly Bush",
+      "botanical": "Buddleja davidii",
+      "type": "shrub",
+      "zoneMin": 5,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": true,
+      "category": "shrub",
+      "gbif": {
+        "usageKey": 3173338,
+        "canonicalName": "Buddleja davidii",
+        "family": "Scrophulariaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Mountain Laurel",
+      "botanical": "Kalmia latifolia",
+      "type": "evergreen",
+      "zoneMin": 4,
+      "zoneMax": 9,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "evergreen",
+      "gbif": {
+        "usageKey": 2883005,
+        "canonicalName": "Kalmia latifolia",
+        "family": "Ericaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Japanese Pieris",
+      "botanical": "Pieris japonica",
+      "type": "evergreen",
+      "zoneMin": 5,
+      "zoneMax": 8,
+      "sun": "part",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "evergreen",
+      "gbif": {
+        "usageKey": 2882631,
+        "canonicalName": "Pieris japonica",
+        "family": "Ericaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Catawba Rhododendron",
+      "botanical": "Rhododendron catawbiense",
+      "type": "evergreen",
+      "zoneMin": 4,
+      "zoneMax": 8,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "evergreen",
+      "gbif": {
+        "usageKey": 2883047,
+        "canonicalName": "Rhododendron catawbiense",
+        "family": "Ericaceae",
+        "establishmentMeans": [
+          "introduced",
+          "invasive",
+          "managed"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Inkberry Holly",
+      "botanical": "Ilex glabra",
+      "type": "evergreen",
+      "zoneMin": 4,
+      "zoneMax": 9,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "evergreen",
+      "gbif": {
+        "usageKey": 5414266,
+        "canonicalName": "Ilex glabra",
+        "family": "Aquifoliaceae",
+        "establishmentMeans": [
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Blue Star Juniper",
+      "botanical": "Juniperus squamata",
+      "type": "evergreen",
+      "zoneMin": 4,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "evergreen",
+      "gbif": {
+        "usageKey": 2684690,
+        "canonicalName": "Juniperus squamata",
+        "family": "Cupressaceae",
+        "establishmentMeans": [
+          "introduced",
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Hinoki False Cypress",
+      "botanical": "Chamaecyparis obtusa",
+      "type": "evergreen",
+      "zoneMin": 4,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "evergreen",
+      "gbif": {
+        "usageKey": 2683849,
+        "canonicalName": "Chamaecyparis obtusa",
+        "family": "Cupressaceae",
+        "establishmentMeans": [
+          "introduced",
+          "managed"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Eastern White Pine",
+      "botanical": "Pinus strobus",
+      "type": "evergreen",
+      "zoneMin": 3,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "evergreen",
+      "gbif": {
+        "usageKey": 5284982,
+        "canonicalName": "Pinus strobus",
+        "family": "Pinaceae",
+        "establishmentMeans": [
+          "introduced",
+          "native",
+          "naturalised"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Colorado Blue Spruce",
+      "botanical": "Picea pungens",
+      "type": "evergreen",
+      "zoneMin": 2,
+      "zoneMax": 7,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "evergreen",
+      "gbif": {
+        "usageKey": 5284871,
+        "canonicalName": "Picea pungens",
+        "family": "Pinaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Black-Eyed Susan",
+      "botanical": "Rudbeckia fulgida",
+      "type": "perennial",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "perennial",
+      "gbif": {
+        "usageKey": 7344766,
+        "canonicalName": "Rudbeckia fulgida",
+        "family": "Asteraceae",
+        "establishmentMeans": [
+          "introduced",
+          "native",
+          "uncertain"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Purple Coneflower",
+      "botanical": "Echinacea purpurea",
+      "type": "perennial",
+      "zoneMin": 3,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "perennial",
+      "gbif": {
+        "usageKey": 3150935,
+        "canonicalName": "Echinacea purpurea",
+        "family": "Asteraceae",
+        "establishmentMeans": [
+          "introduced",
+          "native",
+          "uncertain"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Threadleaf Coreopsis",
+      "botanical": "Coreopsis verticillata",
+      "type": "perennial",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "perennial",
+      "gbif": {
+        "usageKey": 3133887,
+        "canonicalName": "Coreopsis verticillata",
+        "family": "Asteraceae",
+        "establishmentMeans": [
+          "introduced",
+          "managed",
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Autumn Joy Stonecrop",
+      "botanical": "Hylotelephium telephium",
+      "type": "perennial",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "perennial",
+      "gbif": {
+        "usageKey": 2985865,
+        "canonicalName": "Hylotelephium telephium",
+        "family": "Crassulaceae",
+        "establishmentMeans": [
+          "introduced",
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Catmint",
+      "botanical": "Nepeta x faassenii",
+      "type": "perennial",
+      "zoneMin": 3,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "perennial",
+      "gbif": {
+        "usageKey": 7350989,
+        "canonicalName": "Nepeta faassenii",
+        "family": "Lamiaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Russian Sage",
+      "botanical": "Salvia yangii",
+      "type": "perennial",
+      "zoneMin": 4,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "perennial",
+      "gbif": {
+        "usageKey": 10801424,
+        "canonicalName": "Salvia yangii",
+        "family": "Lamiaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Common Yarrow",
+      "botanical": "Achillea millefolium",
+      "type": "perennial",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "perennial",
+      "gbif": {
+        "usageKey": 3120060,
+        "canonicalName": "Achillea millefolium",
+        "family": "Asteraceae",
+        "establishmentMeans": [
+          "introduced",
+          "managed",
+          "native",
+          "uncertain"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Bearded Iris",
+      "botanical": "Iris germanica",
+      "type": "perennial",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "perennial",
+      "gbif": {
+        "usageKey": 5298069,
+        "canonicalName": "Iris germanica",
+        "family": "Iridaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Lenten Rose",
+      "botanical": "Helleborus orientalis",
+      "type": "perennial",
+      "zoneMin": 4,
+      "zoneMax": 9,
+      "sun": "part",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "perennial",
+      "gbif": {
+        "usageKey": 6374953,
+        "canonicalName": "Helleborus orientalis",
+        "family": "Ranunculaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Garden Phlox",
+      "botanical": "Phlox paniculata",
+      "type": "perennial",
+      "zoneMin": 4,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "perennial",
+      "gbif": {
+        "usageKey": 2927744,
+        "canonicalName": "Phlox paniculata",
+        "family": "Polemoniaceae",
+        "establishmentMeans": [
+          "introduced",
+          "managed"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Peony",
+      "botanical": "Paeonia lactiflora",
+      "type": "perennial",
+      "zoneMin": 3,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "perennial",
+      "gbif": {
+        "usageKey": 3083486,
+        "canonicalName": "Paeonia lactiflora",
+        "family": "Paeoniaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Hardy Geranium",
+      "botanical": "Geranium x cantabrigiense",
+      "type": "perennial",
+      "zoneMin": 4,
+      "zoneMax": 8,
+      "sun": "part",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "perennial",
+      "gbif": {
+        "usageKey": 2890995,
+        "canonicalName": "Geranium cantabrigiense",
+        "family": "Geraniaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Joe-Pye Weed",
+      "botanical": "Eutrochium purpureum",
+      "type": "perennial",
+      "zoneMin": 4,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "native-perennial",
+      "gbif": {
+        "usageKey": 3138192,
+        "canonicalName": "Eutrochium purpureum",
+        "family": "Asteraceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "New York Ironweed",
+      "botanical": "Vernonia noveboracensis",
+      "type": "perennial",
+      "zoneMin": 5,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "native-perennial",
+      "gbif": {
+        "usageKey": 8271565,
+        "canonicalName": "Vernonia noveboracensis",
+        "family": "Asteraceae",
+        "establishmentMeans": []
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Foxglove Beardtongue",
+      "botanical": "Penstemon digitalis",
+      "type": "perennial",
+      "zoneMin": 3,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "native-perennial",
+      "gbif": {
+        "usageKey": 8251158,
+        "canonicalName": "Penstemon digitalis",
+        "family": "Plantaginaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Wild Columbine",
+      "botanical": "Aquilegia canadensis",
+      "type": "perennial",
+      "zoneMin": 3,
+      "zoneMax": 8,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "native-perennial",
+      "gbif": {
+        "usageKey": 3033197,
+        "canonicalName": "Aquilegia canadensis",
+        "family": "Ranunculaceae",
+        "establishmentMeans": [
+          "introduced",
+          "managed",
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Cardinal Flower",
+      "botanical": "Lobelia cardinalis",
+      "type": "perennial",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "native-perennial",
+      "gbif": {
+        "usageKey": 5408269,
+        "canonicalName": "Lobelia cardinalis",
+        "family": "Campanulaceae",
+        "establishmentMeans": [
+          "introduced",
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Swamp Milkweed",
+      "botanical": "Asclepias incarnata",
+      "type": "perennial",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "native-perennial",
+      "gbif": {
+        "usageKey": 3170266,
+        "canonicalName": "Asclepias incarnata",
+        "family": "Apocynaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Maiden Grass",
+      "botanical": "Miscanthus sinensis",
+      "type": "grass",
+      "zoneMin": 5,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": true,
+      "category": "grass",
+      "gbif": {
+        "usageKey": 2706026,
+        "canonicalName": "Miscanthus sinensis",
+        "family": "Poaceae",
+        "establishmentMeans": []
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Fountain Grass",
+      "botanical": "Pennisetum alopecuroides",
+      "type": "grass",
+      "zoneMin": 5,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": true,
+      "category": "grass",
+      "gbif": {
+        "usageKey": 2703201,
+        "canonicalName": "Cenchrus",
+        "family": "Poaceae",
+        "establishmentMeans": []
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Feather Reed Grass",
+      "botanical": "Calamagrostis x acutiflora",
+      "type": "grass",
+      "zoneMin": 4,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "grass",
+      "gbif": {
+        "usageKey": 4127011,
+        "canonicalName": "Calamagrostis acutiflora",
+        "family": "Poaceae",
+        "establishmentMeans": []
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Pink Muhly Grass",
+      "botanical": "Muhlenbergia capillaris",
+      "type": "grass",
+      "zoneMin": 5,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "grass",
+      "gbif": {
+        "usageKey": 2704016,
+        "canonicalName": "Muhlenbergia capillaris",
+        "family": "Poaceae",
+        "establishmentMeans": []
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Big Bluestem",
+      "botanical": "Andropogon gerardii",
+      "type": "grass",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "grass",
+      "gbif": {
+        "usageKey": 4932035,
+        "canonicalName": "Andropogon gerardi",
+        "family": "Poaceae",
+        "establishmentMeans": []
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Sedge",
+      "botanical": "Carex pensylvanica",
+      "type": "grass",
+      "zoneMin": 3,
+      "zoneMax": 8,
+      "sun": "shade",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "grass",
+      "gbif": {
+        "usageKey": 2724855,
+        "canonicalName": "Carex pensylvanica",
+        "family": "Cyperaceae",
+        "establishmentMeans": []
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Creeping Thyme",
+      "botanical": "Thymus serpyllum",
+      "type": "groundcover",
+      "zoneMin": 4,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "groundcover",
+      "gbif": {
+        "usageKey": 6409622,
+        "canonicalName": "Thymus serpyllum",
+        "family": "Lamiaceae",
+        "establishmentMeans": [
+          "introduced",
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Bigroot Geranium",
+      "botanical": "Geranium macrorrhizum",
+      "type": "groundcover",
+      "zoneMin": 3,
+      "zoneMax": 8,
+      "sun": "part",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "groundcover",
+      "gbif": {
+        "usageKey": 2891079,
+        "canonicalName": "Geranium macrorrhizum",
+        "family": "Geraniaceae",
+        "establishmentMeans": [
+          "introduced",
+          "invasive"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Bugleweed",
+      "botanical": "Ajuga reptans",
+      "type": "groundcover",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "part",
+      "nativeNA": false,
+      "invasiveWatch": true,
+      "category": "groundcover",
+      "gbif": {
+        "usageKey": 2927078,
+        "canonicalName": "Ajuga reptans",
+        "family": "Lamiaceae",
+        "establishmentMeans": [
+          "introduced",
+          "managed",
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Allegheny Spurge",
+      "botanical": "Pachysandra procumbens",
+      "type": "groundcover",
+      "zoneMin": 4,
+      "zoneMax": 9,
+      "sun": "shade",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "groundcover",
+      "gbif": {
+        "usageKey": 2984677,
+        "canonicalName": "Pachysandra procumbens",
+        "family": "Buxaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Creeping Phlox",
+      "botanical": "Phlox subulata",
+      "type": "groundcover",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "groundcover",
+      "gbif": {
+        "usageKey": 2927727,
+        "canonicalName": "Phlox subulata",
+        "family": "Polemoniaceae",
+        "establishmentMeans": [
+          "introduced",
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Periwinkle",
+      "botanical": "Vinca minor",
+      "type": "groundcover",
+      "zoneMin": 4,
+      "zoneMax": 8,
+      "sun": "part",
+      "nativeNA": false,
+      "invasiveWatch": true,
+      "category": "groundcover",
+      "gbif": {
+        "usageKey": 3169707,
+        "canonicalName": "Vinca minor",
+        "family": "Apocynaceae",
+        "establishmentMeans": [
+          "introduced",
+          "managed",
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Red Maple",
+      "botanical": "Acer rubrum",
+      "type": "tree",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "tree",
+      "gbif": {
+        "usageKey": 3189883,
+        "canonicalName": "Acer rubrum",
+        "family": "Sapindaceae",
+        "establishmentMeans": [
+          "introduced",
+          "managed"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Sugar Maple",
+      "botanical": "Acer saccharum",
+      "type": "tree",
+      "zoneMin": 3,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "tree",
+      "gbif": {
+        "usageKey": 3189859,
+        "canonicalName": "Acer saccharum",
+        "family": "Sapindaceae",
+        "establishmentMeans": [
+          "introduced",
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "River Birch",
+      "botanical": "Betula nigra",
+      "type": "tree",
+      "zoneMin": 4,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "tree",
+      "gbif": {
+        "usageKey": 5331532,
+        "canonicalName": "Betula nigra",
+        "family": "Betulaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Eastern Redbud",
+      "botanical": "Cercis canadensis",
+      "type": "tree",
+      "zoneMin": 4,
+      "zoneMax": 9,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "tree",
+      "gbif": {
+        "usageKey": 5353583,
+        "canonicalName": "Cercis canadensis",
+        "family": "Fabaceae",
+        "establishmentMeans": []
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Kousa Dogwood",
+      "botanical": "Cornus kousa",
+      "type": "tree",
+      "zoneMin": 5,
+      "zoneMax": 8,
+      "sun": "part",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "tree",
+      "gbif": {
+        "usageKey": 3082274,
+        "canonicalName": "Cornus kousa",
+        "family": "Cornaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Sweetbay Magnolia",
+      "botanical": "Magnolia virginiana",
+      "type": "tree",
+      "zoneMin": 5,
+      "zoneMax": 10,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "tree",
+      "gbif": {
+        "usageKey": 3153639,
+        "canonicalName": "Magnolia virginiana",
+        "family": "Magnoliaceae",
+        "establishmentMeans": []
+      },
+      "verified": false
+    },
+    {
+      "commonName": "American Hornbeam",
+      "botanical": "Carpinus caroliniana",
+      "type": "tree",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "tree",
+      "gbif": {
+        "usageKey": 2875842,
+        "canonicalName": "Carpinus caroliniana",
+        "family": "Betulaceae",
+        "establishmentMeans": []
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Ginkgo",
+      "botanical": "Ginkgo biloba",
+      "type": "tree",
+      "zoneMin": 3,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "tree",
+      "gbif": {
+        "usageKey": 2687885,
+        "canonicalName": "Ginkgo biloba",
+        "family": "Ginkgoaceae",
+        "establishmentMeans": [
+          "introduced",
+          "managed"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Katsura Tree",
+      "botanical": "Cercidiphyllum japonicum",
+      "type": "tree",
+      "zoneMin": 4,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "tree",
+      "gbif": {
+        "usageKey": 8060423,
+        "canonicalName": "Cercidiphyllum japonicum",
+        "family": "Cercidiphyllaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Black Tupelo",
+      "botanical": "Nyssa sylvatica",
+      "type": "tree",
+      "zoneMin": 4,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "tree",
+      "gbif": {
+        "usageKey": 5383717,
+        "canonicalName": "Nyssa sylvatica",
+        "family": "Nyssaceae",
+        "establishmentMeans": [
+          "native"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "White Fringetree",
+      "botanical": "Chionanthus virginicus",
+      "type": "tree",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "part",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "tree",
+      "gbif": {
+        "usageKey": 3172303,
+        "canonicalName": "Chionanthus virginicus",
+        "family": "Oleaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Crabapple",
+      "botanical": "Malus 'Prairifire'",
+      "type": "tree",
+      "zoneMin": 4,
+      "zoneMax": 8,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "tree",
+      "gbif": {
+        "usageKey": 3001068,
+        "canonicalName": "Malus",
+        "family": "Rosaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Bald Cypress",
+      "botanical": "Taxodium distichum",
+      "type": "tree",
+      "zoneMin": 4,
+      "zoneMax": 10,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "tree",
+      "gbif": {
+        "usageKey": 2684191,
+        "canonicalName": "Taxodium distichum",
+        "family": "Cupressaceae",
+        "establishmentMeans": [
+          "introduced",
+          "managed"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Clematis",
+      "botanical": "Clematis x jackmanii",
+      "type": "vine",
+      "zoneMin": 4,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "vine",
+      "gbif": {
+        "usageKey": 3033584,
+        "canonicalName": "Clematis jackmanii",
+        "family": "Ranunculaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Climbing Hydrangea",
+      "botanical": "Hydrangea anomala petiolaris",
+      "type": "vine",
+      "zoneMin": 4,
+      "zoneMax": 8,
+      "sun": "part",
+      "nativeNA": false,
+      "invasiveWatch": false,
+      "category": "vine",
+      "gbif": {
+        "usageKey": 4937726,
+        "canonicalName": "Hydrangea anomala petiolaris",
+        "family": "Hydrangeaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Trumpet Honeysuckle",
+      "botanical": "Lonicera sempervirens",
+      "type": "vine",
+      "zoneMin": 4,
+      "zoneMax": 9,
+      "sun": "full",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "vine",
+      "gbif": {
+        "usageKey": 5334239,
+        "canonicalName": "Lonicera sempervirens",
+        "family": "Caprifoliaceae",
+        "establishmentMeans": [
+          "introduced",
+          "managed"
+        ]
+      },
+      "verified": false
+    },
+    {
+      "commonName": "Virginia Creeper",
+      "botanical": "Parthenocissus quinquefolia",
+      "type": "vine",
+      "zoneMin": 3,
+      "zoneMax": 9,
+      "sun": "any",
+      "nativeNA": true,
+      "invasiveWatch": false,
+      "category": "vine",
+      "gbif": {
+        "usageKey": 3039194,
+        "canonicalName": "Parthenocissus quinquefolia",
+        "family": "Vitaceae",
+        "establishmentMeans": [
+          "introduced"
+        ]
+      },
+      "verified": false
+    }
+  ]
+}
