@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
 import {
-  Bookmark,
   Calculator,
   GraduationCap,
   Home,
@@ -29,9 +28,8 @@ import {
 
 const ITEMS = [
   { href: "/", key: "home", icon: Home, exact: true },
-  { href: "/dashboard", key: "dashboard", icon: LayoutDashboard, exact: false },
   { href: "/plan", key: "plan", icon: Sprout, exact: false },
-  { href: "/plans", key: "saved", icon: Bookmark, exact: false },
+  { href: "/plans", key: "myPlans", icon: LayoutDashboard, exact: false },
   { href: "/account", key: "account", icon: User, exact: false },
 ] as const;
 

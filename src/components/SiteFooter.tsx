@@ -5,7 +5,7 @@ import { Link } from "@/i18n/navigation";
 
 const FOOTER_NAV = [
   { href: "/plan", key: "plan" },
-  { href: "/plans", key: "saved" },
+  { href: "/plans", key: "myPlans" },
   { href: "/pro", key: "pro" },
   { href: "/pricing", key: "pricing" },
   { href: "/guide", key: "guide" },

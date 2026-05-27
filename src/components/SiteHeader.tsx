@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
-import { ChevronDown, LogOut, Settings, UserRound } from "lucide-react";
+import { ChevronDown, LogOut, Plus, Settings, UserRound } from "lucide-react";
 
 import { initials, signOut, useAccount } from "@/lib/accountStore";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -27,9 +27,7 @@ import {
 // The working surface stays inline; business + info pages tuck into a "More"
 // overflow so the bar reads as one calm row instead of eight flat links.
 const PRIMARY_NAV = [
-  { href: "/plan", key: "plan" },
-  { href: "/dashboard", key: "dashboard" },
-  { href: "/plans", key: "saved" },
+  { href: "/plans", key: "myPlans" },
   { href: "/toolbox", key: "toolbox" },
 ] as const;
 
@@ -150,6 +148,15 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          {/* Primary action lives here, not as a nav tab — start a plan from anywhere.
+              Mobile uses the bottom nav's Plan tab, so this shows on sm+ only. */}
+          <Link
+            href="/plan"
+            className="hidden items-center gap-1.5 rounded-full bg-brand px-3.5 py-2 text-sm font-semibold text-on-strong shadow-sm outline-none transition hover:bg-brand-strong focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface active:scale-[0.97] sm:inline-flex"
+          >
+            <Plus className="size-4" aria-hidden />
+            {t("newPlan")}
+          </Link>
           <span className="hidden md:inline-flex">
             <SyncStatusBadge />
           </span>

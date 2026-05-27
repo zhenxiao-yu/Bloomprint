@@ -5,13 +5,15 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { BloomprintPlan } from "@/domain/models";
 import { deletePlan, useSavedPlans, type SavedPlan } from "@/lib/plansStore";
+import { loadPlanningDraft, type PlanningDraftSnapshot } from "@/lib/workspace/draftStore";
 import { SavedPlans } from "@/components/SavedPlans";
 import { CompareView } from "@/components/CompareView";
 import { SyncStatusBadge } from "@/components/SyncStatusBadge";
 import { trackEvent } from "@/lib/analytics";
 import { readApiError } from "@/lib/apiError";
 import { Button } from "@/components/ui/button";
-import { GitCompare } from "lucide-react";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { ArrowRight, GitCompare } from "lucide-react";
 
 type Entry = { label: string; plan: BloomprintPlan };
 
@@ -29,7 +31,14 @@ async function fetchSaved(p: SavedPlan, regenError: string): Promise<BloomprintP
 
 export default function PlansPage() {
   const t = useTranslations("SavedPlans");
+  const tNav = useTranslations("Nav");
+  const tDash = useTranslations("Dashboard");
   const plans = useSavedPlans();
+  // The merged hub also surfaces any in-progress draft so "continue where I left off"
+  // lives in the same place as the saved library.
+  const [draft] = useState<PlanningDraftSnapshot | null>(() =>
+    typeof window === "undefined" ? null : loadPlanningDraft(),
+  );
   const [selected, setSelected] = useState<string[]>([]);
   const [comparison, setComparison] = useState<Entry[] | null>(null);
   const [busy, setBusy] = useState(false);
@@ -84,20 +93,36 @@ export default function PlansPage() {
 
   return (
     <main className="page-wide flex-1 py-10 lg:py-14">
-      <div className="mb-6 flex items-center justify-between">
-        <Link href="/plan" className="text-sm font-semibold text-brand">
-          {t("backToPlanning")}
-        </Link>
-        <Link href="/" className="text-sm text-muted hover:text-foreground">
-          {t("home")}
-        </Link>
-      </div>
-
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="display-lg text-foreground">{t("title")}</h1>
+        <h1 className="display-lg text-foreground">{tNav("myPlans")}</h1>
         <SyncStatusBadge />
       </div>
       <p className="lead mt-1 max-w-2xl text-muted-foreground">{t("subtitle")}</p>
+
+      {/* Continue an in-progress draft — same home as the saved library. */}
+      {draft ? (
+        <div className="relative mt-5 overflow-hidden rounded-2xl border border-brand/25 bg-brand-soft p-5 sm:p-6">
+          <BorderBeam size={120} duration={7} colorFrom="var(--brand)" colorTo="var(--brand-strong)" />
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="title-3 text-brand-strong">{tDash("resumeTitle")}</p>
+              <p className="mt-1 text-sm text-brand-strong/85">
+                {tDash("resumeMeta", {
+                  photos: draft.photos.length,
+                  zones: draft.analysis?.zones.length ?? 0,
+                  when: new Date(draft.session.updatedAt).toLocaleString(),
+                })}
+              </p>
+            </div>
+            <Button asChild className="shrink-0 rounded-full bg-brand text-on-strong hover:bg-brand-strong">
+              <Link href="/plan">
+                {tDash("resumeCta")}
+                <ArrowRight className="size-4" aria-hidden />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       {plans.length >= 2 ? (
         <div className="mt-4 flex flex-wrap items-center gap-3">
