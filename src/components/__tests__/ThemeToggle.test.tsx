@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from "vitest";
-import userEvent from "@testing-library/user-event";
 import { screen, waitFor } from "@testing-library/react";
 import { renderWithIntl } from "@/test/render";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -10,30 +9,18 @@ describe("ThemeToggle", () => {
     renderWithIntl(<ThemeToggle />);
     const button = screen.getByRole("button");
     expect(button).toBeInTheDocument();
-    // After mount the aria-label reflects the next theme in the cycle.
+    // After mount the trigger's aria-label reflects the current theme.
     await waitFor(() => {
       expect(button.getAttribute("aria-label")).toMatch(/Theme:/);
     });
   });
 
-  it("cycles the theme on click (aria-label advances Light -> Dark -> System)", async () => {
-    const user = userEvent.setup();
+  it("labels the trigger with the current theme (default: System)", async () => {
     renderWithIntl(<ThemeToggle />);
     const button = screen.getByRole("button");
-
-    // Default theme is "system" -> next is "light".
+    // Default theme is "system"; the dropdown trigger announces it.
     await waitFor(() => {
-      expect(button.getAttribute("aria-label")).toBe("Theme: System. Switch to Light.");
-    });
-
-    await user.click(button);
-    await waitFor(() => {
-      expect(button.getAttribute("aria-label")).toBe("Theme: Light. Switch to Dark.");
-    });
-
-    await user.click(button);
-    await waitFor(() => {
-      expect(button.getAttribute("aria-label")).toBe("Theme: Dark. Switch to System.");
+      expect(button.getAttribute("aria-label")).toBe("Theme: System");
     });
   });
 
@@ -41,7 +28,7 @@ describe("ThemeToggle", () => {
     renderWithIntl(<ThemeToggle />, { locale: "zh" });
     const button = screen.getByRole("button");
     await waitFor(() => {
-      // zh: System -> 系统, Light -> 浅色
+      // zh: System -> 跟随系统 (contains 系统)
       expect(button.getAttribute("aria-label")).toContain("系统");
     });
   });

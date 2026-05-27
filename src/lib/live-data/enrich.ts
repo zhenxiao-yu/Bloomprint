@@ -8,12 +8,14 @@
  */
 import type { ConfidenceLevel } from "@/domain/models";
 import { getPlant } from "@/domain/data";
+import { getHardinessZone, isUsZip, parseZoneNumber, plantsOutOfZone } from "@/lib/live-data/hardiness";
 import { getInvasiveRisk } from "@/lib/live-data/invasive";
 import { getPlantFacts } from "@/lib/live-data/plantFacts";
 import { getRetailerMatches } from "@/lib/live-data/retailer";
 import { getWeatherContext } from "@/lib/live-data/weather";
 import {
   type EnrichPlanRequest,
+  type HardinessContext,
   type InvasiveRisk,
   LIVE_DISCLAIMER,
   LivePlanEnrichment,
@@ -24,7 +26,7 @@ import {
 
 const REAL_PROVIDERS = new Set(["serpapi", "perenual", "open-meteo", "gbif"]);
 
-/** True only when a real provider is configured; mock-only deployments report false. */
+/** True only when a real *paid* provider is configured (legacy seam; kept for freeDataMode). */
 export function realProvidersConfigured(): boolean {
   const provider = process.env.LIVE_DATA_PROVIDER;
   return (
@@ -32,6 +34,15 @@ export function realProvidersConfigured(): boolean {
     Boolean(process.env.SERPAPI_KEY) ||
     Boolean(process.env.PERENUAL_API_KEY)
   );
+}
+
+/**
+ * The live layer now runs on free, key-free, commercial-OK sources (GBIF, USDA phzmapi,
+ * regional climatology) that are always available and cache/prefetch-protected — so enrichment
+ * is ON by default. One env kill-switch (`LIVE_DATA_ENRICHMENT=off`) disables the whole layer.
+ */
+export function freeDataEnrichmentEnabled(): boolean {
+  return process.env.LIVE_DATA_ENRICHMENT !== "off";
 }
 
 export async function getLiveEnrichment(req: EnrichPlanRequest): Promise<LivePlanEnrichment> {
@@ -43,6 +54,7 @@ export async function getLiveEnrichment(req: EnrichPlanRequest): Promise<LivePla
     weather: null,
     plantFacts: [],
     invasive: [],
+    hardiness: null,
     disclaimer: LIVE_DISCLAIMER,
   };
 
@@ -91,17 +103,47 @@ export async function getLiveEnrichment(req: EnrichPlanRequest): Promise<LivePla
       const commonName = record?.commonName ?? plant.commonName;
       const facts = await getPlantFacts(scientificName, commonName);
       if (facts) plantFacts.push(facts.value);
-      const risk = await getInvasiveRisk(scientificName, Boolean(record?.invasive), commonName);
+      const risk = await getInvasiveRisk(
+        scientificName,
+        Boolean(record?.invasive),
+        commonName,
+        plant.plantId,
+      );
       if (risk) invasive.push(risk.value);
     }
 
+    // Location-precise hardiness zone — only for a US ZIP, and only when live data is on
+    // (keyless public source, but we still respect the master live-data switch). Flags any plant
+    // whose Core Library cold-hardiness may not cover the resolved zone. Region zone stands otherwise.
+    let hardiness: HardinessContext | null = null;
+    if (freeDataEnrichmentEnabled() && isUsZip(req.region)) {
+      const zip = req.region!.trim();
+      const res = await getHardinessZone(zip);
+      if (res) {
+        const zoneNumber = parseZoneNumber(res.value.zone);
+        const knownPlants = req.plants
+          .map((p) => getPlant(p.plantId))
+          .filter((rec): rec is NonNullable<typeof rec> => !!rec)
+          .map((rec) => ({ commonName: rec.commonName, hardinessMin: rec.hardinessMin }));
+        hardiness = {
+          query: zip,
+          zone: res.value.zone,
+          temperatureRange: res.value.temperatureRange,
+          outOfRange: zoneNumber != null ? plantsOutOfZone(knownPlants, zoneNumber) : [],
+          source: res.source,
+          lastCheckedAt: res.retrievedAt,
+        };
+      }
+    }
+
     return LivePlanEnrichment.parse({
-      enabled: realProvidersConfigured(),
+      enabled: freeDataEnrichmentEnabled(),
       generatedAt,
       storeReality,
       weather,
       plantFacts,
       invasive,
+      hardiness,
       disclaimer: LIVE_DISCLAIMER,
     });
   } catch {

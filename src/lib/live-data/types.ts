@@ -8,7 +8,8 @@ export type LiveDataKind =
   | "source-snapshot"
   | "retailer-products"
   | "plant-facts"
-  | "invasive";
+  | "invasive"
+  | "hardiness";
 
 export interface CachePolicy {
   ttlMs: number;

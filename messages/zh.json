@@ -12,7 +12,9 @@
     "settings": "设置",
     "signOut": "退出登录",
     "createAccount": "注册账户",
-    "me": "我"
+    "me": "我",
+    "more": "更多",
+    "moreDescription": "更多导航选项"
   },
   "Meta": {
     "title": "Bloomprint —— 为真实住宅打造可落地的庭院方案",
@@ -28,7 +30,8 @@
     "dark": "深色",
     "system": "跟随系统",
     "label": "当前主题：{current}，点击切换到{next}。",
-    "title": "主题：{current}"
+    "title": "主题：{current}",
+    "appearance": "外观"
   },
   "Language": {
     "label": "语言",
@@ -61,7 +64,9 @@
     "budgetTooltip": "预计区间",
     "laborTitle": "各阶段施工工时",
     "laborTooltip": "预计工作量",
-    "laborHours": "{hours} 小时"
+    "laborHours": "{hours} 小时",
+    "budgetAxisTip": "每根柱形代表一个支出类别；柱长为其估算费用区间的中点。悬停柱形可查看完整区间。",
+    "laborAxisTip": "每根柱形代表一个安装阶段；柱长为其预估实际工时。"
   },
   "Home": {
     "eyebrow": "Bloomprint",
@@ -138,7 +143,33 @@
     "capture": {
       "title": "拍下你的院子，交给我们读。",
       "body": "引导拍摄或上传——Bloomprint 会检查照片质量、估算种植区，并把不确定的地方变成可确认的问题，确认后再生成方案。",
-      "cta": "用照片做方案"
+      "cta": "用照片做方案",
+      "badge": "用照片做方案"
+    },
+    "heroKicker": "不只是好看，更能落地。",
+    "stats": {
+      "heading": "每份方案都包含",
+      "deliverables": "方案模块：购物清单、施工顺序、风险、门店清单",
+      "steps": "施工步骤，按正确顺序排列",
+      "accounts": "开始前需要的账号或密钥"
+    },
+    "bento": {
+      "eyebrow": "每份方案，从头到尾",
+      "title": "一份能动手做的方案，而不是渲染图",
+      "subtitle": "材料、顺序、风险、门店实际情况——在你花钱之前就都算好。",
+      "photoCaption": "按你家院子的真实尺寸来规划",
+      "shoppingBody": "植物、材料和用量都来自核心库——绝不由 AI 编造。",
+      "orderBody": "精确的施工顺序，避免返工。",
+      "risksBody": "可能出问题的地方，连同依据一起提前标出。",
+      "storeBody": "搜索链接与替代选项——不会假装知道库存。"
+    },
+    "marquee": {
+      "label": "真实的院子，真实的改造"
+    },
+    "entry": {
+      "heading": "选择你想要的开始方式",
+      "recommended": "推荐",
+      "go": "开始使用"
     }
   },
   "Common": {
@@ -523,7 +554,13 @@
     "connectSyncing": "同步中…",
     "connectSuccess": "已将 {synced} 个方案同步到你的账户。",
     "connectSuccessWithSkipped": "已同步 {synced} 个方案；跳过 {skipped} 个账户中已有的方案。",
-    "connectError": "无法连接云端 —— 你的方案已安全保存在此设备上。"
+    "connectError": "无法连接云端 —— 你的方案已安全保存在此设备上。",
+    "noAccountBadge": "开始使用",
+    "noAccountPhotoAlt": "准备生长的幼苗",
+    "tabOverview": "概览",
+    "tabData": "数据与同步",
+    "savedPlansHint": "保存在此设备上的方案——随时打开或对比。",
+    "startNewBody": "把新想法变成可执行的方案。"
   },
   "Settings": {
     "backToAccount": "← 账户",
@@ -569,7 +606,10 @@
     "preferencesTitle": "偏好设置",
     "themeLabel": "主题",
     "languageLabel": "语言",
-    "preferencesHint": "主题和语言仅保存在此设备上，不会与你的账户绑定。"
+    "preferencesHint": "主题和语言仅保存在此设备上，不会与你的账户绑定。",
+    "tabProfile": "个人资料",
+    "tabPreferences": "偏好设置",
+    "tabData": "你的数据"
   },
   "SavedPlans": {
     "backToPlanning": "← 返回做方案",
@@ -600,7 +640,22 @@
     "refinements": "{count} 处微调",
     "open": "打开",
     "rename": "重命名",
-    "delete": "删除"
+    "delete": "删除",
+    "emptyBadge": "你的方案库",
+    "emptyPhotoAlt": "刚建好的高架花床",
+    "rowActionsAria": "方案操作",
+    "addToCompare": "加入对比",
+    "removeFromCompare": "移出对比",
+    "copyLink": "复制链接",
+    "pageAria": "第 {page} 页",
+    "renameHint": "为这个方案起一个方便日后识别的名称。",
+    "renameLabel": "方案名称",
+    "renameCancel": "取消",
+    "renameSave": "保存名称",
+    "toastRenamed": "已重命名为“{label}”",
+    "toastDeleted": "已删除“{label}”",
+    "toastLinkCopied": "已复制方案链接",
+    "toastLinkError": "无法复制链接"
   },
   "Plan": {
     "back": "← Bloomprint",
@@ -749,7 +804,20 @@
     "seasonsEvergreen": "常绿结构支撑",
     "seasonsQuiet": "较平淡——暂无特别看点",
     "seasonsStructure": "全年结构：{plants}",
-    "seasonsNote": "依据 Core Library 的季节说明；花期因地区与年份而异，请在本地确认。"
+    "seasonsNote": "依据 Core Library 的季节说明；花期因地区与年份而异，请在本地确认。",
+    "tipConfidence": "我们对此方案与场地契合度的诚实判断——用一句话表达，而非单一评分。信心较低意味着需要更多本地核实，而非方案更差。",
+    "tipPlanLabel": "此方案的完成度：可施工的估算、概念性布局，或需先经本地核实的方案。",
+    "tipPlanLabelLabel": "方案阶段",
+    "tipBudget": "基于当前各类别估算的自助（DIY）费用区间——仅含材料，不含人工。请将其视为预算参考区间，而非报价。",
+    "tipLabor": "预估的实际动手工时及大致需要的周末数。实际用时因经验和场地条件而异。",
+    "tipStore": "此方案中常见物品本地通常是否有货，或是否更适合选择配送。",
+    "tipTier": "同一方案在不同花费水平下的快速／较好／最佳呈现——均为估算，并非独立报价。",
+    "tipFitScore": "此植物与场地光照、土壤和空间的契合程度——分数越高，妥协越少。",
+    "tipFitScoreLabel": "植物契合度",
+    "tipHardiness": "根据您的位置得出的 USDA 耐寒区，用于核实每种植物能否度过当地冬季。",
+    "tipOutOfZone": "这些植物超出了您的耐寒区——若不加以保护或更换，可能无法度过当地冬季。",
+    "showMore": "显示其余 {count} 项",
+    "showLess": "收起"
   },
   "YardMap": {
     "metaTitle": "院子地图（测试版）· Bloomprint",
@@ -866,7 +934,11 @@
     "timingTitle": "种植时机",
     "cautionTitle": "生态提醒",
     "careTitle": "养护提示",
-    "sourceLabel": "来源"
+    "sourceLabel": "来源",
+    "hardinessTitle": "耐寒区核对",
+    "hardinessZone": "{zip} 属于 USDA {zone} 区。",
+    "hardinessAllHardy": "所选植物在此区均可越冬。",
+    "hardinessOutOfRange": "可能无法在此越冬：{plants} —— 购买前请确认。"
   },
   "Evidence": {
     "titleExpert": "Bloomprint 为什么这样推荐",
@@ -887,7 +959,12 @@
     "supports": "支持：{items}",
     "retrieved": "获取于 {when}",
     "verified": "核实于 {when}",
-    "footerNote": "耐寒性参考确定气候基础；核心植物库和你的输入决定其余部分。AI 只负责措辞，绝不决定种什么。"
+    "footerNote": "耐寒性参考确定气候基础；核心植物库和你的输入决定其余部分。AI 只负责措辞，绝不决定种什么。",
+    "openDataTitle": "由免费开放数据驱动：",
+    "openDataCore": "Bloomprint 核心植物库",
+    "openDataNote": "无需付费密钥。植物名称与入侵性背景来自 GBIF，耐寒区来自 USDA，种植时段来自区域气候规律——全部免费且带缓存，应用绝不会因 API 卡住。",
+    "tipConfidenceDimension": "信心按维度（如气候或土壤）分别评定，而非单一总评，以便您清楚了解各处的可靠程度。",
+    "tipSourceLadder": "来源按质量阶梯排序（L1 最高）：经同行评审的资料和政府数据高于供应商或社区信息。"
   },
   "Compare": {
     "title": "对比",
@@ -988,6 +1065,59 @@
     "deleteBtn": "删除",
     "saveChanges": "保存修改",
     "createProject": "创建工程",
-    "untitled": "未命名工程"
+    "untitled": "未命名工程",
+    "emptyPhotoAlt": "园艺花园小径",
+    "onboard1Title": "添加工作",
+    "onboard1Body": "记录客户项目，从线索到完工。",
+    "onboard2Title": "关联方案",
+    "onboard2Body": "为每个工作关联可执行的 Bloomprint 方案。",
+    "onboard3Title": "一份采购清单",
+    "onboard3Body": "将各工作的材料合并为一份采购清单。",
+    "statActiveHint": "尚未完成的工作。",
+    "statAwaitingHint": "已报价、等待客户确认的工作。",
+    "statScheduledHint": "未来一周内安装的工作。",
+    "statPipelineHint": "所有进行中工作的报价总额。",
+    "toastSampleLoaded": "已载入示例工作台",
+    "toastWorkspaceCleared": "工作台已清空",
+    "toastClientAdded": "已添加 {name}",
+    "toastBuyCopied": "已复制采购清单",
+    "toastBuyCopyError": "无法复制清单"
+  },
+  "Dashboard": {
+    "title": "欢迎回到你的庭院工作台",
+    "subtitle": "继续草稿、对比版本、管理照片，或切换到专业版与门店流程。",
+    "eyebrow": "指挥中心",
+    "heroAlt": "被绿色草坪和树木环绕的住宅外景",
+    "ctaNew": "新建项目",
+    "ctaPro": "专业版面板",
+    "statsAria": "工作台指标",
+    "statActive": "进行中的方案",
+    "statActiveHint": "你已保存、可重新打开或对比的方案。",
+    "statPhotos": "草稿照片",
+    "statPhotosHint": "当前规划草稿中的照片数量。",
+    "statCompare": "可对比数量",
+    "statCompareHint": "保存两个及以上方案即可并排对比。",
+    "statMode": "工作台模式",
+    "statModeHint": "当草稿用于客户物业时切换为专业版。",
+    "modeHome": "家庭",
+    "modePro": "专业",
+    "resumeTitle": "继续你最近的规划",
+    "resumeMeta": "{photos} 张照片，识别出 {zones} 个区域，上次保存于 {when}。",
+    "resumeCta": "继续草稿",
+    "recentTitle": "最近的项目",
+    "recentOpenAll": "查看已保存",
+    "recentEmptyTitle": "还没有已保存的项目",
+    "recentEmptyBody": "从照片开始，Bloomprint 会为你保留草稿。",
+    "recentEmptyCta": "开始规划",
+    "draftDefault": "草稿 1",
+    "confidenceSuffix": "置信度 {confidence}",
+    "modesTitle": "模式",
+    "modesSubtitle": "选择适合今天工作的流程。",
+    "modeHomeownerTitle": "业主",
+    "modeHomeownerBody": "改造自家庭院，保存版本，稍后继续。",
+    "modeProTitle": "园艺师 / 专业",
+    "modeProBody": "客户、物业，以及可用于报价的材料与人工视图。",
+    "modeStoreTitle": "门店助手",
+    "modeStoreBody": "运营建议、替代方案，以及打印/分享摘要。"
   }
 }

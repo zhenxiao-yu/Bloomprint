@@ -1,5 +1,10 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# raw USDA PLANTS exports — multi-MB build-time inputs; the small derived
+# artifact (src/domain/data/usda-synonyms.generated.json) is committed instead.
+/data/usda/*.txt
+/data/usda/*.csv
+
 # dependencies
 /node_modules
 /.pnp
@@ -53,3 +58,6 @@ supabase/signing_keys.json
 next-env.d.ts
 
 .vercel
+
+# local visual-review screenshots
+/.shots/

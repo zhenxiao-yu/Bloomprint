@@ -10,7 +10,34 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { HelpCircle } from "lucide-react";
 import type { BudgetBreakdown, InstallPhase } from "@/domain/models";
+import {
+  Tooltip as Hint,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+/** Honest helper that explains what a chart's bars and axis represent. */
+function AxisHint({ label, children }: { label: string; children: string }) {
+  return (
+    <figcaption className="mb-2 flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-muted">
+      {label}
+      <Hint>
+        <TooltipTrigger
+          type="button"
+          aria-label={label}
+          className="inline-flex size-4 items-center justify-center rounded-full text-muted/70 transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+        >
+          <HelpCircle className="size-3.5" aria-hidden />
+        </TooltipTrigger>
+        <TooltipContent className="max-w-[15rem] leading-relaxed normal-case tracking-normal">
+          {children}
+        </TooltipContent>
+      </Hint>
+    </figcaption>
+  );
+}
 
 // Calm palette pulled from theme CSS variables so charts adapt to dark mode.
 const BUDGET_COLORS = [
@@ -48,9 +75,7 @@ export function PlanCharts({
   return (
     <div className="mt-4 grid gap-5 border-t border-border pt-4 sm:grid-cols-2">
       <figure>
-        <figcaption className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
-          {t("budgetTitle")}
-        </figcaption>
+        <AxisHint label={t("budgetTitle")}>{t("budgetAxisTip")}</AxisHint>
         <ResponsiveContainer width="100%" height={Math.max(120, budgetData.length * 34)}>
           <BarChart
             data={budgetData}
@@ -91,9 +116,7 @@ export function PlanCharts({
 
       {laborData.length > 0 ? (
         <figure>
-          <figcaption className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
-            {t("laborTitle")}
-          </figcaption>
+          <AxisHint label={t("laborTitle")}>{t("laborAxisTip")}</AxisHint>
           <ResponsiveContainer width="100%" height={Math.max(120, laborData.length * 34)}>
             <BarChart
               data={laborData}

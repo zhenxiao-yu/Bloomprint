@@ -2,6 +2,7 @@ import type { ReactElement, ReactNode } from "react";
 import { render, type RenderOptions } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { ThemeProvider } from "next-themes";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import en from "../../messages/en.json";
 import zh from "../../messages/zh.json";
 
@@ -27,7 +28,7 @@ export function renderWithIntl(ui: ReactElement, options: RenderWithIntlOptions 
     return (
       <NextIntlClientProvider locale={locale} messages={MESSAGES[locale]}>
         <ThemeProvider attribute="class" enableSystem defaultTheme="system">
-          {children}
+          <TooltipProvider>{children}</TooltipProvider>
         </ThemeProvider>
       </NextIntlClientProvider>
     );

@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { ArrowUp, Sparkles } from "lucide-react";
+import { ArrowUp, HelpCircle, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { BloomprintPlan, RefinementAdjustment, ShoppingPriority } from "@/domain/models";
 import { DRAINAGE_OPTIONS, REFINEMENTS, SOIL_OPTIONS, SUN_OPTIONS } from "@/lib/uiOptions";
-import { Chip, MetricPill, Money, Section, SeverityTag } from "@/components/ui";
+import { Chip, Money, Section, SeverityTag } from "@/components/ui";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { NumberTicker } from "@/components/ui/number-ticker";
+import { MagicCard } from "@/components/ui/magic-card";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { BlurFade } from "@/components/ui/blur-fade";
+import { motion } from "motion/react";
 import { YardPreviewOverlay } from "@/components/yard-map/YardPreviewOverlay";
 import { CommandBar } from "@/components/CommandBar";
 import { ShoppingTable } from "@/components/ShoppingTable";
@@ -63,6 +69,67 @@ const ACCURACY_CONTROLS: Record<SiteField, { value: string; label: string }[]> =
   soil: SOIL_OPTIONS,
   drainage: DRAINAGE_OPTIONS,
 };
+
+/**
+ * Honest helper: a small info affordance that explains a metric or domain term.
+ * Presentation only — it never alters the value it sits beside.
+ */
+function InfoTip({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        type="button"
+        aria-label={label}
+        className="inline-flex size-5 items-center justify-center rounded-full text-muted/70 transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+      >
+        <HelpCircle className="size-3.5" aria-hidden />
+      </TooltipTrigger>
+      <TooltipContent className="max-w-[15rem] leading-relaxed">{children}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+/** Metric pill with an inline honest helper on its label. Mirrors MetricPill's look. */
+function MetricStat({
+  label,
+  tip,
+  tone = "neutral",
+  children,
+}: {
+  label: string;
+  tip: string;
+  tone?: "neutral" | "brand" | "warn";
+  children: ReactNode;
+}) {
+  const tones = {
+    neutral: "border-border bg-surface text-foreground",
+    brand: "border-brand/25 bg-brand-soft text-brand-strong",
+    warn: "border-warn/25 bg-warn/10 text-warn",
+  };
+  return (
+    <span className={`flex min-h-11 flex-col justify-center rounded-lg border px-3 py-1.5 ${tones[tone]}`}>
+      <span className="flex items-center gap-1 text-[0.68rem] font-medium uppercase tracking-wide opacity-75">
+        {label}
+        <InfoTip label={label}>{tip}</InfoTip>
+      </span>
+      <span className="numeric text-sm font-semibold">{children}</span>
+    </span>
+  );
+}
+
+/**
+ * Animates the EXISTING money range — start/end values are taken verbatim from
+ * the engine, only the count-up is presentational.
+ */
+function MoneyTicker({ value }: { value: { min: number; max: number } }) {
+  return (
+    <span className="tabular-nums">
+      $<NumberTicker value={value.min} className="text-inherit tracking-normal text-foreground dark:text-foreground" />
+      –$
+      <NumberTicker value={value.max} className="text-inherit tracking-normal text-foreground dark:text-foreground" />
+    </span>
+  );
+}
 
 export function PlanResult({
   result,
@@ -155,6 +222,7 @@ export function PlanResult({
       .map((x) => [(x.commonName ?? x.scientificName).toLowerCase(), x]),
   );
   const weather = live?.weather ?? null;
+  const hardiness = live?.hardiness ?? null;
   const careFact = live?.plantFacts[0] ?? null;
   // Map live care facts to plants by name so per-plant bloom can show inline — only when a
   // real provider supplied a flowering season (the mock never sets one, so this stays quiet
@@ -164,10 +232,14 @@ export function PlanResult({
   );
 
   return (
-    <div ref={rootRef} className="space-y-6">
+    // The parent (PlanExperience) widens to ~1200px for the result step, so here we
+    // just lay out a sticky section-nav rail beside the main content on large screens.
+    <div>
+     <div ref={rootRef} className="lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-start lg:gap-8">
       {/* Sticky orientation: a slim reading-progress bar over the jump nav tells
-          the reader how far through a long plan they are (reduces length anxiety). */}
-      <div className="sticky top-2 z-20 space-y-1.5 sm:top-4">
+          the reader how far through a long plan they are (reduces length anxiety).
+          Mobile: a horizontal pill bar. Desktop: a vertical rail beside the plan. */}
+      <div className="sticky top-2 z-20 space-y-1.5 sm:top-4 lg:top-6 lg:self-start">
         <div
           className="h-1 w-full overflow-hidden rounded-full bg-border/60"
           role="progressbar"
@@ -181,8 +253,8 @@ export function PlanResult({
             style={{ width: `${Math.round(progress * 100)}%` }}
           />
         </div>
-        <nav className="-mx-1 overflow-x-auto rounded-full border border-border bg-surface/95 p-1 shadow-sm backdrop-blur">
-          <div className="flex min-w-max gap-1">
+        <nav className="glass-chip -mx-1 overflow-x-auto rounded-full p-1 shadow-sm lg:mx-0 lg:overflow-visible lg:rounded-2xl lg:p-1.5">
+          <div className="flex min-w-max gap-1 lg:min-w-0 lg:flex-col">
             {navItems.map((item) => {
               const active = activeSection === item.id;
               return (
@@ -190,13 +262,21 @@ export function PlanResult({
                   key={item.id}
                   href={`#${item.id}`}
                   aria-current={active ? "true" : undefined}
-                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                  className={`relative flex min-h-11 items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition lg:min-h-11 lg:rounded-xl lg:px-4 ${
                     active
-                      ? "bg-brand text-on-strong"
-                      : "text-muted hover:bg-brand-soft hover:text-brand-strong"
+                      ? "text-on-strong"
+                      : "text-muted-foreground hover:bg-brand-soft hover:text-brand-strong"
                   }`}
                 >
-                  {item.label}
+                  {active ? (
+                    <motion.span
+                      layoutId="planNavActive"
+                      className="absolute inset-0 rounded-full bg-brand lg:rounded-xl"
+                      transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                      aria-hidden
+                    />
+                  ) : null}
+                  <span className="relative z-10">{item.label}</span>
                 </a>
               );
             })}
@@ -204,8 +284,12 @@ export function PlanResult({
         </nav>
       </div>
 
+      <div className="min-w-0 space-y-6">
+
       {/* Hero moment — confidence sentence + visual summary, before any logistics */}
-      <section id="summary" className="card scroll-mt-24 overflow-hidden">
+      <section id="summary" className="scroll-mt-24">
+       <MagicCard className="rounded-[var(--radius)] border border-border shadow-sm" gradientColor="var(--brand-soft)" gradientOpacity={0.5}>
+        <BorderBeam size={120} duration={9} colorFrom="var(--brand)" colorTo="var(--accent)" className="motion-reduce:hidden" />
         <div className="bg-brand-soft p-6">
           {/* Honesty control: AI only writes the wording. Collapse it to see the raw engine plan. */}
           {hasAi ? (
@@ -230,8 +314,13 @@ export function PlanResult({
               {enhancement.conceptName}
             </p>
           ) : null}
-          <h2 className="mt-1 text-2xl font-semibold text-foreground">{plan.confidenceSentence}</h2>
-          <p className="mt-2 max-w-2xl text-sm text-foreground/80">{heroDescription}</p>
+          <h2 className="mt-1 flex items-start gap-1.5 text-2xl font-semibold text-foreground">
+            <span>{plan.confidenceSentence}</span>
+            <span className="mt-1.5">
+              <InfoTip label={t("metricConfidence")}>{t("tipConfidence")}</InfoTip>
+            </span>
+          </h2>
+          <p className="mt-3 max-w-prose text-base leading-relaxed text-foreground/80">{heroDescription}</p>
 
           <div className="mt-4 flex flex-wrap gap-2">
             {plan.visualSummary.moodChips.map((c) => (
@@ -241,16 +330,16 @@ export function PlanResult({
 
           {/* Transformation preview — help users FEEL the before → after */}
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-lg border border-border bg-surface/70 p-3">
+            <div className="rounded-lg border border-border bg-surface/70 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t("now")}</p>
-              <p className="mt-1 text-sm text-foreground">{plan.visualSummary.transformation.current}</p>
+              <p className="mt-1 text-base leading-relaxed text-foreground">{plan.visualSummary.transformation.current}</p>
             </div>
-            <div className="rounded-lg border border-brand bg-surface p-3">
+            <div className="rounded-lg border border-brand bg-surface p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-brand-strong">{t("planned")}</p>
-              <p className="mt-1 text-sm text-foreground">{plan.visualSummary.transformation.planned}</p>
+              <p className="mt-1 text-base leading-relaxed text-foreground">{plan.visualSummary.transformation.planned}</p>
             </div>
           </div>
-          <p className="mt-3 text-sm font-medium text-brand-strong">
+          <p className="mt-3 text-base font-medium text-brand-strong">
             {plan.visualSummary.transformation.feeling}
           </p>
         </div>
@@ -260,7 +349,7 @@ export function PlanResult({
             <p className="text-xs font-semibold uppercase tracking-wide text-muted">
               {plan.visualSummary.styleLabel} · {plan.visualSummary.expectedEffort}
             </p>
-            <ul className="mt-2 space-y-1 text-sm text-foreground">
+            <ul className="mt-2 space-y-1.5 text-base leading-relaxed text-foreground">
               {plan.visualSummary.whatChangesVisually.map((w) => (
                 <li key={w} className="flex gap-2">
                   <span className="text-brand">›</span>
@@ -269,7 +358,7 @@ export function PlanResult({
               ))}
             </ul>
           </div>
-          <div className="rounded-lg bg-accent/10 p-4 text-sm text-foreground">
+          <div className="rounded-lg bg-accent/10 p-4 text-base leading-relaxed text-foreground">
             <p className="font-semibold text-accent">{t("whySmart")}</p>
             <p className="mt-1">{plan.insight}</p>
           </div>
@@ -281,30 +370,45 @@ export function PlanResult({
               {r.kind === "good" ? "✓" : "⚠"} {r.text}
             </span>
           ))}
-          <span className="ml-auto rounded bg-border px-2 py-0.5 text-xs font-medium text-foreground">
+          <span className="ml-auto inline-flex items-center gap-1 rounded bg-border px-2 py-0.5 text-xs font-medium text-foreground">
             {PLAN_LABEL_KEY[plan.planLabel] ? t(PLAN_LABEL_KEY[plan.planLabel]) : plan.planLabel}
+            <InfoTip label={t("tipPlanLabelLabel")}>{t("tipPlanLabel")}</InfoTip>
           </span>
         </div>
+       </MagicCard>
       </section>
 
-      <ReadinessMeter readiness={plan.readiness} />
+      <BlurFade inView delay={0.05}>
+        <ReadinessMeter readiness={plan.readiness} />
+      </BlurFade>
 
-      <section className="grid grid-cols-2 gap-2 rounded-xl border border-brand/20 bg-surface p-3 shadow-sm sm:grid-cols-4">
-        <MetricPill label={t("metricDiyRange")} value={<Money value={plan.budget.diyTotal} />} tone="brand" />
-        <MetricPill
-          label={t("metricInstall")}
-          value={t("metricInstallValue", { hours: plan.labor.totalHours, weekends: plan.labor.weekends })}
-        />
-        <MetricPill label={t("metricConfidence")} value={plan.confidence} tone={plan.confidence === "low" ? "warn" : "brand"} />
-        <MetricPill
+      <BlurFade inView delay={0.08}>
+       <section className="grid grid-cols-2 gap-2 rounded-xl border border-brand/20 bg-surface p-3 shadow-sm sm:grid-cols-4">
+        <MetricStat label={t("metricDiyRange")} tip={t("tipBudget")} tone="brand">
+          <MoneyTicker value={plan.budget.diyTotal} />
+        </MetricStat>
+        <MetricStat label={t("metricInstall")} tip={t("tipLabor")}>
+          {t("metricInstallValue", { hours: plan.labor.totalHours, weekends: plan.labor.weekends })}
+        </MetricStat>
+        <MetricStat
+          label={t("metricConfidence")}
+          tip={t("tipConfidence")}
+          tone={plan.confidence === "low" ? "warn" : "brand"}
+        >
+          {plan.confidence}
+        </MetricStat>
+        <MetricStat
           label={t("metricStore")}
-          value={plan.storeSearches.some((s) => s.deliveryRecommended) ? t("metricStoreDelivery") : t("metricStoreReady")}
+          tip={t("tipStore")}
           tone={plan.storeSearches.some((s) => s.deliveryRecommended) ? "warn" : "neutral"}
-        />
-      </section>
+        >
+          {plan.storeSearches.some((s) => s.deliveryRecommended) ? t("metricStoreDelivery") : t("metricStoreReady")}
+        </MetricStat>
+       </section>
+      </BlurFade>
 
       {/* See your yard — deterministic concept board with a Now / Planned toggle */}
-      <section className="card p-5">
+      <BlurFade inView className="block"><section className="card p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-base font-semibold text-foreground">{t("seeYard")}</h3>
           <Link
@@ -372,7 +476,7 @@ export function PlanResult({
             <ArView />
           )}
         </div>
-      </section>
+      </section></BlurFade>
 
       {/* Natural-language command bar — maps plain language onto the refinements below */}
       <CommandBar adjustments={adjustments} busy={busy} onRefine={onRefine} />
@@ -447,20 +551,34 @@ export function PlanResult({
 
       {/* Budget */}
       <Section id="buy" title={t("budget")} subtitle={t("budgetSubtitle")} variant="action">
-        <p className="text-2xl font-semibold text-foreground">
-          {t("expectedDiyTotal")} <Money value={plan.budget.diyTotal} />
+        <p className="flex flex-wrap items-center gap-1.5 text-2xl font-semibold text-foreground">
+          {t("expectedDiyTotal")} <MoneyTicker value={plan.budget.diyTotal} />
+          <span className="self-start">
+            <InfoTip label={t("budget")}>{t("tipBudget")}</InfoTip>
+          </span>
         </p>
-        <ul className="mt-3 divide-y divide-border text-sm">
-          {plan.budget.byCategory.map((c) => (
-            <li key={c.category} className="flex justify-between py-1.5">
-              <span className="text-muted">{c.category}</span>
-              <Money value={c.price} />
-            </li>
-          ))}
-        </ul>
         {view !== "simple" ? (
-          <PlanCharts budget={plan.budget} installPhases={plan.installPhases} />
-        ) : null}
+          <div className="mt-3 grid gap-5 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-start">
+            <ul className="divide-y divide-border text-base">
+              {plan.budget.byCategory.map((c) => (
+                <li key={c.category} className="flex justify-between py-2">
+                  <span className="text-muted-foreground">{c.category}</span>
+                  <Money value={c.price} />
+                </li>
+              ))}
+            </ul>
+            <PlanCharts budget={plan.budget} installPhases={plan.installPhases} />
+          </div>
+        ) : (
+          <ul className="mt-3 divide-y divide-border text-base">
+            {plan.budget.byCategory.map((c) => (
+              <li key={c.category} className="flex justify-between py-2">
+                <span className="text-muted-foreground">{c.category}</span>
+                <Money value={c.price} />
+              </li>
+            ))}
+          </ul>
+        )}
       </Section>
 
       {/* Quick / Better / Best — estimate framings of the same plan (free-data grounded) */}
@@ -474,9 +592,12 @@ export function PlanResult({
                   tier.tier === "better_fix" ? "border-brand bg-brand-soft" : "border-border"
                 }`}
               >
-                <p className="text-sm font-semibold text-foreground">{t(`tier_${tier.tier}`)}</p>
+                <p className="flex items-center gap-1 text-sm font-semibold text-foreground">
+                  {t(`tier_${tier.tier}`)}
+                  <InfoTip label={t("tiersTitle")}>{t("tipTier")}</InfoTip>
+                </p>
                 <p className="mt-0.5 text-lg font-semibold text-foreground">
-                  <Money value={tier.estTotal} />
+                  <MoneyTicker value={tier.estTotal} />
                 </p>
                 <p className="mt-1 text-xs text-muted">{tier.summary}</p>
               </div>
@@ -569,22 +690,46 @@ export function PlanResult({
             <span className="font-semibold">{tLive("timingTitle")}:</span> {weather.plantingNote}
           </p>
         ) : null}
+        {hardiness ? (
+          <p
+            className={`mt-2 flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2 text-xs ${
+              hardiness.outOfRange.length > 0
+                ? "border-warn/30 bg-warn/10 text-foreground"
+                : "border-blueprint/30 bg-blueprint-soft text-foreground"
+            }`}
+          >
+            <span>
+              <span className="font-semibold">{tLive("hardinessTitle")}:</span>{" "}
+              {tLive("hardinessZone", { zip: hardiness.query, zone: hardiness.zone })}{" "}
+              {hardiness.outOfRange.length > 0
+                ? tLive("hardinessOutOfRange", { plants: hardiness.outOfRange.join(", ") })
+                : tLive("hardinessAllHardy")}
+            </span>
+            <InfoTip label={tLive("hardinessTitle")}>
+              {hardiness.outOfRange.length > 0 ? t("tipOutOfZone") : t("tipHardiness")}
+            </InfoTip>
+            <LiveBadge source={hardiness.source} />
+          </p>
+        ) : null}
       </Section>
 
       {/* Plants */}
       <Section id="plants" title={t("plants")} subtitle={t("plantsSubtitle", { count: plan.plants.length })} variant="quiet">
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {plan.plants.map((p) => (
             <div key={p.plantId} className="rounded-lg border border-border p-3">
-              <div className="flex items-baseline justify-between">
-                <span className="text-sm font-semibold text-foreground">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-base font-semibold text-foreground">
                   {p.quantity}× {p.commonName}
                 </span>
                 {showNumbers ? (
-                  <span className="text-xs text-muted">{t("fitScore", { score: Math.round(p.fit.score * 100) })}</span>
+                  <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+                    {t("fitScore", { score: Math.round(p.fit.score * 100) })}
+                    <InfoTip label={t("tipFitScoreLabel")}>{t("tipFitScore")}</InfoTip>
+                  </span>
                 ) : null}
               </div>
-              <p className="text-xs text-muted">{p.spacingNote}</p>
+              <p className="mt-0.5 text-sm text-muted-foreground">{p.spacingNote}</p>
               {p.safety.toxic || p.safety.invasive ? (
                 <div className="mt-1.5 flex flex-wrap gap-1">
                   {p.safety.toxic ? (
@@ -600,15 +745,15 @@ export function PlanResult({
                 </div>
               ) : null}
               {showNumbers ? (
-                <p className="mt-1 text-xs text-muted">
+                <p className="mt-1 text-sm text-muted-foreground">
                   {p.matureSize} · {p.sunLabel} · {t("maintenanceSuffix", { level: p.maintenance })}
                 </p>
               ) : null}
-              {p.fit.reasons[0] ? <p className="mt-1 text-xs text-brand-strong">✓ {p.fit.reasons[0]}</p> : null}
-              {p.fit.warnings[0] ? <p className="mt-0.5 text-xs text-warn">⚠ {p.fit.warnings[0]}</p> : null}
+              {p.fit.reasons[0] ? <p className="mt-1 text-sm text-brand-strong">✓ {p.fit.reasons[0]}</p> : null}
+              {p.fit.warnings[0] ? <p className="mt-0.5 text-sm text-warn">⚠ {p.fit.warnings[0]}</p> : null}
               {(() => {
                 const inv = invasiveByName.get(p.commonName.toLowerCase());
-                return inv ? <p className="mt-0.5 text-xs text-warn">⚠ {inv.note}</p> : null;
+                return inv ? <p className="mt-0.5 text-sm text-warn">⚠ {inv.note}</p> : null;
               })()}
               {(() => {
                 const facts = factsByName.get(p.commonName.toLowerCase());
@@ -657,13 +802,13 @@ export function PlanResult({
               <div key={key} className="rounded-lg border border-border bg-background/60 p-3">
                 <p className="text-xs font-semibold uppercase tracking-wide text-brand">{t(label)}</p>
                 {names.length > 0 ? (
-                  <ul className="mt-1 space-y-0.5 text-xs text-foreground">
+                  <ul className="mt-1 space-y-0.5 text-sm text-foreground">
                     {names.map((n) => (
                       <li key={n}>• {n}</li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-1 text-xs text-muted">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     {hasEvergreen ? t("seasonsEvergreen") : t("seasonsQuiet")}
                   </p>
                 )}
@@ -753,6 +898,8 @@ export function PlanResult({
       ) : null}
 
       <BackToTop label={t("backToTop")} />
+      </div>
+     </div>
     </div>
   );
 }

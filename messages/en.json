@@ -12,7 +12,9 @@
     "settings": "Settings",
     "signOut": "Sign out",
     "createAccount": "Create account",
-    "me": "Me"
+    "me": "Me",
+    "more": "More",
+    "moreDescription": "More navigation options"
   },
   "Meta": {
     "title": "Bloomprint — buildable yard plans for real homes",
@@ -28,7 +30,8 @@
     "dark": "Dark",
     "system": "System",
     "label": "Theme: {current}. Switch to {next}.",
-    "title": "Theme: {current}"
+    "title": "Theme: {current}",
+    "appearance": "Appearance"
   },
   "Language": {
     "label": "Language",
@@ -61,7 +64,9 @@
     "budgetTooltip": "Estimated range",
     "laborTitle": "Install hours by phase",
     "laborTooltip": "Estimated effort",
-    "laborHours": "{hours}h"
+    "laborHours": "{hours}h",
+    "budgetAxisTip": "Each bar is one spending category; bar length is the midpoint of its estimated cost range. Hover a bar for the full range.",
+    "laborAxisTip": "Each bar is one install phase; bar length is its estimated hands-on hours."
   },
   "Home": {
     "eyebrow": "Bloomprint",
@@ -138,7 +143,33 @@
     "capture": {
       "title": "Snap your yard. We’ll read it.",
       "body": "Guided camera or upload — Bloomprint checks the photo, estimates planting zones, and turns uncertainty into questions you confirm before anything is generated.",
-      "cta": "Plan from a photo"
+      "cta": "Plan from a photo",
+      "badge": "Plan from a photo"
+    },
+    "heroKicker": "Buildable, not just beautiful.",
+    "stats": {
+      "heading": "What every plan includes",
+      "deliverables": "Plan sections: shopping list, install order, risks, store",
+      "steps": "Install steps, in the right order",
+      "accounts": "Accounts or keys required to start"
+    },
+    "bento": {
+      "eyebrow": "Every plan, end to end",
+      "title": "A buildable plan, not a render",
+      "subtitle": "Materials, order, risks, and store reality — worked out before you spend a dollar.",
+      "photoCaption": "Sized to your real yard",
+      "shoppingBody": "Plants, materials, and quantities from the Core Library — never invented by AI.",
+      "orderBody": "The exact sequence to build in, so nothing gets redone.",
+      "risksBody": "What can go wrong, flagged early with the evidence behind it.",
+      "storeBody": "Search links and substitutions — no fake inventory claims."
+    },
+    "marquee": {
+      "label": "Real yards, real transformations"
+    },
+    "entry": {
+      "heading": "Pick how you want to start",
+      "recommended": "Recommended",
+      "go": "Get started"
     }
   },
   "Common": {
@@ -523,7 +554,13 @@
     "connectSyncing": "Syncing…",
     "connectSuccess": "Synced {synced, plural, one {# plan} other {# plans}} to your account.",
     "connectSuccessWithSkipped": "Synced {synced, plural, one {# plan} other {# plans}}; skipped {skipped} already in your account.",
-    "connectError": "Couldn’t reach the cloud — your plans stay safe on this device."
+    "connectError": "Couldn’t reach the cloud — your plans stay safe on this device.",
+    "noAccountBadge": "Get started",
+    "noAccountPhotoAlt": "Young seedlings ready to grow",
+    "tabOverview": "Overview",
+    "tabData": "Data & sync",
+    "savedPlansHint": "Plans saved on this device — open or compare any time.",
+    "startNewBody": "Turn a fresh idea into a buildable plan."
   },
   "Settings": {
     "backToAccount": "← Account",
@@ -569,7 +606,10 @@
     "preferencesTitle": "Preferences",
     "themeLabel": "Theme",
     "languageLabel": "Language",
-    "preferencesHint": "Theme and language are saved on this device only — they aren’t tied to your account."
+    "preferencesHint": "Theme and language are saved on this device only — they aren’t tied to your account.",
+    "tabProfile": "Profile",
+    "tabPreferences": "Preferences",
+    "tabData": "Your data"
   },
   "SavedPlans": {
     "backToPlanning": "← Back to planning",
@@ -600,7 +640,22 @@
     "refinements": "{count} refinement(s)",
     "open": "Open",
     "rename": "Rename",
-    "delete": "Delete"
+    "delete": "Delete",
+    "emptyBadge": "Your plan library",
+    "emptyPhotoAlt": "A freshly built raised garden bed",
+    "rowActionsAria": "Plan actions",
+    "addToCompare": "Add to compare",
+    "removeFromCompare": "Remove from compare",
+    "copyLink": "Copy link",
+    "pageAria": "Page {page}",
+    "renameHint": "Give this plan a name you'll recognize later.",
+    "renameLabel": "Plan name",
+    "renameCancel": "Cancel",
+    "renameSave": "Save name",
+    "toastRenamed": "Renamed to \"{label}\"",
+    "toastDeleted": "Deleted \"{label}\"",
+    "toastLinkCopied": "Plan link copied",
+    "toastLinkError": "Couldn't copy the link"
   },
   "Plan": {
     "back": "← Bloomprint",
@@ -749,7 +804,20 @@
     "seasonsEvergreen": "Evergreen structure holds it",
     "seasonsQuiet": "Quieter — nothing specific noted",
     "seasonsStructure": "Year-round structure: {plants}",
-    "seasonsNote": "Based on the Core Library’s noted season of interest; bloom timing varies by region and year — confirm locally."
+    "seasonsNote": "Based on the Core Library’s noted season of interest; bloom timing varies by region and year — confirm locally.",
+    "tipConfidence": "Our honest read on how well this plan fits your site — stated as a sentence, not a single grade. Lower confidence means more local checks, never a worse plan.",
+    "tipPlanLabel": "How finished this plan is: a buildable estimate, a concept placement, or something that needs local verification first.",
+    "tipPlanLabelLabel": "Plan stage",
+    "tipBudget": "A DIY cost range from current category estimates — materials only, not labor. Treat it as a planning band, not a quote.",
+    "tipLabor": "Estimated hands-on hours and the number of weekends they roughly span. Real time varies with experience and site access.",
+    "tipStore": "Whether typical items should be in stock locally, or whether delivery is the safer bet for this plan.",
+    "tipTier": "Quick / better / best framings of the same plan at different spend levels — estimates, not separate quotes.",
+    "tipFitScore": "How well this plant matches your site's sun, soil, and space — higher means fewer compromises.",
+    "tipFitScoreLabel": "Plant fit",
+    "tipHardiness": "Your USDA hardiness zone from your location, used to check each plant survives local winters.",
+    "tipOutOfZone": "These plants fall outside your hardiness zone — they may not survive local winters without protection or replacement.",
+    "showMore": "Show {count} more",
+    "showLess": "Show less"
   },
   "YardMap": {
     "metaTitle": "Yard Map (beta) · Bloomprint",
@@ -866,7 +934,11 @@
     "timingTitle": "Planting timing",
     "cautionTitle": "Ecological caution",
     "careTitle": "Care notes",
-    "sourceLabel": "Source"
+    "sourceLabel": "Source",
+    "hardinessTitle": "Hardiness check",
+    "hardinessZone": "{zip} is USDA zone {zone}.",
+    "hardinessAllHardy": "All chosen plants are rated hardy here.",
+    "hardinessOutOfRange": "May not survive winter here: {plants} — confirm before buying."
   },
   "Evidence": {
     "titleExpert": "Why Bloomprint recommends this",
@@ -887,7 +959,12 @@
     "supports": "Supports: {items}",
     "retrieved": "Retrieved {when}",
     "verified": "Verified {when}",
-    "footerNote": "Hardiness references set the climate basis; the Core Library and your inputs do the rest. AI only rephrases — it never decides what to plant."
+    "footerNote": "Hardiness references set the climate basis; the Core Library and your inputs do the rest. AI only rephrases — it never decides what to plant.",
+    "openDataTitle": "Powered by free, open data:",
+    "openDataCore": "Bloomprint Core Library",
+    "openDataNote": "No paid keys. Plant names and invasive context come from GBIF, hardiness from USDA, and the planting window from regional climatology — all free and cached, so the app never blocks on an API.",
+    "tipConfidenceDimension": "Confidence is rated per dimension (like climate or soil) rather than as one overall grade, so you can see exactly where it's strong or thin.",
+    "tipSourceLadder": "Sources are ranked on a quality ladder (L1 highest): peer-reviewed and government data outrank vendor or community notes."
   },
   "Compare": {
     "title": "Comparison",
@@ -988,6 +1065,59 @@
     "deleteBtn": "Delete",
     "saveChanges": "Save changes",
     "createProject": "Create project",
-    "untitled": "Untitled project"
+    "untitled": "Untitled project",
+    "emptyPhotoAlt": "A landscaped garden path",
+    "onboard1Title": "Add a job",
+    "onboard1Body": "Capture a client project from lead to done.",
+    "onboard2Title": "Link a plan",
+    "onboard2Body": "Attach a buildable Bloomprint plan to each job.",
+    "onboard3Title": "Buy in one list",
+    "onboard3Body": "Merge materials across jobs into one buy list.",
+    "statActiveHint": "Jobs that aren't done yet.",
+    "statAwaitingHint": "Quoted jobs waiting on client approval.",
+    "statScheduledHint": "Jobs installing within the next week.",
+    "statPipelineHint": "Total quoted value across open jobs.",
+    "toastSampleLoaded": "Sample workspace loaded",
+    "toastWorkspaceCleared": "Workspace cleared",
+    "toastClientAdded": "Added {name}",
+    "toastBuyCopied": "Buy list copied",
+    "toastBuyCopyError": "Couldn't copy the list"
+  },
+  "Dashboard": {
+    "title": "Welcome back to your yard workspace.",
+    "subtitle": "Continue drafts, compare versions, manage photos, or switch into pro and store workflows.",
+    "eyebrow": "Command center",
+    "heroAlt": "A home exterior framed by a green lawn and trees",
+    "ctaNew": "New project",
+    "ctaPro": "Pro dashboard",
+    "statsAria": "Workspace metrics",
+    "statActive": "Active plans",
+    "statActiveHint": "Plans you've saved and can reopen or compare.",
+    "statPhotos": "Draft photos",
+    "statPhotosHint": "Photos in your current planning draft.",
+    "statCompare": "Ready to compare",
+    "statCompareHint": "Save two or more plans to compare them side by side.",
+    "statMode": "Workspace mode",
+    "statModeHint": "Switches to Pro when your draft is for a client property.",
+    "modeHome": "Home",
+    "modePro": "Pro",
+    "resumeTitle": "Resume your latest planning session",
+    "resumeMeta": "{photos} photo(s), {zones} detected zone(s), last saved {when}.",
+    "resumeCta": "Resume draft",
+    "recentTitle": "Recent projects",
+    "recentOpenAll": "Open saved",
+    "recentEmptyTitle": "No saved projects yet",
+    "recentEmptyBody": "Start with photos and Bloomprint will keep a draft for you.",
+    "recentEmptyCta": "Start a plan",
+    "draftDefault": "Draft 1",
+    "confidenceSuffix": "{confidence} confidence",
+    "modesTitle": "Modes",
+    "modesSubtitle": "Pick the flow that fits today's job.",
+    "modeHomeownerTitle": "Homeowner",
+    "modeHomeownerBody": "Fix your own yard, save versions, continue later.",
+    "modeProTitle": "Landscaper / Pro",
+    "modeProBody": "Clients, properties, quote-ready material and labor views.",
+    "modeStoreTitle": "Store helper",
+    "modeStoreBody": "Operational recommendations, substitutions, and print/share summary."
   }
 }
