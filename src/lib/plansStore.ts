@@ -30,6 +30,9 @@ export interface SavedPlan {
   adjustments: RefinementAdjustment[];
   createdAt: number;
   summary: SavedPlanSummary;
+  /** When set, the plan is archived: hidden from the default list but recoverable. Optional for
+   *  backward compatibility — plans saved before this field are treated as active. */
+  archivedAt?: number;
 }
 
 const listeners = new Set<() => void>();
@@ -81,19 +84,30 @@ function parse(raw: string | null): SavedPlan[] {
   }
 }
 
-/** All saved plans, newest first. Stable reference unless the underlying string changes. */
+/** Active (non-archived) saved plans, newest first. Stable unless the underlying string changes. */
 export function useSavedPlans(): SavedPlan[] {
   const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  return useMemo(() => parse(raw), [raw]);
+  return useMemo(() => parse(raw).filter((p) => !p.archivedAt), [raw]);
+}
+
+/** Archived saved plans, newest first — shown in the dashboard's Archived view, restorable. */
+export function useArchivedPlans(): SavedPlan[] {
+  const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return useMemo(() => parse(raw).filter((p) => p.archivedAt), [raw]);
 }
 
 function currentPlans(): SavedPlan[] {
   return parse(read());
 }
 
-/** Non-hook reader for the storage layer (same data `useSavedPlans` exposes to React). */
+/** Non-hook reader for the storage layer — ACTIVE plans only (matches `useSavedPlans`). */
 export function listSavedPlans(): SavedPlan[] {
-  return currentPlans();
+  return currentPlans().filter((p) => !p.archivedAt);
+}
+
+/** Non-hook reader for archived plans. */
+export function listArchivedPlans(): SavedPlan[] {
+  return currentPlans().filter((p) => p.archivedAt);
 }
 
 /** Non-hook single-plan lookup for the storage layer. */
@@ -115,6 +129,39 @@ export function savePlan(entry: Omit<SavedPlan, "id" | "createdAt">): SavedPlan 
   const saved: SavedPlan = { ...entry, id: crypto.randomUUID(), createdAt: Date.now() };
   write([saved, ...plans].slice(0, MAX));
   return saved;
+}
+
+/** Copy a plan as a new, independent project (bypasses dedupe — duplicating is intentional). */
+export function duplicatePlan(id: string, label?: string): SavedPlan | null {
+  const plans = currentPlans();
+  const original = plans.find((p) => p.id === id);
+  if (!original) return null;
+  const copy: SavedPlan = {
+    ...original,
+    id: crypto.randomUUID(),
+    label: label ?? `${original.label} (copy)`,
+    createdAt: Date.now(),
+    archivedAt: undefined,
+  };
+  write([copy, ...plans].slice(0, MAX));
+  return copy;
+}
+
+/** Soft-archive: hide from the active list without deleting (recoverable via {@link restorePlan}). */
+export function archivePlan(id: string): void {
+  write(currentPlans().map((p) => (p.id === id ? { ...p, archivedAt: Date.now() } : p)));
+}
+
+/** Bring an archived plan back to the active list. */
+export function restorePlan(id: string): void {
+  write(
+    currentPlans().map((p) => {
+      if (p.id !== id) return p;
+      const next = { ...p };
+      delete next.archivedAt;
+      return next;
+    }),
+  );
 }
 
 export function deletePlan(id: string): void {

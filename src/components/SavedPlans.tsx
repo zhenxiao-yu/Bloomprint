@@ -5,9 +5,12 @@ import Fuse from "fuse.js";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
+  Archive,
+  ArchiveRestore,
   ArrowRight,
   Check,
   Copy,
+  CopyPlus,
   GitCompare,
   MoreHorizontal,
   Pencil,
@@ -16,7 +19,15 @@ import {
   Trash2,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { renamePlan, type SavedPlan } from "@/lib/plansStore";
+import {
+  archivePlan,
+  deletePlan,
+  duplicatePlan,
+  renamePlan,
+  restorePlan,
+  useArchivedPlans,
+  type SavedPlan,
+} from "@/lib/plansStore";
 import { encodeShare } from "@/lib/shareLink";
 import { Photo } from "@/components/ui/photo";
 import { Button } from "@/components/ui/button";
@@ -73,6 +84,12 @@ export function SavedPlans({
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [renaming, setRenaming] = useState<SavedPlan | null>(null);
+  const archived = useArchivedPlans();
+  // The plan pending a delete confirmation, and whether it's an archived one (deleted directly)
+  // vs an active one (routed through the parent's onDelete so it can clear compare state).
+  const [confirmDelete, setConfirmDelete] = useState<{ plan: SavedPlan; fromArchive: boolean } | null>(
+    null,
+  );
 
   const fuse = useMemo(
     () =>
@@ -100,7 +117,7 @@ export function SavedPlans({
     setPage(1);
   }
 
-  if (plans.length === 0) {
+  if (plans.length === 0 && archived.length === 0) {
     return (
       <BlurFade inView>
         <div className="card overflow-hidden p-0">
@@ -148,9 +165,31 @@ export function SavedPlans({
     setRenaming(null);
   }
 
-  function handleDelete(plan: SavedPlan) {
-    onDelete(plan.id);
+  function handleDuplicate(plan: SavedPlan) {
+    const copy = duplicatePlan(plan.id);
+    if (copy) toast.success(t("toastDuplicated", { label: copy.label }));
+  }
+
+  function handleArchive(plan: SavedPlan) {
+    if (selected.includes(plan.id)) onToggle(plan.id); // drop it from any pending comparison
+    archivePlan(plan.id);
+    toast.success(t("toastArchived", { label: plan.label }));
+  }
+
+  function handleRestore(plan: SavedPlan) {
+    restorePlan(plan.id);
+    toast.success(t("toastRestored", { label: plan.label }));
+  }
+
+  function performDelete() {
+    if (!confirmDelete) return;
+    const { plan, fromArchive } = confirmDelete;
+    // Active plans route through the parent so it can clear compare/selection state;
+    // archived ones are removed directly (the parent isn't tracking them).
+    if (fromArchive) deletePlan(plan.id);
+    else onDelete(plan.id);
     toast.success(t("toastDeleted", { label: plan.label }));
+    setConfirmDelete(null);
   }
 
   async function handleCopyLink(plan: SavedPlan) {
@@ -164,7 +203,9 @@ export function SavedPlans({
   }
 
   return (
-    <div>
+    <div className="space-y-8">
+      {plans.length > 0 ? (
+        <div>
       <div className="relative mb-4">
         <Search
           className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
@@ -217,7 +258,9 @@ export function SavedPlans({
                             t={t}
                             openHref={openHref(plan)}
                             onRename={() => setRenaming(plan)}
-                            onDelete={() => handleDelete(plan)}
+                            onDuplicate={() => handleDuplicate(plan)}
+                            onArchive={() => handleArchive(plan)}
+                            onDelete={() => setConfirmDelete({ plan, fromArchive: false })}
                             onCompare={() => onToggle(plan.id)}
                             onCopyLink={() => void handleCopyLink(plan)}
                             isSelected={isSelected}
@@ -317,6 +360,21 @@ export function SavedPlans({
           ) : null}
         </>
       )}
+        </div>
+      ) : (
+        <div className="card p-8 text-center text-base text-muted-foreground">
+          {t("allArchivedNote")}
+        </div>
+      )}
+
+      {archived.length > 0 ? (
+        <ArchivedSection
+          archived={archived}
+          t={t}
+          onRestore={handleRestore}
+          onDelete={(plan) => setConfirmDelete({ plan, fromArchive: true })}
+        />
+      ) : null}
 
       <RenameDialog
         plan={renaming}
@@ -324,7 +382,102 @@ export function SavedPlans({
         onSubmit={handleRename}
         t={t}
       />
+      <ConfirmDeleteDialog
+        target={confirmDelete}
+        onClose={() => setConfirmDelete(null)}
+        onConfirm={performDelete}
+        t={t}
+      />
     </div>
+  );
+}
+
+function ArchivedSection({
+  archived,
+  t,
+  onRestore,
+  onDelete,
+}: {
+  archived: SavedPlan[];
+  t: ReturnType<typeof useTranslations>;
+  onRestore: (plan: SavedPlan) => void;
+  onDelete: (plan: SavedPlan) => void;
+}) {
+  return (
+    <section aria-label={t("archivedTitle")} className="rounded-2xl border border-border bg-surface-muted/30 p-4 sm:p-5">
+      <h2 className="title-3 flex items-center gap-2 text-foreground">
+        <Archive className="size-4 text-muted-foreground" aria-hidden />
+        {t("archivedTitle")}
+        <span className="text-sm font-normal text-muted-foreground">({archived.length})</span>
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">{t("archivedHint")}</p>
+      <ul className="mt-4 flex flex-col gap-2">
+        {archived.map((plan) => (
+          <li
+            key={plan.id}
+            className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-base font-medium capitalize text-foreground">{plan.label}</p>
+              <p className="text-sm text-muted-foreground">
+                {t("savedOn", { date: new Date(plan.createdAt).toLocaleDateString() })}
+              </p>
+            </div>
+            <Button variant="outline" size="sm" className="rounded-full" onClick={() => onRestore(plan)}>
+              <ArchiveRestore className="size-4" aria-hidden />
+              {t("restore")}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="rounded-full text-muted hover:text-[var(--danger)]"
+              aria-label={t("delete")}
+              onClick={() => onDelete(plan)}
+            >
+              <Trash2 className="size-4" aria-hidden />
+            </Button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function ConfirmDeleteDialog({
+  target,
+  onClose,
+  onConfirm,
+  t,
+}: {
+  target: { plan: SavedPlan; fromArchive: boolean } | null;
+  onClose: () => void;
+  onConfirm: () => void;
+  t: ReturnType<typeof useTranslations>;
+}) {
+  return (
+    <Dialog open={target !== null} onOpenChange={(open) => (open ? null : onClose())}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t("confirmDeleteTitle")}</DialogTitle>
+          <DialogDescription>
+            {target ? t("confirmDeleteBody", { label: target.plan.label }) : ""}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="mt-6">
+          <Button type="button" variant="outline" className="rounded-full" onClick={onClose}>
+            {t("confirmDeleteCancel")}
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            className="rounded-full"
+            onClick={onConfirm}
+          >
+            {t("confirmDeleteConfirm")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -332,6 +485,8 @@ function RowMenu({
   t,
   openHref,
   onRename,
+  onDuplicate,
+  onArchive,
   onDelete,
   onCompare,
   onCopyLink,
@@ -340,6 +495,8 @@ function RowMenu({
   t: ReturnType<typeof useTranslations>;
   openHref: string;
   onRename: () => void;
+  onDuplicate: () => void;
+  onArchive: () => void;
   onDelete: () => void;
   onCompare: () => void;
   onCopyLink: () => void;
@@ -375,6 +532,14 @@ function RowMenu({
         <DropdownMenuItem onSelect={onRename}>
           <Pencil aria-hidden />
           {t("rename")}
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={onDuplicate}>
+          <CopyPlus aria-hidden />
+          {t("duplicate")}
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={onArchive}>
+          <Archive aria-hidden />
+          {t("archive")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onSelect={onDelete}>
