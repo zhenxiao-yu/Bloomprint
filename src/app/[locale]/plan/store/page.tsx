@@ -28,9 +28,9 @@ export default async function StorePage({
 
   if (!decoded) {
     return (
-      <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-10">
-        <p className="text-foreground">That store link is missing or invalid.</p>
-        <Link href="/plan" className="mt-3 inline-block text-sm font-semibold text-brand">
+      <main className="page-shell flex-1 py-10">
+        <p className="text-base text-foreground">That store link is missing or invalid.</p>
+        <Link href="/plan" className="mt-3 inline-block text-base font-semibold text-brand">
           ← Start a plan
         </Link>
       </main>
@@ -41,49 +41,53 @@ export default async function StorePage({
   const backHref = `/plan?${SHARE_PARAM}=${typeof raw === "string" ? raw : ""}`;
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:px-6 sm:py-10 print:py-0">
+    <main className="page-shell flex-1 py-8 sm:py-10 print:py-0">
       <PrintBar backHref={backHref} />
 
-      <h1 className="text-2xl font-semibold text-foreground">Shopping list</h1>
-      <p className="mt-1 text-sm text-muted">
+      <h1 className="text-3xl font-semibold text-foreground">Shopping list</h1>
+      <p className="mt-2 text-base text-muted-foreground">
         {plan.styleLabel} · {plan.intake.goal.replace(/-/g, " ")} · Expected DIY total $
         {plan.budget.diyTotal.min.toLocaleString()}–${plan.budget.diyTotal.max.toLocaleString()}
       </p>
-      <p className="mt-1 text-xs text-muted">
+      <p className="mt-1 text-sm text-muted-foreground">
         Prices are typical ranges, not quotes — confirm at the store. Best planting window:{" "}
         {plan.bestWeatherWindow}.
       </p>
 
-      {GROUPS.map((g) => {
-        const items = plan.shoppingList.filter((i) => i.priority === g.key);
-        if (items.length === 0) return null;
-        return (
-          <section key={g.key} className="mt-6 break-inside-avoid">
-            <h2 className="border-b border-border pb-1 text-base font-semibold text-foreground">{g.label}</h2>
-            <ul className="mt-2 space-y-2">
-              {items.map((item, i) => (
-                <li key={`${item.name}-${i}`} className="flex items-center gap-3 text-base">
-                  <span className="inline-block h-4 w-4 shrink-0 rounded border border-foreground" aria-hidden />
-                  <span className="flex-1 text-foreground">
-                    {item.quantity} {item.unit}
-                    {item.quantity > 1 ? "s" : ""} · {item.name}
-                  </span>
-                  <span className="tabular-nums text-muted">
-                    ${item.price.min.toLocaleString()}–${item.price.max.toLocaleString()}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        );
-      })}
+      {/* On screen the groups flow into two columns on wide displays; print keeps a
+          single column and never splits a group across a page. */}
+      <div className="mt-6 lg:columns-2 lg:gap-10 print:columns-1">
+        {GROUPS.map((g) => {
+          const items = plan.shoppingList.filter((i) => i.priority === g.key);
+          if (items.length === 0) return null;
+          return (
+            <section key={g.key} className="mb-6 break-inside-avoid">
+              <h2 className="border-b border-border pb-1 text-lg font-semibold text-foreground">{g.label}</h2>
+              <ul className="mt-2 space-y-2.5">
+                {items.map((item, i) => (
+                  <li key={`${item.name}-${i}`} className="flex items-center gap-3 text-base">
+                    <span className="inline-block h-4 w-4 shrink-0 rounded border border-foreground" aria-hidden />
+                    <span className="flex-1 text-foreground">
+                      {item.quantity} {item.unit}
+                      {item.quantity > 1 ? "s" : ""} · {item.name}
+                    </span>
+                    <span className="tabular-nums text-muted-foreground">
+                      ${item.price.min.toLocaleString()}–${item.price.max.toLocaleString()}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })}
 
-      <section className="mt-6 break-inside-avoid">
-        <h2 className="border-b border-border pb-1 text-base font-semibold text-foreground">Tools</h2>
-        <p className="mt-2 text-sm text-foreground">{plan.tools.map((t) => t.name).join(", ")}</p>
-      </section>
+        <section className="mb-6 break-inside-avoid">
+          <h2 className="border-b border-border pb-1 text-lg font-semibold text-foreground">Tools</h2>
+          <p className="mt-2 text-base text-foreground">{plan.tools.map((t) => t.name).join(", ")}</p>
+        </section>
+      </div>
 
-      <p className="mt-8 text-xs text-muted">Bloomprint · bloomprint.vercel.app</p>
+      <p className="mt-8 text-sm text-muted-foreground">Bloomprint · bloomprint.vercel.app</p>
     </main>
   );
 }

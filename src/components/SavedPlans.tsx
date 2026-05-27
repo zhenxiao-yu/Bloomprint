@@ -120,7 +120,7 @@ export function SavedPlans({
           <div className="flex flex-col items-center gap-4 p-6 text-center sm:p-8">
             <div>
               <p className="title-2 text-foreground">{t("emptyTitle")}</p>
-              <p className="mx-auto mt-2 max-w-md text-sm text-muted">
+              <p className="mx-auto mt-2 max-w-md text-base text-muted-foreground">
                 {t("emptyBodyBefore")} <span className="font-semibold">{t("emptySaveLabel")}</span>{" "}
                 {t("emptyBodyAfter")}
               </p>
@@ -181,10 +181,10 @@ export function SavedPlans({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="card p-8 text-center text-sm text-muted">{t("noMatches")}</div>
+        <div className="card p-8 text-center text-base text-muted-foreground">{t("noMatches")}</div>
       ) : (
         <>
-          <ul className="grid gap-3 sm:grid-cols-2">
+          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
             {pageItems.map((plan, i) => {
               const isSelected = selected.includes(plan.id);
               return (
@@ -210,7 +210,7 @@ export function SavedPlans({
                       </button>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-2">
-                          <p className="truncate text-sm font-semibold capitalize text-foreground">
+                          <p className="truncate text-base font-semibold capitalize text-foreground">
                             {plan.label}
                           </p>
                           <RowMenu
@@ -234,11 +234,11 @@ export function SavedPlans({
                             {t("confidenceSuffix", { confidence: plan.summary.confidence })}
                           </Badge>
                         </div>
-                        <p className="numeric mt-2 text-sm font-semibold text-foreground">
+                        <p className="numeric mt-2 text-lg font-semibold text-foreground">
                           ${plan.summary.diyMin.toLocaleString()}–$
                           {plan.summary.diyMax.toLocaleString()}
                         </p>
-                        <p className="mt-1 text-xs text-muted">
+                        <p className="mt-1 text-sm text-muted-foreground">
                           {t("plantTypes", { count: plan.summary.plantCount })} ·{" "}
                           {t("laborHours", { hours: plan.summary.laborHours ?? "?" })} ·{" "}
                           {plan.summary.maintenance
@@ -246,7 +246,7 @@ export function SavedPlans({
                             : t("maintenanceUnknown")}
                           {plan.summary.heavyWorkWarning ? ` · ${t("heavyMaterials")}` : ""}
                         </p>
-                        <p className="mt-1 text-xs text-muted">
+                        <p className="mt-1 text-sm text-muted-foreground">
                           {t("savedOn", { date: new Date(plan.createdAt).toLocaleDateString() })}
                           {plan.adjustments.length > 0
                             ? ` · ${t("refinements", { count: plan.adjustments.length })}`

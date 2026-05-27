@@ -56,18 +56,19 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
-      <Link href="/account" className="text-sm font-semibold text-brand hover:text-brand-strong">
-        {t("backToAccount")}
-      </Link>
-      <BlurFade inView>
-        <div className="mt-2">
-          <h1 className="display-lg text-foreground">{t("title")}</h1>
-          <p className="lead mt-1 max-w-2xl text-muted">{t("subtitle")}</p>
+    <main className="page-shell flex-1 py-10 lg:py-14">
+      <div className="grid items-start gap-6 lg:grid-cols-[20rem_1fr] lg:gap-10">
+      <BlurFade inView className="lg:sticky lg:top-24">
+        <div>
+          <Link href="/account" className="text-sm font-semibold text-brand hover:text-brand-strong">
+            {t("backToAccount")}
+          </Link>
+          <h1 className="display-lg mt-2 text-foreground">{t("title")}</h1>
+          <p className="lead mt-1 text-muted-foreground">{t("subtitle")}</p>
         </div>
       </BlurFade>
 
-      <Tabs defaultValue="profile" className="mt-6">
+      <Tabs defaultValue="profile">
         <TabsList className="grid w-full grid-cols-3 rounded-full bg-surface-muted p-1">
           <TabsTrigger value="profile" className="rounded-full data-[state=active]:bg-brand data-[state=active]:text-on-strong">
             {t("tabProfile")}
@@ -82,38 +83,40 @@ export default function SettingsPage() {
 
         <TabsContent value="profile" className="mt-4 space-y-4">
           <BlurFade inView>
-            <form onSubmit={handleSubmit(save)} className="card flex flex-col gap-4 p-5" noValidate>
-              <div className="space-y-2">
-                <Label htmlFor="account-name">{t("nameLabel")}</Label>
-                <Input
-                  id="account-name"
-                  {...register("name")}
-                  aria-invalid={errors.name ? "true" : undefined}
-                />
-                {errors.name ? (
-                  <span className="block text-xs text-danger">{errors.name.message}</span>
-                ) : null}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="account-email">
-                  {t("emailLabel")} <span className="font-normal text-muted">{tc("optional")}</span>
-                </Label>
-                <Input
-                  id="account-email"
-                  type="email"
-                  {...register("email")}
-                  aria-invalid={errors.email ? "true" : undefined}
-                />
-                {errors.email ? (
-                  <span className="block text-xs text-danger">{errors.email.message}</span>
-                ) : null}
+            <form onSubmit={handleSubmit(save)} className="card flex flex-col gap-5 p-6" noValidate>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="account-name">{t("nameLabel")}</Label>
+                  <Input
+                    id="account-name"
+                    {...register("name")}
+                    aria-invalid={errors.name ? "true" : undefined}
+                  />
+                  {errors.name ? (
+                    <span className="block text-sm text-danger">{errors.name.message}</span>
+                  ) : null}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="account-email">
+                    {t("emailLabel")} <span className="font-normal text-muted-foreground">{tc("optional")}</span>
+                  </Label>
+                  <Input
+                    id="account-email"
+                    type="email"
+                    {...register("email")}
+                    aria-invalid={errors.email ? "true" : undefined}
+                  />
+                  {errors.email ? (
+                    <span className="block text-sm text-danger">{errors.email.message}</span>
+                  ) : null}
+                </div>
               </div>
               <div className="flex items-center gap-3">
                 <Button type="submit" className="rounded-full bg-brand text-on-strong hover:bg-brand-strong">
                   {t("saveChanges")}
                 </Button>
                 {saved ? (
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-brand-strong">
+                  <span className="inline-flex items-center gap-1 text-sm font-medium text-brand-strong">
                     <Check className="size-3.5" aria-hidden />
                     {t("savedConfirm")}
                   </span>
@@ -137,9 +140,9 @@ export default function SettingsPage() {
 
         <TabsContent value="data" className="mt-4">
           <BlurFade inView>
-            <div className="card flex flex-col gap-3 p-5">
+            <div className="card flex flex-col gap-3 p-6">
               <h2 className="title-3 text-foreground">{t("dataTitle")}</h2>
-              <p className="text-sm text-muted">
+              <p className="text-base text-muted-foreground">
                 {plans.length === 1
                   ? t("savedCountOne", { count: plans.length })
                   : t("savedCountOther", { count: plans.length })}
@@ -173,6 +176,7 @@ export default function SettingsPage() {
           </BlurFade>
         </TabsContent>
       </Tabs>
+      </div>
     </main>
   );
 }

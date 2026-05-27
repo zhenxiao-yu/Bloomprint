@@ -122,12 +122,12 @@ export function ShoppingTable({ items }: { items: ShoppingItem[] }) {
           return (
             <li key={row.id} className="rounded-lg border border-border bg-surface p-3">
               <div className="flex items-start justify-between gap-3">
-                <span className="text-sm font-medium text-foreground">{item.name}</span>
-                <span className="shrink-0 text-sm font-semibold text-foreground">
+                <span className="text-base font-medium text-foreground">{item.name}</span>
+                <span className="shrink-0 text-base font-semibold text-foreground">
                   <Money value={item.price} />
                 </span>
               </div>
-              <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-muted">
+              <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                 <span>
                   {item.quantity} {item.unit}
                   {item.quantity > 1 ? "s" : ""}
@@ -144,9 +144,9 @@ export function ShoppingTable({ items }: { items: ShoppingItem[] }) {
         })}
       </ul>
 
-      {/* Desktop: sortable table */}
+      {/* Desktop: sortable table — full comfortable width */}
       <div className="-mx-1 hidden overflow-x-auto sm:block">
-        <table className="w-full min-w-[28rem] text-sm">
+        <table className="w-full min-w-[28rem] text-base">
           <thead>
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id} className="border-b border-border text-left">
@@ -154,11 +154,11 @@ export function ShoppingTable({ items }: { items: ShoppingItem[] }) {
                   const sorted = header.column.getIsSorted();
                   const label = (header.column.columnDef.meta as { label?: string })?.label ?? "";
                   return (
-                    <th key={header.id} className="px-2 py-2 font-semibold text-muted">
+                    <th key={header.id} className="px-3 py-2.5 text-sm font-semibold text-muted-foreground">
                       <button
                         type="button"
                         onClick={header.column.getToggleSortingHandler()}
-                        className="inline-flex min-h-9 items-center gap-1 hover:text-foreground"
+                        className="inline-flex min-h-11 items-center gap-1 hover:text-foreground"
                         aria-label={t("sortBy", { column: label })}
                       >
                         {flexRender(header.column.columnDef.header, header.getContext())}
@@ -176,7 +176,7 @@ export function ShoppingTable({ items }: { items: ShoppingItem[] }) {
             {rows.map((row) => (
               <tr key={row.id} className="border-b border-border/60 transition hover:bg-brand-soft/40">
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-2 py-2">
+                  <td key={cell.id} className="px-3 py-3">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

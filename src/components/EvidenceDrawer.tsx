@@ -177,6 +177,16 @@ export function EvidenceDrawer({ evidence, view }: { evidence: PlanEvidence; vie
                 {evidence.fallbackNotes.join(" ")}
               </p>
             ) : null}
+            <p className="mt-3 flex flex-wrap items-center gap-1.5 rounded-lg bg-trust/5 p-2 text-xs text-muted">
+              <ShieldCheck className="size-3.5 text-trust" aria-hidden />
+              <span className="font-semibold text-foreground">{t("openDataTitle")}</span>
+              <a href="https://www.gbif.org/" target="_blank" rel="noreferrer" className="text-brand hover:underline">GBIF</a>
+              <span aria-hidden>·</span>
+              <a href="https://phzmapi.org/" target="_blank" rel="noreferrer" className="text-brand hover:underline">USDA</a>
+              <span aria-hidden>·</span>
+              <span>{t("openDataCore")}</span>
+              <span className="basis-full text-[11px] text-muted/80">{t("openDataNote")}</span>
+            </p>
             <p className="mt-2 text-xs text-muted">{t("footerNote")}</p>
           </div>
         </AccordionContent>

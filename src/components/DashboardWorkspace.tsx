@@ -109,15 +109,15 @@ export function DashboardWorkspace() {
   );
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-7 px-4 py-8 sm:px-6 sm:py-12">
+    <main className="page-wide flex flex-1 flex-col gap-7 py-10 lg:py-14">
       <BlurFade inView>
         <Photo
           src="/photos/house-exterior.jpg"
           alt={t("heroAlt")}
           priority
           scrim
-          sizes="(max-width: 1152px) 100vw, 1152px"
-          className="relative flex min-h-72 rounded-3xl ring-1 ring-foreground/10"
+          sizes="(max-width: 1400px) 100vw, 1400px"
+          className="relative flex min-h-72 rounded-3xl ring-1 ring-foreground/10 lg:min-h-80"
         >
           <BorderBeam
             size={140}
@@ -132,7 +132,7 @@ export function DashboardWorkspace() {
                 <Sparkles className="size-3.5" aria-hidden />
                 {t("eyebrow")}
               </span>
-              <h1 className="display-lg mt-3 max-w-2xl text-white drop-shadow-sm">
+              <h1 className="display-lg mt-3 max-w-3xl text-white drop-shadow-sm">
                 {t("title")}
               </h1>
               <p className="lead mt-3 max-w-2xl text-white/85">{t("subtitle")}</p>
@@ -159,7 +159,7 @@ export function DashboardWorkspace() {
 
       <section
         aria-label={t("statsAria")}
-        className="grid gap-3 grid-cols-2 lg:grid-cols-4"
+        className="grid gap-4 grid-cols-2 lg:grid-cols-4 lg:gap-6"
       >
         {stats.map((stat, i) => (
           <BlurFade key={stat.key} inView delay={0.05 * i}>
@@ -202,8 +202,8 @@ export function DashboardWorkspace() {
         </BlurFade>
       ) : null}
 
-      <section className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <BlurFade inView className="flex">
+      <section className="grid gap-6 lg:grid-cols-3 lg:gap-8">
+        <BlurFade inView className="flex lg:col-span-2">
           <div className="card hover-lift flex w-full flex-col p-5 sm:p-6">
             <div className="flex items-center justify-between gap-3">
               <h2 className="title-2 text-foreground">{t("recentTitle")}</h2>
@@ -221,15 +221,15 @@ export function DashboardWorkspace() {
                   <Link
                     key={plan.id}
                     href={`/projects/${plan.id}`}
-                    className="group/row hover-sheen rounded-xl border border-border p-3 transition hover:border-brand"
+                    className="group/row hover-sheen min-h-11 rounded-xl border border-border p-4 transition hover:border-brand"
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <p className="truncate text-sm font-semibold capitalize text-foreground">
+                      <p className="truncate text-base font-semibold capitalize text-foreground">
                         {plan.label}
                       </p>
                       <ArrowRight className="size-4 shrink-0 text-muted transition group-hover/row:translate-x-0.5 group-hover/row:text-brand" aria-hidden />
                     </div>
-                    <p className="numeric mt-1 text-xs text-muted">
+                    <p className="numeric mt-1 text-sm text-muted-foreground">
                       {plan.summary.versionLabel ?? t("draftDefault")} · $
                       {plan.summary.diyMin.toLocaleString()}–$
                       {plan.summary.diyMax.toLocaleString()} ·{" "}
@@ -247,7 +247,7 @@ export function DashboardWorkspace() {
         <BlurFade inView delay={0.08} className="flex">
           <div className="card hover-lift flex w-full flex-col p-5 sm:p-6">
             <h2 className="title-2 text-foreground">{t("modesTitle")}</h2>
-            <p className="mt-1 text-sm text-muted">{t("modesSubtitle")}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{t("modesSubtitle")}</p>
             <div className="mt-4 flex flex-1 flex-col gap-3">
               <ModeLink
                 icon={Home}
@@ -346,14 +346,14 @@ function ModeLink({
   return (
     <Link
       href={href}
-      className="group/mode hover-sheen flex items-center gap-3 rounded-xl border border-border p-3 transition hover:border-brand"
+      className="group/mode hover-sheen flex min-h-11 items-center gap-3 rounded-xl border border-border p-4 transition hover:border-brand"
     >
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand">
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand">
         <Icon className="size-5" aria-hidden />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-sm font-semibold text-foreground">{title}</span>
-        <span className="mt-0.5 block text-xs text-muted">{body}</span>
+        <span className="block text-base font-semibold text-foreground">{title}</span>
+        <span className="mt-0.5 block text-sm text-muted-foreground">{body}</span>
       </span>
       <ArrowRight className="size-4 shrink-0 text-muted transition group-hover/mode:translate-x-0.5 group-hover/mode:text-brand" aria-hidden />
     </Link>

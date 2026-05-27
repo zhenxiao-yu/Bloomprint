@@ -83,7 +83,7 @@ export default function PlansPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
+    <main className="page-wide flex-1 py-10 lg:py-14">
       <div className="mb-6 flex items-center justify-between">
         <Link href="/plan" className="text-sm font-semibold text-brand">
           {t("backToPlanning")}
@@ -97,7 +97,7 @@ export default function PlansPage() {
         <h1 className="display-lg text-foreground">{t("title")}</h1>
         <SyncStatusBadge />
       </div>
-      <p className="lead mt-1 text-muted">{t("subtitle")}</p>
+      <p className="lead mt-1 max-w-2xl text-muted-foreground">{t("subtitle")}</p>
 
       {plans.length >= 2 ? (
         <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -109,7 +109,7 @@ export default function PlansPage() {
             <GitCompare className="size-4" aria-hidden />
             {busy ? t("comparing") : t("compareSelected", { count: selected.length })}
           </Button>
-          {error ? <span className="text-xs text-[var(--danger)]">{error}</span> : null}
+          {error ? <span className="text-sm text-[var(--danger)]">{error}</span> : null}
         </div>
       ) : null}
 

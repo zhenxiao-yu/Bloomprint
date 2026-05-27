@@ -66,7 +66,7 @@ export function SiteHeader() {
         }`}
       />
 
-      <div className="mx-auto flex h-14 w-full max-w-5xl items-center gap-3 px-4 sm:px-6">
+      <div className="page-wide flex h-16 items-center gap-3">
         <Link
           href="/"
           className="group flex shrink-0 items-center gap-2 rounded-full font-display font-semibold text-brand outline-none transition focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface active:scale-95"
@@ -79,7 +79,7 @@ export function SiteHeader() {
         </Link>
 
         {/* Primary nav is hidden on mobile — the fixed bottom MobileNav carries it there. */}
-        <nav className="ml-2 hidden items-center gap-0.5 text-sm sm:flex">
+        <nav className="ml-3 hidden items-center gap-1 text-base lg:gap-1.5 sm:flex">
           {NAV.map((n) => {
             const href = n.href as string;
             const active = pathname === href || pathname.startsWith(`${href}/`);
@@ -88,7 +88,7 @@ export function SiteHeader() {
                 key={n.href}
                 href={n.href}
                 aria-current={active ? "page" : undefined}
-                className={`group relative shrink-0 rounded-full px-3 py-1.5 font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand/50 ${
+                className={`group relative inline-flex min-h-11 shrink-0 items-center rounded-full px-3.5 font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand/50 ${
                   active ? "text-brand-strong" : "text-muted hover:text-foreground"
                 }`}
               >

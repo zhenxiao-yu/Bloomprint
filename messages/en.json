@@ -960,6 +960,9 @@
     "retrieved": "Retrieved {when}",
     "verified": "Verified {when}",
     "footerNote": "Hardiness references set the climate basis; the Core Library and your inputs do the rest. AI only rephrases — it never decides what to plant.",
+    "openDataTitle": "Powered by free, open data:",
+    "openDataCore": "Bloomprint Core Library",
+    "openDataNote": "No paid keys. Plant names and invasive context come from GBIF, hardiness from USDA, and the planting window from regional climatology — all free and cached, so the app never blocks on an API.",
     "tipConfidenceDimension": "Confidence is rated per dimension (like climate or soil) rather than as one overall grade, so you can see exactly where it's strong or thin.",
     "tipSourceLadder": "Sources are ranked on a quality ladder (L1 highest): peer-reviewed and government data outrank vendor or community notes."
   },

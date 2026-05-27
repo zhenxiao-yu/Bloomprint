@@ -960,6 +960,9 @@
     "retrieved": "获取于 {when}",
     "verified": "核实于 {when}",
     "footerNote": "耐寒性参考确定气候基础；核心植物库和你的输入决定其余部分。AI 只负责措辞，绝不决定种什么。",
+    "openDataTitle": "由免费开放数据驱动：",
+    "openDataCore": "Bloomprint 核心植物库",
+    "openDataNote": "无需付费密钥。植物名称与入侵性背景来自 GBIF，耐寒区来自 USDA，种植时段来自区域气候规律——全部免费且带缓存，应用绝不会因 API 卡住。",
     "tipConfidenceDimension": "信心按维度（如气候或土壤）分别评定，而非单一总评，以便您清楚了解各处的可靠程度。",
     "tipSourceLadder": "来源按质量阶梯排序（L1 最高）：经同行评审的资料和政府数据高于供应商或社区信息。"
   },

@@ -113,7 +113,7 @@ export function ProDashboard() {
 
   if (isEmpty) {
     return (
-      <main className="aurora mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-12 sm:px-6">
+      <main className="aurora page-shell flex flex-1 flex-col gap-6 py-10 lg:py-14">
         <ProHeader onNewProject={() => setEditing("new")} />
         <BlurFade inView>
           <div className="card overflow-hidden p-0">
@@ -121,8 +121,8 @@ export function ProDashboard() {
               src="/photos/garden-path.jpg"
               alt={t("emptyPhotoAlt")}
               scrim
-              sizes="(max-width: 768px) 100vw, 768px"
-              className="flex min-h-40 items-end"
+              sizes="(max-width: 1200px) 100vw, 1200px"
+              className="flex min-h-48 items-end"
             >
               <div className="p-5">
                 <span className="glass-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-white">
@@ -134,9 +134,9 @@ export function ProDashboard() {
             <div className="flex flex-col items-center gap-5 p-6 text-center sm:p-8">
               <div>
                 <h2 className="title-1 text-foreground">{t("emptyTitle")}</h2>
-                <p className="mx-auto mt-2 max-w-md text-sm text-muted">{t("emptyBody")}</p>
+                <p className="mx-auto mt-2 max-w-md text-base text-muted-foreground">{t("emptyBody")}</p>
               </div>
-              <div className="grid w-full gap-2 sm:grid-cols-3">
+              <div className="grid w-full gap-3 sm:grid-cols-3">
                 <OnboardStep n="1" title={t("onboard1Title")} body={t("onboard1Body")} />
                 <OnboardStep n="2" title={t("onboard2Title")} body={t("onboard2Body")} />
                 <OnboardStep n="3" title={t("onboard3Title")} body={t("onboard3Body")} />
@@ -179,10 +179,10 @@ export function ProDashboard() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <main className="page-wide flex flex-1 flex-col gap-7 py-10 lg:py-14">
       <ProHeader onNewProject={() => setEditing("new")} />
 
-      <section className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+      <section className="grid gap-4 grid-cols-2 lg:grid-cols-4 lg:gap-6">
         <StatCard icon={Layers} label={t("statActive")} hint={t("statActiveHint")} value={stats.active} tone="brand" />
         <StatCard icon={FileCheck2} label={t("statAwaiting")} hint={t("statAwaitingHint")} value={stats.awaitingApproval} tone="accent" />
         <StatCard icon={CalendarDays} label={t("statScheduled")} hint={t("statScheduledHint")} value={stats.scheduledSoon} tone="trust" />
@@ -215,8 +215,8 @@ export function ProDashboard() {
         </TabsContent>
       </Tabs>
 
-      <p className="flex items-center gap-2 text-xs text-muted">
-        <CheckCircle2 className="size-3.5 text-brand" aria-hidden />
+      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+        <CheckCircle2 className="size-4 text-brand" aria-hidden />
         {t("footerNote")}
         <button
           type="button"
@@ -226,7 +226,7 @@ export function ProDashboard() {
               toast.success(t("toastWorkspaceCleared"));
             }
           }}
-          className="ml-auto rounded-full border border-border px-2 py-1 font-semibold text-muted transition hover:border-danger/40 hover:text-danger"
+          className="ml-auto min-h-11 rounded-full border border-border px-3 py-1.5 font-semibold text-muted-foreground transition hover:border-danger/40 hover:text-danger"
         >
           {t("clearWorkspace")}
         </button>
@@ -252,8 +252,8 @@ function ProHeader({ onNewProject }: { onNewProject: () => void }) {
         alt="A manicured lawn bordered by a modern fence"
         priority
         scrim
-        sizes="(max-width: 1152px) 100vw, 1152px"
-        className="relative flex min-h-56 rounded-3xl ring-1 ring-foreground/10"
+        sizes="(max-width: 1400px) 100vw, 1400px"
+        className="relative flex min-h-56 rounded-3xl ring-1 ring-foreground/10 lg:min-h-72"
       >
         <BorderBeam
           size={140}
@@ -341,8 +341,8 @@ function OnboardStep({ n, title, body }: { n: string; title: string; body: strin
       <span className="flex size-7 items-center justify-center rounded-full bg-brand text-xs font-semibold text-on-strong">
         {n}
       </span>
-      <p className="mt-2 text-sm font-semibold text-foreground">{title}</p>
-      <p className="mt-0.5 text-xs text-muted">{body}</p>
+      <p className="mt-2 text-base font-semibold text-foreground">{title}</p>
+      <p className="mt-0.5 text-sm text-muted-foreground">{body}</p>
     </div>
   );
 }
@@ -403,8 +403,8 @@ function ProjectCard({
   return (
     <div className="card hover-lift p-3 text-left shadow-sm">
       <button type="button" onClick={onOpen} className="block w-full text-left">
-        <p className="text-sm font-semibold text-foreground">{project.title}</p>
-        {clientName ? <p className="mt-0.5 text-xs text-muted">{clientName}</p> : null}
+        <p className="text-base font-semibold text-foreground">{project.title}</p>
+        {clientName ? <p className="mt-0.5 text-sm text-muted-foreground">{clientName}</p> : null}
         <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
           {project.savedPlanId ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-semibold text-brand-strong">
@@ -430,7 +430,7 @@ function ProjectCard({
         <select
           value={project.status}
           onChange={(e) => moveProject(project.id, e.target.value as ProStatus)}
-          className="w-full rounded-lg border border-border bg-background p-1.5 text-xs text-foreground"
+          className="min-h-11 w-full rounded-lg border border-border bg-background p-2 text-sm text-foreground"
         >
           {PRO_STATUSES.map((s) => (
             <option key={s} value={s}>
@@ -473,7 +473,7 @@ function ClientsView({ clients, projects }: { clients: ProClient[]; projects: Pr
           onChange={(e) => setName(e.target.value)}
           placeholder={t("addClientPlaceholder")}
           aria-label={t("addClientPlaceholder")}
-          className="min-w-0 flex-1 rounded-full border border-border bg-surface px-4 py-2 text-sm text-foreground"
+          className="min-h-11 min-w-0 flex-1 rounded-full border border-border bg-surface px-4 py-2 text-base text-foreground"
         />
         <Button type="submit" className="rounded-full bg-brand text-on-strong hover:bg-brand-strong">
           <Plus className="size-4" aria-hidden />
@@ -486,14 +486,14 @@ function ClientsView({ clients, projects }: { clients: ProClient[]; projects: Pr
         </p>
       ) : (
         <>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
             {pageClients.map((client, i) => (
               <BlurFade key={client.id} inView delay={0.04 * i} className="flex">
-                <div className="card hover-lift flex w-full flex-col p-4">
-                  <p className="text-sm font-semibold text-foreground">{client.name}</p>
-                  {client.email ? <p className="mt-0.5 text-xs text-muted">{client.email}</p> : null}
-                  {client.phone ? <p className="text-xs text-muted">{client.phone}</p> : null}
-                  <p className="mt-2 text-xs font-medium text-brand-strong">
+                <div className="card hover-lift flex w-full flex-col p-5">
+                  <p className="text-base font-semibold text-foreground">{client.name}</p>
+                  {client.email ? <p className="mt-0.5 text-sm text-muted-foreground">{client.email}</p> : null}
+                  {client.phone ? <p className="text-sm text-muted-foreground">{client.phone}</p> : null}
+                  <p className="mt-2 text-sm font-medium text-brand-strong">
                     {t("clientProjects", { count: countFor(client.id) })}
                   </p>
                 </div>
@@ -598,11 +598,11 @@ function BuyListView({ projects }: { projects: ProProject[] }) {
   }
 
   return (
-    <section className="card p-4 sm:p-5">
+    <section className="card p-5 sm:p-6">
       <div className="flex flex-wrap items-center gap-2">
         <ClipboardList className="size-5 text-brand" aria-hidden />
-        <h2 className="text-lg font-semibold text-foreground">{t("buyTitle")}</h2>
-        <span className="text-xs text-muted">{t("buyAcross", { count: projectCount })}</span>
+        <h2 className="text-xl font-semibold text-foreground">{t("buyTitle")}</h2>
+        <span className="text-sm text-muted-foreground">{t("buyAcross", { count: projectCount })}</span>
         <button
           type="button"
           onClick={copyList}
@@ -613,7 +613,7 @@ function BuyListView({ projects }: { projects: ProProject[] }) {
         </button>
       </div>
       <div className="mt-3 overflow-x-auto">
-        <table className="w-full min-w-[520px] text-left text-sm">
+        <table className="w-full min-w-[520px] text-left text-base">
           <thead className="text-xs uppercase tracking-wide text-muted">
             <tr>
               <th className="py-2">{t("thItem")}</th>
@@ -658,15 +658,15 @@ function BuyRow({ item }: { item: ConsolidatedItem }) {
             {t("buyFirst")}
           </span>
         ) : null}
-        <span className="block text-[11px] text-muted">{item.category}</span>
+        <span className="block text-xs text-muted-foreground">{item.category}</span>
       </td>
-      <td className="py-2 text-muted">
+      <td className="py-2 text-muted-foreground">
         {item.quantity} {item.unit}
       </td>
-      <td className="py-2 text-muted">
+      <td className="py-2 text-muted-foreground">
         {money(item.priceMin)}–{money(item.priceMax)}
       </td>
-      <td className="py-2 text-muted">{item.projectCount}</td>
+      <td className="py-2 text-muted-foreground">{item.projectCount}</td>
     </tr>
   );
 }

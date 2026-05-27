@@ -47,7 +47,7 @@ export default function Home() {
   ];
 
   return (
-    <main className="snap-y flex w-full flex-1 flex-col gap-16 px-4 pb-24 pt-6 sm:gap-24 sm:px-6">
+    <main className="snap-y flex w-full flex-1 flex-col gap-20 pb-28 pt-8 sm:gap-28">
       {/* ===== Immersive photographic hero ===== */}
       <HomeHero
         eyebrow={t("eyebrow")}
@@ -69,11 +69,11 @@ export default function Home() {
       />
 
       {/* ===== Transformation showcase — real yards ===== */}
-      <Reveal as="section" className="snap-section mx-auto w-full max-w-6xl">
+      <Reveal as="section" className="snap-section page-wide">
         <p className="eyebrow text-brand">{t("showcase.eyebrow")}</p>
-        <h2 className="title-1 mt-2 max-w-2xl text-foreground">{t("showcase.title")}</h2>
-        <p className="mt-2 max-w-2xl text-sm text-muted sm:text-base">{t("showcase.subtitle")}</p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        <h2 className="title-1 mt-3 max-w-3xl text-foreground">{t("showcase.title")}</h2>
+        <p className="lead mt-4 max-w-2xl">{t("showcase.subtitle")}</p>
+        <div className="mt-10 grid gap-6 sm:grid-cols-3 lg:gap-8">
           {showcase.map((shot, i) => (
             <Reveal
               as="div"
@@ -85,13 +85,13 @@ export default function Home() {
                 src={shot.src}
                 alt={shot.title}
                 scrim
-                sizes="(max-width: 640px) 100vw, 360px"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 460px"
                 className="flex aspect-[4/5]"
                 imgClassName="transition-transform duration-700 ease-out group-hover:scale-110"
               >
-                <div className="mt-auto p-4">
-                  <p className="text-base font-semibold text-white drop-shadow-sm">{shot.title}</p>
-                  <p className="mt-1 text-xs text-white/85">{shot.desc}</p>
+                <div className="mt-auto p-6">
+                  <p className="text-lg font-semibold text-white drop-shadow-sm">{shot.title}</p>
+                  <p className="mt-1 text-base text-white/85">{shot.desc}</p>
                 </div>
               </Photo>
             </Reveal>
@@ -121,21 +121,21 @@ export default function Home() {
       <PhotoMarquee label={t("marquee.label")} />
 
       {/* ===== Plan from a photo — capture band ===== */}
-      <Reveal as="section" className="snap-section aurora mx-auto w-full max-w-6xl">
+      <Reveal as="section" className="snap-section aurora page-wide">
         <div className="card hover-lift grid items-stretch overflow-hidden p-0 lg:grid-cols-2">
           <Photo
             src="/photos/photo-intake.jpg"
             alt="Photographing a yard with a camera"
-            sizes="(max-width: 1024px) 100vw, 576px"
-            className="min-h-64 lg:min-h-full"
+            sizes="(max-width: 1024px) 100vw, 700px"
+            className="min-h-72 lg:min-h-full"
           />
-          <div className="flex flex-col justify-center gap-4 p-6 sm:p-10">
-            <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-strong">
+          <div className="flex flex-col justify-center gap-4 p-6 sm:p-10 lg:p-16">
+            <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1.5 text-[13px] font-semibold uppercase tracking-wide text-brand-strong">
               <Camera className="size-3.5" aria-hidden />
               {t("capture.badge")}
             </span>
-            <h2 className="title-2 text-foreground">{t("capture.title")}</h2>
-            <p className="max-w-md text-sm text-muted sm:text-base">{t("capture.body")}</p>
+            <h2 className="title-1 text-foreground">{t("capture.title")}</h2>
+            <p className="lead max-w-prose">{t("capture.body")}</p>
             <Link href="/plan">
               <ShimmerButton
                 background="var(--brand)"
@@ -159,28 +159,28 @@ export default function Home() {
       />
 
       {/* ===== Entry points ===== */}
-      <Reveal as="section" className="snap-section mx-auto w-full max-w-6xl">
-        <h2 className="title-2 text-center text-foreground">{t("entry.heading")}</h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      <Reveal as="section" className="snap-section page-wide">
+        <h2 className="title-1 text-center text-foreground">{t("entry.heading")}</h2>
+        <div className="mt-10 grid gap-6 sm:grid-cols-3 lg:gap-8">
           {ctas.map((c, i) => (
             <Reveal
               as="div"
               key={c.href}
               delay={i * 80}
-              className={`card hover-lift hover-sheen group flex flex-col gap-2 p-6 ${
+              className={`card hover-lift hover-sheen group flex flex-col gap-2 p-7 sm:p-8 ${
                 c.primary ? "ring-2 ring-brand" : ""
               }`}
             >
               <Link href={c.href} className="flex flex-col gap-2">
                 {c.primary ? (
-                  <span className="mb-1 inline-flex w-fit items-center gap-1 rounded-full bg-brand-soft px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-brand-strong">
-                    <Sparkles className="size-3" aria-hidden />
+                  <span className="mb-1 inline-flex w-fit items-center gap-1 rounded-full bg-brand-soft px-2.5 py-0.5 text-[13px] font-semibold uppercase tracking-wide text-brand-strong">
+                    <Sparkles className="size-3.5" aria-hidden />
                     {t("entry.recommended")}
                   </span>
                 ) : null}
                 <span className="title-3 text-foreground">{c.title}</span>
-                <span className="text-sm text-muted">{c.desc}</span>
-                <span className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-brand">
+                <span className="text-base leading-relaxed text-muted">{c.desc}</span>
+                <span className="mt-1 inline-flex items-center gap-1 text-base font-semibold text-brand">
                   {t("entry.go")}
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
                 </span>
@@ -190,7 +190,7 @@ export default function Home() {
         </div>
       </Reveal>
 
-      <p className="mx-auto w-full max-w-6xl text-xs text-muted">{t("disclaimer")}</p>
+      <p className="page-wide text-sm leading-relaxed text-muted">{t("disclaimer")}</p>
     </main>
   );
 }

@@ -232,10 +232,14 @@ export function PlanResult({
   );
 
   return (
-    <div ref={rootRef} className="space-y-6">
+    // The parent (PlanExperience) widens to ~1200px for the result step, so here we
+    // just lay out a sticky section-nav rail beside the main content on large screens.
+    <div>
+     <div ref={rootRef} className="lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-start lg:gap-8">
       {/* Sticky orientation: a slim reading-progress bar over the jump nav tells
-          the reader how far through a long plan they are (reduces length anxiety). */}
-      <div className="sticky top-2 z-20 space-y-1.5 sm:top-4">
+          the reader how far through a long plan they are (reduces length anxiety).
+          Mobile: a horizontal pill bar. Desktop: a vertical rail beside the plan. */}
+      <div className="sticky top-2 z-20 space-y-1.5 sm:top-4 lg:top-6 lg:self-start">
         <div
           className="h-1 w-full overflow-hidden rounded-full bg-border/60"
           role="progressbar"
@@ -249,8 +253,8 @@ export function PlanResult({
             style={{ width: `${Math.round(progress * 100)}%` }}
           />
         </div>
-        <nav className="glass-chip -mx-1 overflow-x-auto rounded-full p-1 shadow-sm">
-          <div className="flex min-w-max gap-1">
+        <nav className="glass-chip -mx-1 overflow-x-auto rounded-full p-1 shadow-sm lg:mx-0 lg:overflow-visible lg:rounded-2xl lg:p-1.5">
+          <div className="flex min-w-max gap-1 lg:min-w-0 lg:flex-col">
             {navItems.map((item) => {
               const active = activeSection === item.id;
               return (
@@ -258,16 +262,16 @@ export function PlanResult({
                   key={item.id}
                   href={`#${item.id}`}
                   aria-current={active ? "true" : undefined}
-                  className={`relative flex min-h-9 items-center rounded-full px-3.5 py-1.5 text-xs font-medium transition ${
+                  className={`relative flex min-h-11 items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition lg:min-h-11 lg:rounded-xl lg:px-4 ${
                     active
                       ? "text-on-strong"
-                      : "text-muted hover:bg-brand-soft hover:text-brand-strong"
+                      : "text-muted-foreground hover:bg-brand-soft hover:text-brand-strong"
                   }`}
                 >
                   {active ? (
                     <motion.span
                       layoutId="planNavActive"
-                      className="absolute inset-0 rounded-full bg-brand"
+                      className="absolute inset-0 rounded-full bg-brand lg:rounded-xl"
                       transition={{ type: "spring", stiffness: 380, damping: 32 }}
                       aria-hidden
                     />
@@ -279,6 +283,8 @@ export function PlanResult({
           </div>
         </nav>
       </div>
+
+      <div className="min-w-0 space-y-6">
 
       {/* Hero moment — confidence sentence + visual summary, before any logistics */}
       <section id="summary" className="scroll-mt-24">
@@ -314,7 +320,7 @@ export function PlanResult({
               <InfoTip label={t("metricConfidence")}>{t("tipConfidence")}</InfoTip>
             </span>
           </h2>
-          <p className="mt-2 max-w-2xl text-sm text-foreground/80">{heroDescription}</p>
+          <p className="mt-3 max-w-prose text-base leading-relaxed text-foreground/80">{heroDescription}</p>
 
           <div className="mt-4 flex flex-wrap gap-2">
             {plan.visualSummary.moodChips.map((c) => (
@@ -324,16 +330,16 @@ export function PlanResult({
 
           {/* Transformation preview — help users FEEL the before → after */}
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-lg border border-border bg-surface/70 p-3">
+            <div className="rounded-lg border border-border bg-surface/70 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t("now")}</p>
-              <p className="mt-1 text-sm text-foreground">{plan.visualSummary.transformation.current}</p>
+              <p className="mt-1 text-base leading-relaxed text-foreground">{plan.visualSummary.transformation.current}</p>
             </div>
-            <div className="rounded-lg border border-brand bg-surface p-3">
+            <div className="rounded-lg border border-brand bg-surface p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-brand-strong">{t("planned")}</p>
-              <p className="mt-1 text-sm text-foreground">{plan.visualSummary.transformation.planned}</p>
+              <p className="mt-1 text-base leading-relaxed text-foreground">{plan.visualSummary.transformation.planned}</p>
             </div>
           </div>
-          <p className="mt-3 text-sm font-medium text-brand-strong">
+          <p className="mt-3 text-base font-medium text-brand-strong">
             {plan.visualSummary.transformation.feeling}
           </p>
         </div>
@@ -343,7 +349,7 @@ export function PlanResult({
             <p className="text-xs font-semibold uppercase tracking-wide text-muted">
               {plan.visualSummary.styleLabel} · {plan.visualSummary.expectedEffort}
             </p>
-            <ul className="mt-2 space-y-1 text-sm text-foreground">
+            <ul className="mt-2 space-y-1.5 text-base leading-relaxed text-foreground">
               {plan.visualSummary.whatChangesVisually.map((w) => (
                 <li key={w} className="flex gap-2">
                   <span className="text-brand">›</span>
@@ -352,7 +358,7 @@ export function PlanResult({
               ))}
             </ul>
           </div>
-          <div className="rounded-lg bg-accent/10 p-4 text-sm text-foreground">
+          <div className="rounded-lg bg-accent/10 p-4 text-base leading-relaxed text-foreground">
             <p className="font-semibold text-accent">{t("whySmart")}</p>
             <p className="mt-1">{plan.insight}</p>
           </div>
@@ -551,17 +557,28 @@ export function PlanResult({
             <InfoTip label={t("budget")}>{t("tipBudget")}</InfoTip>
           </span>
         </p>
-        <ul className="mt-3 divide-y divide-border text-sm">
-          {plan.budget.byCategory.map((c) => (
-            <li key={c.category} className="flex justify-between py-1.5">
-              <span className="text-muted">{c.category}</span>
-              <Money value={c.price} />
-            </li>
-          ))}
-        </ul>
         {view !== "simple" ? (
-          <PlanCharts budget={plan.budget} installPhases={plan.installPhases} />
-        ) : null}
+          <div className="mt-3 grid gap-5 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-start">
+            <ul className="divide-y divide-border text-base">
+              {plan.budget.byCategory.map((c) => (
+                <li key={c.category} className="flex justify-between py-2">
+                  <span className="text-muted-foreground">{c.category}</span>
+                  <Money value={c.price} />
+                </li>
+              ))}
+            </ul>
+            <PlanCharts budget={plan.budget} installPhases={plan.installPhases} />
+          </div>
+        ) : (
+          <ul className="mt-3 divide-y divide-border text-base">
+            {plan.budget.byCategory.map((c) => (
+              <li key={c.category} className="flex justify-between py-2">
+                <span className="text-muted-foreground">{c.category}</span>
+                <Money value={c.price} />
+              </li>
+            ))}
+          </ul>
+        )}
       </Section>
 
       {/* Quick / Better / Best — estimate framings of the same plan (free-data grounded) */}
@@ -698,21 +715,21 @@ export function PlanResult({
 
       {/* Plants */}
       <Section id="plants" title={t("plants")} subtitle={t("plantsSubtitle", { count: plan.plants.length })} variant="quiet">
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {plan.plants.map((p) => (
             <div key={p.plantId} className="rounded-lg border border-border p-3">
-              <div className="flex items-baseline justify-between">
-                <span className="text-sm font-semibold text-foreground">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-base font-semibold text-foreground">
                   {p.quantity}× {p.commonName}
                 </span>
                 {showNumbers ? (
-                  <span className="inline-flex items-center gap-1 text-xs text-muted">
+                  <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
                     {t("fitScore", { score: Math.round(p.fit.score * 100) })}
                     <InfoTip label={t("tipFitScoreLabel")}>{t("tipFitScore")}</InfoTip>
                   </span>
                 ) : null}
               </div>
-              <p className="text-xs text-muted">{p.spacingNote}</p>
+              <p className="mt-0.5 text-sm text-muted-foreground">{p.spacingNote}</p>
               {p.safety.toxic || p.safety.invasive ? (
                 <div className="mt-1.5 flex flex-wrap gap-1">
                   {p.safety.toxic ? (
@@ -728,15 +745,15 @@ export function PlanResult({
                 </div>
               ) : null}
               {showNumbers ? (
-                <p className="mt-1 text-xs text-muted">
+                <p className="mt-1 text-sm text-muted-foreground">
                   {p.matureSize} · {p.sunLabel} · {t("maintenanceSuffix", { level: p.maintenance })}
                 </p>
               ) : null}
-              {p.fit.reasons[0] ? <p className="mt-1 text-xs text-brand-strong">✓ {p.fit.reasons[0]}</p> : null}
-              {p.fit.warnings[0] ? <p className="mt-0.5 text-xs text-warn">⚠ {p.fit.warnings[0]}</p> : null}
+              {p.fit.reasons[0] ? <p className="mt-1 text-sm text-brand-strong">✓ {p.fit.reasons[0]}</p> : null}
+              {p.fit.warnings[0] ? <p className="mt-0.5 text-sm text-warn">⚠ {p.fit.warnings[0]}</p> : null}
               {(() => {
                 const inv = invasiveByName.get(p.commonName.toLowerCase());
-                return inv ? <p className="mt-0.5 text-xs text-warn">⚠ {inv.note}</p> : null;
+                return inv ? <p className="mt-0.5 text-sm text-warn">⚠ {inv.note}</p> : null;
               })()}
               {(() => {
                 const facts = factsByName.get(p.commonName.toLowerCase());
@@ -785,13 +802,13 @@ export function PlanResult({
               <div key={key} className="rounded-lg border border-border bg-background/60 p-3">
                 <p className="text-xs font-semibold uppercase tracking-wide text-brand">{t(label)}</p>
                 {names.length > 0 ? (
-                  <ul className="mt-1 space-y-0.5 text-xs text-foreground">
+                  <ul className="mt-1 space-y-0.5 text-sm text-foreground">
                     {names.map((n) => (
                       <li key={n}>• {n}</li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-1 text-xs text-muted">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     {hasEvergreen ? t("seasonsEvergreen") : t("seasonsQuiet")}
                   </p>
                 )}
@@ -881,6 +898,8 @@ export function PlanResult({
       ) : null}
 
       <BackToTop label={t("backToTop")} />
+      </div>
+     </div>
     </div>
   );
 }

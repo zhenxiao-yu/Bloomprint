@@ -901,7 +901,9 @@ export function PhotoFirstPlanning({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    // Sits in the comfortable intake column alongside the form; no viewport breakout.
+    <div>
+     <div className="flex flex-col gap-4">
       <section className="card overflow-hidden">
         <div className="bg-brand-soft p-4 sm:p-5">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -1188,7 +1190,7 @@ export function PhotoFirstPlanning({
         ) : null}
 
         {photos.length > 0 ? (
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {photos.map((photo, index) => (
               <figure
                 key={photo.id}
@@ -1671,6 +1673,7 @@ export function PhotoFirstPlanning({
           </div>
         </div>
       ) : null}
+     </div>
     </div>
   );
 }

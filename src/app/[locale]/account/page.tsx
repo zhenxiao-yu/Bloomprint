@@ -25,7 +25,8 @@ export default function AccountPage() {
 
   if (!account) {
     return (
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-6">
+      <main className="page-shell flex-1 py-10 lg:py-14">
+        <div className="mx-auto w-full max-w-2xl">
         <BlurFade inView>
           <div className="card overflow-hidden p-0">
             <Photo
@@ -45,7 +46,7 @@ export default function AccountPage() {
             <div className="flex flex-col items-center gap-4 p-6 text-center sm:p-8">
               <div>
                 <p className="title-1 text-foreground">{t("noAccountTitle")}</p>
-                <p className="mx-auto mt-2 max-w-md text-sm text-muted">{t("noAccountSubtitle")}</p>
+                <p className="mx-auto mt-2 max-w-md text-base text-muted-foreground">{t("noAccountSubtitle")}</p>
               </div>
               <Button asChild size="lg" className="rounded-full bg-brand text-on-strong hover:bg-brand-strong">
                 <Link href="/signup">
@@ -59,14 +60,16 @@ export default function AccountPage() {
         <div className="mt-4">
           <CloudSyncCard />
         </div>
+        </div>
       </main>
     );
   }
 
   return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
-      <BlurFade inView>
-        <div className="card relative flex items-center gap-4 overflow-hidden p-5">
+    <main className="page-shell flex-1 py-10 lg:py-14">
+      <div className="grid items-start gap-6 lg:grid-cols-[20rem_1fr] lg:gap-10">
+      <BlurFade inView className="lg:sticky lg:top-24">
+        <div className="card relative flex items-center gap-4 overflow-hidden p-5 lg:flex-col lg:items-start lg:gap-5 lg:p-6">
           <BorderBeam
             size={110}
             duration={8}
@@ -74,12 +77,12 @@ export default function AccountPage() {
             colorTo="var(--accent)"
             className="opacity-60"
           />
-          <span className="flex size-14 items-center justify-center rounded-full bg-brand text-lg font-semibold text-on-strong">
+          <span className="flex size-14 items-center justify-center rounded-full bg-brand text-lg font-semibold text-on-strong lg:size-16">
             {initials(account.name) || "🌱"}
           </span>
           <div className="min-w-0">
             <h1 className="title-1 truncate text-foreground">{t("greeting", { name: account.name })}</h1>
-            <p className="truncate text-sm text-muted">
+            <p className="mt-1 truncate text-sm text-muted-foreground">
               {account.email ? `${account.email} · ` : ""}
               {t("memberSince", { date: new Date(account.createdAt).toLocaleDateString() })}
             </p>
@@ -87,7 +90,7 @@ export default function AccountPage() {
         </div>
       </BlurFade>
 
-      <Tabs defaultValue="overview" className="mt-6">
+      <Tabs defaultValue="overview">
         <TabsList className="grid w-full grid-cols-2 rounded-full bg-surface-muted p-1">
           <TabsTrigger value="overview" className="rounded-full data-[state=active]:bg-brand data-[state=active]:text-on-strong">
             {t("tabOverview")}
@@ -119,7 +122,7 @@ export default function AccountPage() {
                     </Tooltip>
                   </div>
                   <NumberTicker value={plans.length} className="numeric mt-3 text-3xl font-semibold !text-foreground" />
-                  <p className="mt-1 text-sm text-muted">
+                  <p className="mt-1 text-base text-muted-foreground">
                     {plans.length === 1 ? t("savedPlanOne") : t("savedPlanOther")}
                   </p>
                 </Link>
@@ -132,7 +135,7 @@ export default function AccountPage() {
                   <Plus className="size-5" aria-hidden />
                 </span>
                 <p className="mt-3 title-3 text-foreground">{t("startNew")}</p>
-                <p className="mt-1 text-sm text-muted">{t("startNewBody")}</p>
+                <p className="mt-1 text-base text-muted-foreground">{t("startNewBody")}</p>
                 <Button
                   asChild
                   size="sm"
@@ -167,9 +170,10 @@ export default function AccountPage() {
           <BlurFade inView delay={0.08}>
             <BillingStatus />
           </BlurFade>
-          <p className="text-xs text-muted">{t("deviceNote")}</p>
+          <p className="text-sm text-muted-foreground">{t("deviceNote")}</p>
         </TabsContent>
       </Tabs>
+      </div>
     </main>
   );
 }
