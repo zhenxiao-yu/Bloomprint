@@ -636,3 +636,49 @@ button:not(:disabled):active {
     color: #000;
   }
 }
+
+/* ===== Device preferences (set on <html> by PreferencesScript + preferencesStore) ===== */
+
+/* Font scale — scales the root rem so the whole UI grows/shrinks. */
+:root[data-font-scale="compact"] {
+  font-size: 14px;
+}
+:root[data-font-scale="default"] {
+  font-size: 16px;
+}
+:root[data-font-scale="comfortable"] {
+  font-size: 17.5px;
+}
+:root[data-font-scale="large"] {
+  font-size: 19px;
+}
+
+/* Reduce motion — collapse CSS animation/transition to near-instant. */
+:root[data-reduce-motion="true"] *,
+:root[data-reduce-motion="true"] *::before,
+:root[data-reduce-motion="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* High contrast — firm up borders + text on top of the active theme. */
+:root[data-contrast="high"] {
+  --muted: #36312a;
+  --border: #9a8b76;
+}
+.dark[data-contrast="high"] {
+  --muted: #e8e2d8;
+  --border: #6f8073;
+  --foreground: #ffffff;
+}
+
+/* Large tap targets — enforce the 44px accessibility minimum on controls. */
+:root[data-tap="large"] button,
+:root[data-tap="large"] a,
+:root[data-tap="large"] [role="button"],
+:root[data-tap="large"] input:not([type="checkbox"]):not([type="radio"]),
+:root[data-tap="large"] select {
+  min-height: 2.75rem;
+}

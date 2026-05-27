@@ -4,8 +4,10 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SITE_NAME, SITE_URL, BRAND_THEME_COLOR } from "@/lib/siteConfig";
 import { Sora, Inter, IBM_Plex_Sans, Noto_Sans_SC } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
+import { AnalyticsGate } from "@/components/AnalyticsGate";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { MotionPreferences } from "@/components/MotionPreferences";
+import { PreferencesScript } from "@/components/PreferencesScript";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { MobileNav } from "@/components/MobileNav";
@@ -110,17 +112,20 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={`${fontVars} h-full antialiased`} suppressHydrationWarning>
       <body className="flex min-h-full flex-col pb-16 sm:pb-0" suppressHydrationWarning>
+        <PreferencesScript />
         <NextIntlClientProvider>
           <ThemeProvider>
-            <TooltipProvider delayDuration={200}>
-              <SiteHeader />
-              <PwaClient />
-              <div className="flex flex-1 flex-col">{children}</div>
-              <SiteFooter />
-              <MobileNav />
-              <Toaster />
-              <Analytics />
-            </TooltipProvider>
+            <MotionPreferences>
+              <TooltipProvider delayDuration={200}>
+                <SiteHeader />
+                <PwaClient />
+                <div className="flex flex-1 flex-col">{children}</div>
+                <SiteFooter />
+                <MobileNav />
+                <Toaster />
+                <AnalyticsGate />
+              </TooltipProvider>
+            </MotionPreferences>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { localizePlantName } from "@/lib/plantNames";
 import { ArrowUp, HelpCircle, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { BloomprintPlan, RefinementAdjustment, ShoppingPriority } from "@/domain/models";
@@ -151,6 +152,7 @@ export function PlanResult({
   const t = useTranslations("Result");
   const tr = useTranslations("Refinements");
   const to = useTranslations("Options");
+  const locale = useLocale();
   const tLive = useTranslations("Live");
   const { plan } = result;
   const showNumbers = view !== "simple";
@@ -720,7 +722,7 @@ export function PlanResult({
             <div key={p.plantId} className="rounded-lg border border-border p-3">
               <div className="flex items-baseline justify-between gap-2">
                 <span className="text-base font-semibold text-foreground">
-                  {p.quantity}× {p.commonName}
+                  {p.quantity}× {localizePlantName(p.plantId, p.commonName, locale)}
                 </span>
                 {showNumbers ? (
                   <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">

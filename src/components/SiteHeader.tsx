@@ -7,8 +7,7 @@ import { ChevronDown, LogOut, Settings, UserRound } from "lucide-react";
 
 import { initials, signOut, useAccount } from "@/lib/accountStore";
 import { Link, usePathname } from "@/i18n/navigation";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { LanguageSwitch } from "@/components/LanguageSwitch";
+import { SettingsButton } from "@/components/settings/SettingsButton";
 import { SyncStatusBadge } from "@/components/SyncStatusBadge";
 import { BorderBeam } from "@/components/ui/border-beam";
 import {
@@ -29,6 +28,7 @@ const NAV = [
   { href: "/dashboard", key: "dashboard" },
   { href: "/plan", key: "plan" },
   { href: "/plans", key: "saved" },
+  { href: "/toolbox", key: "toolbox" },
   { href: "/pro", key: "pro" },
   { href: "/pricing", key: "pricing" },
   { href: "/guide", key: "guide" },
@@ -111,8 +111,7 @@ export function SiteHeader() {
           <span className="hidden md:inline-flex">
             <SyncStatusBadge />
           </span>
-          <LanguageSwitch />
-          <ThemeToggle />
+          <SettingsButton />
           {account ? (
             <DropdownMenu>
               <Tooltip>
