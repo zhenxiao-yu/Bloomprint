@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { AlertTriangle, Ruler } from "lucide-react";
+import { AlertTriangle, BookOpen, Ruler } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -163,6 +163,50 @@ export function DimensionGroup({
         <NumberField id="area" label={`${t("area")} (${areaUnit})`} value={area} onChange={onArea} />
       )}
     </>
+  );
+}
+
+/**
+ * "How this works" panel — the formula, a plain-language explanation, and the evidence behind
+ * the constants. Makes every tool transparent (no black-box numbers) and is shown regardless of
+ * whether the user has entered inputs yet.
+ */
+export function ToolExplainer({
+  formula,
+  how,
+  evidence,
+}: {
+  formula: string;
+  how: string;
+  evidence?: string[];
+}) {
+  const t = useTranslations("Toolbox.common");
+  return (
+    <section className="rounded-2xl border border-border bg-surface-muted/30 p-5">
+      <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+        <BookOpen className="size-4 text-brand" aria-hidden />
+        {t("howItWorks")}
+      </h3>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{how}</p>
+      <code className="mt-3 block overflow-x-auto rounded-lg border border-border bg-surface px-3 py-2 font-mono text-xs text-foreground">
+        {formula}
+      </code>
+      {evidence && evidence.length > 0 ? (
+        <div className="mt-3">
+          <p className="eyebrow text-muted-foreground">{t("evidence")}</p>
+          <ul className="mt-1 flex flex-col gap-1 text-sm text-muted-foreground">
+            {evidence.map((e, i) => (
+              <li key={i} className="flex gap-2">
+                <span aria-hidden className="text-brand">
+                  •
+                </span>
+                {e}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </section>
   );
 }
 

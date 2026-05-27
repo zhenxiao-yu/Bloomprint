@@ -1407,7 +1407,10 @@
       "recommendedPieces": "Recommended: {count} pieces (with buffer)",
       "pieceLength": "Piece length",
       "assumePiece": "Each piece is {len} ft long.",
-      "perimeter": "Perimeter"
+      "perimeter": "Perimeter",
+      "howItWorks": "How this works",
+      "evidence": "Why these numbers",
+      "material": "Material"
     }
   },
   "SettingsModal": {
@@ -1523,37 +1526,59 @@
       "assumeDepth": "Depth: {depth} in across the whole bed.",
       "assumeBuffer": "Includes a {pct}% buffer for settling and uneven coverage.",
       "emptyTitle": "Enter your bed size",
-      "emptyBody": "Fill in the dimensions and depth to see how much mulch to buy."
-    },
-    "soil": {
-      "title": "Topsoil Calculator",
-      "intro": "How much topsoil or garden soil to fill a bed, by bag or cubic yard.",
-      "emptyTitle": "Enter your bed size",
-      "emptyBody": "Fill in the area and depth to see how much soil to buy."
-    },
-    "compost": {
-      "title": "Compost Calculator",
-      "intro": "How much compost to top-dress or amend a bed.",
-      "emptyTitle": "Enter your bed size",
-      "emptyBody": "Fill in the area and depth to see how much compost to buy."
-    },
-    "gravel": {
-      "title": "Gravel & Stone Calculator",
-      "intro": "How much gravel or crushed stone to cover an area — by bag, cubic yard, or estimated tons.",
-      "emptyTitle": "Enter your area",
-      "emptyBody": "Fill in the area and depth to see how much stone to buy."
+      "emptyBody": "Fill in the dimensions and depth to see how much mulch to buy.",
+      "formula": "bags = ⌈ area × depth ÷ bag volume ⌉ + buffer",
+      "how": "Area × depth is how much mulch fills the bed. We round up to whole bags and add a buffer; recommended depth is held at 2–3 in to protect roots.",
+      "evidence": [
+        "A standard bag holds 2 cu ft of mulch.",
+        "2–3 in is the horticultural sweet spot — deeper can suffocate roots and rot stems.",
+        "The buffer covers settling and uneven coverage."
+      ]
     },
     "edging": {
       "title": "Edging Calculator",
       "intro": "How many edging pieces to border a bed.",
       "emptyTitle": "Enter your bed shape",
-      "emptyBody": "Pick a rectangle or circle and enter its size to see how much edging you need."
+      "emptyBody": "Pick a rectangle or circle and enter its size to see how much edging you need.",
+      "formula": "pieces = ⌈ perimeter ÷ piece length ⌉ + buffer",
+      "how": "Perimeter is the distance around the bed. Divide by the length of each edging section, round up, and add a buffer for corner cuts and overlap.",
+      "evidence": [
+        "Rigid and coiled edging commonly comes in ~8 ft sections.",
+        "The buffer covers corner cuts and overlap."
+      ]
     },
     "bedArea": {
       "title": "Bed Area Calculator",
       "intro": "Measure a bed's area and perimeter — the starting point for every material estimate.",
       "emptyTitle": "Enter your dimensions",
-      "emptyBody": "Fill in the shape to see area and perimeter."
+      "emptyBody": "Fill in the shape to see area and perimeter.",
+      "formula": "rectangle = L × W   ·   circle = π × r²",
+      "how": "Enter a shape and its dimensions; we report the area in both sq ft and sq m, plus the perimeter where the shape has one.",
+      "evidence": [
+        "1 sq m = 10.764 sq ft.",
+        "Drop this area into any of the material calculators."
+      ]
+    },
+    "material": {
+      "title": "Material Calculator",
+      "intro": "How much topsoil, compost, gravel, sand, or bark to cover an area — by bag, cubic yard, or estimated tons.",
+      "emptyTitle": "Enter your area",
+      "emptyBody": "Pick a material and fill in the area and depth.",
+      "formula": "bags = ⌈ area × depth ÷ bag volume ⌉ + buffer   ·   cu yd = volume ÷ 27",
+      "how": "Area × depth gives the loose volume to fill. We round up to whole bags and add a buffer for settling and waste; bulk delivery is shown in cubic yards (and an estimated weight for stone).",
+      "evidence": [
+        "Bagged material is ~1–2 cu ft; the default bag size changes per material.",
+        "1 cubic yard = 27 cubic feet.",
+        "Stone weighs roughly 1.4 tons per cubic yard — it varies by stone, so it is shown as a range."
+      ],
+      "materials": {
+        "topsoil": "Topsoil",
+        "compost": "Compost",
+        "gravel": "Gravel / crushed stone",
+        "river_rock": "River rock",
+        "sand": "Sand",
+        "bark": "Bark / wood chips"
+      }
     }
   }
 }

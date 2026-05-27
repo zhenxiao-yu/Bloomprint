@@ -16,6 +16,7 @@ import {
   DimensionGroup,
   Field,
   NumberField,
+  ToolExplainer,
   ToolResult,
   num,
   type LenUnit,
@@ -61,8 +62,10 @@ export function MulchCalculator() {
   }, [shape, unit, length, width, radius, area, depth, bagSize, extraPct]);
 
   const depthUnit = unit === "ft" ? tc("unitIn") : tc("unitCm");
+  const evidence = t.has("evidence") ? (t.raw("evidence") as string[]) : [];
 
   return (
+    <div className="flex flex-col gap-6">
     <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
       <form className="flex flex-col gap-5" onSubmit={(e) => e.preventDefault()}>
         <DimensionGroup
@@ -145,6 +148,8 @@ export function MulchCalculator() {
         emptyTitle={t("emptyTitle")}
         emptyBody={t("emptyBody")}
       />
+      </div>
+      <ToolExplainer formula={t("formula")} how={t("how")} evidence={evidence} />
     </div>
   );
 }

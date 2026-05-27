@@ -40,9 +40,7 @@ export interface ToolMeta {
 
 export const TOOL_CATALOG: readonly ToolMeta[] = [
   { slug: "mulch", category: "materials", personas: ["homeowner", "pro", "store-staff"], effort: "instant" },
-  { slug: "soil", category: "materials", personas: ["homeowner", "pro"], effort: "instant" },
-  { slug: "compost", category: "materials", personas: ["homeowner", "pro", "yard-enthusiast"], effort: "instant" },
-  { slug: "gravel", category: "materials", personas: ["homeowner", "pro"], effort: "instant" },
+  { slug: "material", category: "materials", personas: ["homeowner", "pro", "yard-enthusiast"], effort: "instant" },
   { slug: "edging", category: "hardscape", personas: ["homeowner", "pro"], effort: "instant" },
   { slug: "bedArea", category: "hardscape", personas: ["homeowner", "pro", "yard-enthusiast"], effort: "instant" },
 ];

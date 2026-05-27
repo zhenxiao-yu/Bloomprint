@@ -4,7 +4,14 @@ import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { computeBedArea, type BedAreaInput } from "@/domain/toolbox/bedArea";
-import { DimensionGroup, ToolResult, num, type LenUnit, type Shape } from "@/components/toolbox/_shared";
+import {
+  DimensionGroup,
+  ToolExplainer,
+  ToolResult,
+  num,
+  type LenUnit,
+  type Shape,
+} from "@/components/toolbox/_shared";
 
 /** Measure a bed's area + perimeter — the primitive behind every material estimate. */
 export function BedAreaCalculator() {
@@ -40,7 +47,10 @@ export function BedAreaCalculator() {
       ]
     : undefined;
 
+  const evidence = t.has("evidence") ? (t.raw("evidence") as string[]) : [];
+
   return (
+    <div className="flex flex-col gap-6">
     <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
       <form className="flex flex-col gap-5" onSubmit={(e) => e.preventDefault()}>
         <DimensionGroup
@@ -68,6 +78,8 @@ export function BedAreaCalculator() {
         emptyTitle={t("emptyTitle")}
         emptyBody={t("emptyBody")}
       />
+      </div>
+      <ToolExplainer formula={t("formula")} how={t("how")} evidence={evidence} />
     </div>
   );
 }
