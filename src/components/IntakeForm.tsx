@@ -123,6 +123,8 @@ export function IntakeForm({
   const t = useTranslations("Intake");
   const tc = useTranslations("Common");
   const to = useTranslations("Options");
+  // Resolves engine-emitted finding keys (e.g. zone labels) to localized copy.
+  const tp = useTranslations("PhotoIntake");
   const [stepIndex, setStepIndex] = useState(0);
 
   const { register, handleSubmit, control, setValue } = useForm<FormValues>({
@@ -160,7 +162,10 @@ export function IntakeForm({
     (values.helpers ? 1 : 0) +
     (values.stylePreference ? 1 : 0);
 
-  const photoHints = useMemo(() => buildPhotoHints(photoAnalysis), [photoAnalysis]);
+  const photoHints = useMemo(
+    () => buildPhotoHints(photoAnalysis, (key) => (tp.has(key) ? tp(key) : key)),
+    [photoAnalysis, tp],
+  );
   const activeStep = STEP_KEYS[stepIndex];
 
   function submit(raw: FormValues) {
@@ -986,10 +991,13 @@ type PhotoHints = {
   suggestedDrainage?: Drainage;
 };
 
-function buildPhotoHints(analysis?: PhotoAnalysisResult | null): PhotoHints {
+function buildPhotoHints(
+  analysis?: PhotoAnalysisResult | null,
+  resolveFinding: (key: string) => string = (s) => s,
+): PhotoHints {
   if (!analysis) return { items: [] };
   const items = [
-    ...analysis.zones.map((zone) => zone.label),
+    ...analysis.zones.map((zone) => resolveFinding(zone.label)),
     ...analysis.detectedObjects
       .filter((item) => !item.toLowerCase().includes("warning"))
       .slice(0, 3),

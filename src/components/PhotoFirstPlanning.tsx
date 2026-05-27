@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
@@ -387,6 +387,10 @@ export function PhotoFirstPlanning({
   onSkip: () => void;
 }) {
   const t = useTranslations("PhotoIntake");
+  // Resolve an engine-emitted finding key (zone/assumption/missing-info) to localized
+  // copy, falling back to the raw string so legacy persisted drafts and test fixtures
+  // with literal text still render.
+  const findingText = useCallback((key: string): string => (t.has(key) ? t(key) : key), [t]);
   const [photoType, setPhotoType] = useState<PhotoAssetType>("front_yard");
   const [dragging, setDragging] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -557,7 +561,9 @@ export function PhotoFirstPlanning({
           onAnalysis(next);
           setAssumptionEdits((current) => {
             const merged = { ...current };
-            for (const item of next.assumptions) merged[item.id] = merged[item.id] ?? item.value;
+            // Seed with resolved copy, not the raw key, so the textarea shows real text.
+            for (const item of next.assumptions)
+              merged[item.id] = merged[item.id] ?? findingText(item.value);
             return merged;
           });
           setStatus(t("statusAssumptionsReady"));
@@ -573,7 +579,7 @@ export function PhotoFirstPlanning({
       active = false;
       window.clearTimeout(timer);
     };
-  }, [photos, onAnalysis, t]);
+  }, [photos, onAnalysis, t, findingText]);
 
   useEffect(() => {
     // Tips only show in the camera modal — don't re-render the whole tree otherwise.
@@ -893,7 +899,8 @@ export function PhotoFirstPlanning({
         ...analysis,
         assumptions: analysis.assumptions.map((item) => ({
           ...item,
-          value: assumptionEdits[item.id] ?? item.value,
+          // Persist resolved copy (or the user's edit), never the raw i18n key.
+          value: assumptionEdits[item.id] ?? findingText(item.value),
         })),
       });
     }
@@ -1472,7 +1479,7 @@ export function PhotoFirstPlanning({
                             className="rounded-lg bg-brand-soft px-3 py-2 text-sm text-brand-strong"
                           >
                             {t("zoneItem", {
-                              label: zone.label,
+                              label: findingText(zone.label),
                               percent: Math.round(zone.confidence * 100),
                             })}
                           </li>
@@ -1495,7 +1502,7 @@ export function PhotoFirstPlanning({
                             className="mt-0.5 size-4 shrink-0 text-[var(--warn)]"
                             aria-hidden
                           />
-                          <span>{item}</span>
+                          <span>{findingText(item)}</span>
                         </li>
                       ))}
                     </ul>
@@ -1510,13 +1517,13 @@ export function PhotoFirstPlanning({
                     {analysis.assumptions.map((item) => (
                       <label key={item.id} className="flex flex-col gap-1 text-sm">
                         <span className="flex flex-wrap items-center gap-2 font-medium text-foreground">
-                          {item.label}
+                          {findingText(item.label)}
                           {/* Shared trust language with the plan workspace (Phase 4) — same
                               calm confidence read, with a tooltip explainer. */}
                           <ConfidenceBadge level={item.confidence} />
                         </span>
                         <textarea
-                          value={assumptionEdits[item.id] ?? item.value}
+                          value={assumptionEdits[item.id] ?? findingText(item.value)}
                           onChange={(e) =>
                             setAssumptionEdits((current) => ({
                               ...current,
