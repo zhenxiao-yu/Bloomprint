@@ -5,6 +5,7 @@ import {
   BrickWall,
   Calculator,
   CalendarDays,
+  Carrot,
   Droplets,
   FlaskConical,
   Fence as FenceIcon,
@@ -16,6 +17,7 @@ import {
   Scissors,
   Sparkles,
   Sprout,
+  Trees,
   Waves,
   type LucideIcon,
 } from "lucide-react";
@@ -74,6 +76,10 @@ const COMPONENTS: Record<string, () => Promise<{ default: ComponentType }>> = {
     import("@/components/toolbox/tools/SeedStartingCalculator").then((m) => ({
       default: m.SeedStartingCalculator,
     })),
+  companion: () =>
+    import("@/components/toolbox/tools/CompanionCalculator").then((m) => ({ default: m.CompanionCalculator })),
+  grassType: () =>
+    import("@/components/toolbox/tools/GrassTypeCalculator").then((m) => ({ default: m.GrassTypeCalculator })),
 };
 
 const ICONS: Record<string, LucideIcon> = {
@@ -94,6 +100,8 @@ const ICONS: Record<string, LucideIcon> = {
   frenchDrain: Waves,
   jobQuote: Calculator,
   seedStarting: CalendarDays,
+  companion: Carrot,
+  grassType: Trees,
 };
 
 export const TOOL_REGISTRY: ToolEntry[] = TOOL_CATALOG.map((meta) => ({
