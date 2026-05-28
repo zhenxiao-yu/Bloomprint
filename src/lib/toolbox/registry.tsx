@@ -2,8 +2,10 @@ import { lazy, type ComponentType, type LazyExoticComponent } from "react";
 import {
   Beaker,
   Box,
+  BrickWall,
   Droplets,
   FlaskConical,
+  Fence as FenceIcon,
   Layers,
   Leaf,
   MapPin,
@@ -12,6 +14,7 @@ import {
   Scissors,
   Sparkles,
   Sprout,
+  Waves,
   type LucideIcon,
 } from "lucide-react";
 
@@ -56,6 +59,13 @@ const COMPONENTS: Record<string, () => Promise<{ default: ComponentType }>> = {
     import("@/components/toolbox/tools/RaisedBedCalculator").then((m) => ({ default: m.RaisedBedCalculator })),
   gardenAi: () =>
     import("@/components/toolbox/tools/GardenAiCalculator").then((m) => ({ default: m.GardenAiCalculator })),
+  retainingWall: () =>
+    import("@/components/toolbox/tools/RetainingWallCalculator").then((m) => ({
+      default: m.RetainingWallCalculator,
+    })),
+  fence: () => import("@/components/toolbox/tools/FenceCalculator").then((m) => ({ default: m.FenceCalculator })),
+  frenchDrain: () =>
+    import("@/components/toolbox/tools/FrenchDrainCalculator").then((m) => ({ default: m.FrenchDrainCalculator })),
 };
 
 const ICONS: Record<string, LucideIcon> = {
@@ -71,6 +81,9 @@ const ICONS: Record<string, LucideIcon> = {
   fertilizer: Beaker,
   raisedBed: Box,
   gardenAi: Sparkles,
+  retainingWall: BrickWall,
+  fence: FenceIcon,
+  frenchDrain: Waves,
 };
 
 export const TOOL_REGISTRY: ToolEntry[] = TOOL_CATALOG.map((meta) => ({

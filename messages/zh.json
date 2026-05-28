@@ -726,6 +726,7 @@
     "noAccountSubtitle": "注册一个，把个人资料和已保存方案都放在一起。",
     "greeting": "你好，{name}",
     "memberSince": "{date} 加入",
+    "completeProfile": "添加身份和简介",
     "savedPlanOne": "个已保存方案 — 打开并对比",
     "savedPlanOther": "个已保存方案 — 打开并对比",
     "startNew": "开始一个新的庭院方案",
@@ -811,7 +812,28 @@
     "preferencesHint": "主题和语言仅保存在本设备上——它们不与你的账户绑定。",
     "tabProfile": "个人资料",
     "tabPreferences": "偏好",
-    "tabData": "你的数据"
+    "tabApp": "应用",
+    "tabData": "你的数据",
+    "roleLabel": "身份",
+    "roleHint": "帮助 Bloomprint 贴合你的情境，可选。",
+    "bioLabel": "简介",
+    "bioPlaceholder": "一句话介绍你的院子、目标或工作……",
+    "bioHint": "{count}/{max}",
+    "appSettingsTitle": "外观、语言与提醒",
+    "appSettingsBody": "主题、语言、单位、通知和隐私都在应用设置中——在 Bloomprint 任意位置一键可达。",
+    "openAppSettings": "打开应用设置"
+  },
+  "Roles": {
+    "homeowner": "房主",
+    "pro": "专业园艺师",
+    "retailer": "园艺零售",
+    "renter": "租客",
+    "other": "其他",
+    "homeowner_hint": "规划自己的院子。",
+    "pro_hint": "为客户做规划。",
+    "retailer_hint": "帮助门店顾客规划。",
+    "renter_hint": "容器种植与轻量方案。",
+    "other_hint": "随便看看。"
   },
   "SavedPlans": {
     "backToPlanning": "← 返回规划",
@@ -1793,6 +1815,83 @@
       ],
       "emptyTitle": "提一个园艺问题",
       "emptyBody": "选一个话题并输入你的问题。"
+    },
+    "retainingWall": {
+      "title": "挡土墙估算器",
+      "intro": "砌块层数、数量、压顶层，以及挡土墙真正需要的基础与排水砾石。",
+      "height": "墙高",
+      "blockFace": "砌块正面长度",
+      "blockHeight": "砌块高度",
+      "capRow": "含压顶层",
+      "blocksUnit": "块",
+      "coursesLabel": "层数",
+      "perCourseLabel": "每层块数",
+      "capLabel": "压顶块",
+      "gravelLabel": "基础 + 排水砾石",
+      "gravelValue": "{cuYd} 立方码（≈ {tons} 吨）",
+      "recommend": "多买约 8% 以应对裁切和破损。",
+      "wasteNote": "块数含约 8% 裁切/破损余量。",
+      "gravelNote": "基础垫层约 12 英寸 × 6 英寸沟槽；墙后排水约 12 英寸砾石。",
+      "formula": "块数 = ⌈墙高 ÷ 砌块高⌉ × ⌈墙长 ÷ 砌块面长⌉",
+      "how": "我们算出墙有几层高、每层几块长，加上余量和压顶层，再估算稳固墙体所需的找平垫层与墙后排水砾石。",
+      "evidence": [
+        "排水层 + 基础垫层是防止墙体冻胀的关键，并非可选项。",
+        "默认砌块：正面 12 英寸 × 高 6 英寸（常见拼装块）；可按实际更改。",
+        "超过约 3–4 英尺的墙通常需要工程设计和许可——请在本地核实。"
+      ],
+      "emptyTitle": "输入墙体尺寸",
+      "emptyBody": "填入墙长和墙高。"
+    },
+    "fence": {
+      "title": "围栏估算器",
+      "intro": "按总长度和间距，算出立柱、段数、横档、围板或栅条以及水泥用量。",
+      "postSpacing": "立柱间距",
+      "gates": "门",
+      "style": "样式",
+      "style_panel": "成品围板",
+      "style_picket": "单根栅条",
+      "railsPerSection": "每段横档数",
+      "picketWidth": "栅条宽度（含缝隙）",
+      "postsUnit": "根立柱",
+      "sectionsLabel": "段数",
+      "railsLabel": "横档",
+      "panelsLabel": "围板",
+      "picketsLabel": "栅条",
+      "concreteLabel": "水泥袋数",
+      "formula": "段数 = ⌈长度 ÷ 间距⌉   ·   立柱 = 段数 + 1 + 门数",
+      "how": "我们用总长度除以立柱间距得到段数，加一根端柱及每扇门一根柱，再算出横档、围板或栅条，以及每根立柱约 2 袋水泥。",
+      "evidence": [
+        "木围栏立柱间距常见上限为 8 英尺（较重围板用 6 英尺）。",
+        "每根立柱约 2 袋速凝水泥；门柱需更结实。",
+        "开挖前先打电话定位地下管线。"
+      ],
+      "emptyTitle": "输入围栏长度",
+      "emptyBody": "填入需要围的总长度。"
+    },
+    "frenchDrain": {
+      "title": "盲沟排水估算器",
+      "intro": "砾石、打孔管、过滤布，以及沟槽排水所需的最小坡度。",
+      "width": "沟槽宽度",
+      "depth": "沟槽深度",
+      "pipeDiameter": "管径",
+      "gravelUnit": "立方码砾石",
+      "tonsLabel": "砾石重量",
+      "tonsValue": "≈ {n} 吨",
+      "pipeLabel": "打孔管",
+      "pipeValue": "{n} 英尺",
+      "fabricLabel": "过滤布",
+      "fabricValue": "{n} 平方英尺",
+      "dropLabel": "最小坡降",
+      "dropValue": "全长 {n} 英尺",
+      "formula": "砾石 =（长 × 宽 × 深 − 管）÷ 27   ·   坡度 ≥ 1%",
+      "how": "我们用沟槽横截面减去管体得到砾石体积，沿沟槽包裹过滤布，加上带接头余量的管材，并算出排水所需的最小全长坡降（约 1%）。",
+      "evidence": [
+        "排水沟需约 1% 坡度（约每 8 英尺降 1 英寸）——平沟不排水。",
+        "用过滤布包裹砾石以防淤堵；管孔朝下。",
+        "砾石每立方码约 1.4 吨（因石材而异）。"
+      ],
+      "emptyTitle": "输入沟槽长度",
+      "emptyBody": "填入沟槽长度；宽度、深度和管径有默认值。"
     }
   }
 }

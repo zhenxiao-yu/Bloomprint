@@ -726,6 +726,7 @@
     "noAccountSubtitle": "Create one to keep your profile and saved plans together.",
     "greeting": "Hi, {name}",
     "memberSince": "Member since {date}",
+    "completeProfile": "Add your role & a short bio",
     "savedPlanOne": "saved plan — open & compare",
     "savedPlanOther": "saved plans — open & compare",
     "startNew": "Start a new yard plan",
@@ -811,7 +812,28 @@
     "preferencesHint": "Theme and language are saved on this device only — they aren’t tied to your account.",
     "tabProfile": "Profile",
     "tabPreferences": "Preferences",
-    "tabData": "Your data"
+    "tabApp": "App",
+    "tabData": "Your data",
+    "roleLabel": "Role",
+    "roleHint": "Helps Bloomprint speak to your context. Optional.",
+    "bioLabel": "Short bio",
+    "bioPlaceholder": "A line about your yard, your goals, or your work…",
+    "bioHint": "{count}/{max}",
+    "appSettingsTitle": "Appearance, language & alerts",
+    "appSettingsBody": "Theme, language, units, notifications, and privacy live in app settings — one tap away, anywhere in Bloomprint.",
+    "openAppSettings": "Open app settings"
+  },
+  "Roles": {
+    "homeowner": "Homeowner",
+    "pro": "Professional landscaper",
+    "retailer": "Garden retailer",
+    "renter": "Renter",
+    "other": "Other",
+    "homeowner_hint": "Planning your own yard.",
+    "pro_hint": "Planning for clients.",
+    "retailer_hint": "Helping store customers plan.",
+    "renter_hint": "Container & low-commitment plans.",
+    "other_hint": "Just exploring."
   },
   "SavedPlans": {
     "backToPlanning": "← Back to planning",
@@ -1793,6 +1815,83 @@
       ],
       "emptyTitle": "Ask a gardening question",
       "emptyBody": "Pick a topic and type your question."
+    },
+    "retainingWall": {
+      "title": "Retaining Wall Estimator",
+      "intro": "Block courses, count, cap row, and the base + drainage gravel a wall actually needs.",
+      "height": "Wall height",
+      "blockFace": "Block face length",
+      "blockHeight": "Block height",
+      "capRow": "Include cap row",
+      "blocksUnit": "blocks",
+      "coursesLabel": "Courses",
+      "perCourseLabel": "Per course",
+      "capLabel": "Cap blocks",
+      "gravelLabel": "Base + drainage gravel",
+      "gravelValue": "{cuYd} cu yd (≈ {tons} t)",
+      "recommend": "Buy ~8% extra for cuts and breakage.",
+      "wasteNote": "Block count includes ~8% cutting/breakage waste.",
+      "gravelNote": "Base pad ≈ 12 in × 6 in trench; drainage ≈ 12 in of gravel behind the wall.",
+      "formula": "blocks = ⌈height ÷ block height⌉ × ⌈length ÷ block face⌉",
+      "how": "We work out how many courses tall and how many blocks long the wall is, add a waste margin and a cap row, then size the leveling-pad and behind-wall drainage gravel a sound wall needs.",
+      "evidence": [
+        "A drainage layer + base pad is what keeps a wall from heaving — not optional.",
+        "Default block: 12 in face × 6 in tall (typical segmental block); change it to match yours.",
+        "Walls over ~3–4 ft usually need engineering and a permit — check locally."
+      ],
+      "emptyTitle": "Enter wall size",
+      "emptyBody": "Add the wall length and height."
+    },
+    "fence": {
+      "title": "Fence Estimator",
+      "intro": "Posts, sections, rails, panels or pickets, and concrete from a run length and spacing.",
+      "postSpacing": "Post spacing",
+      "gates": "Gates",
+      "style": "Style",
+      "style_panel": "Pre-made panels",
+      "style_picket": "Individual pickets",
+      "railsPerSection": "Rails per section",
+      "picketWidth": "Picket width (incl. gap)",
+      "postsUnit": "posts",
+      "sectionsLabel": "Sections",
+      "railsLabel": "Rails",
+      "panelsLabel": "Panels",
+      "picketsLabel": "Pickets",
+      "concreteLabel": "Concrete bags",
+      "formula": "sections = ⌈length ÷ spacing⌉   ·   posts = sections + 1 + gates",
+      "how": "We divide the run by your post spacing for sections, add an end post and one per gate, then count rails, panels or pickets, and ~2 bags of concrete per post.",
+      "evidence": [
+        "8 ft is the common max post spacing for wood fences (6 ft for heavier panels).",
+        "Each post ≈ 2 bags of fast-setting concrete; gates need a sturdier post.",
+        "Call before you dig — locate utilities first."
+      ],
+      "emptyTitle": "Enter your fence run",
+      "emptyBody": "Add the total length to run."
+    },
+    "frenchDrain": {
+      "title": "French Drain Estimator",
+      "intro": "Gravel, perforated pipe, filter fabric, and the minimum slope a trench needs to drain.",
+      "width": "Trench width",
+      "depth": "Trench depth",
+      "pipeDiameter": "Pipe diameter",
+      "gravelUnit": "cu yd gravel",
+      "tonsLabel": "Gravel weight",
+      "tonsValue": "≈ {n} tons",
+      "pipeLabel": "Perforated pipe",
+      "pipeValue": "{n} ft",
+      "fabricLabel": "Filter fabric",
+      "fabricValue": "{n} sq ft",
+      "dropLabel": "Min. slope drop",
+      "dropValue": "{n} ft end-to-end",
+      "formula": "gravel = (L × W × D − pipe) ÷ 27   ·   drop ≥ 1%",
+      "how": "We take the trench cross-section minus the pipe for gravel volume, wrap fabric around the trench, add pipe with a fitting margin, and compute the minimum end-to-end drop (≈1%) the drain needs to flow.",
+      "evidence": [
+        "A drain needs ~1% slope (≈1 in per 8 ft) — flat trenches don't drain.",
+        "Wrap gravel in filter fabric so soil doesn't clog it; pipe holes face down.",
+        "Gravel ≈ 1.4 tons per cubic yard (varies by stone)."
+      ],
+      "emptyTitle": "Enter trench length",
+      "emptyBody": "Add the trench length; defaults cover width, depth, and pipe."
     }
   }
 }
