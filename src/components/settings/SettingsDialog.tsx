@@ -171,7 +171,9 @@ function Row({
           <span className="mt-0.5 block text-xs leading-relaxed text-muted">{description}</span>
         )}
       </label>
-      <div className="shrink-0">{control}</div>
+      {/* No shrink-0: the control must be allowed to shrink so a wide Segmented wraps its
+          options instead of overflowing the modal edge. */}
+      <div className="flex min-w-0 max-w-full justify-end">{control}</div>
     </div>
   );
 }
@@ -189,7 +191,11 @@ function Segmented<T extends string>({
 }) {
   const groupId = useId();
   return (
-    <div role="group" aria-label={ariaLabel} className="flex rounded-full border border-border p-0.5">
+    <div
+      role="group"
+      aria-label={ariaLabel}
+      className="flex max-w-full flex-wrap justify-end rounded-full border border-border p-0.5"
+    >
       {options.map((opt) => {
         const active = value === opt.value;
         const Icon = opt.icon;
