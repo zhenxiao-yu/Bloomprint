@@ -9,7 +9,7 @@ export const SQFT_PER_SQM = 10.7639;
 export const IN_PER_CM = 1 / 2.54;
 export const CUFT_PER_CUYD = 27;
 
-export const Shape = z.enum(["rectangle", "circle", "area"]);
+export const Shape = z.enum(["rectangle", "circle", "triangle", "area"]);
 export type Shape = z.infer<typeof Shape>;
 
 export const LenUnit = z.enum(["ft", "m"]);
@@ -40,6 +40,9 @@ export function areaSqftFromShape(input: ShapeDims): number | null {
   let areaInUnit: number | null = null;
   if (input.shape === "rectangle") {
     if (input.length && input.width) areaInUnit = input.length * input.width;
+  } else if (input.shape === "triangle") {
+    // length = base, width = height.
+    if (input.length && input.width) areaInUnit = 0.5 * input.length * input.width;
   } else if (input.shape === "circle") {
     if (input.radius) areaInUnit = Math.PI * input.radius * input.radius;
   } else if (input.shape === "area") {

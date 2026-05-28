@@ -1436,7 +1436,10 @@
       "perimeter": "Perimeter",
       "howItWorks": "How this works",
       "evidence": "Why these numbers",
-      "material": "Material"
+      "material": "Material",
+      "shapeTriangle": "Triangle",
+      "base": "Base",
+      "height": "Height"
     }
   },
   "SettingsModal": {

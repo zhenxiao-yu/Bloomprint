@@ -1436,7 +1436,10 @@
       "perimeter": "周长",
       "howItWorks": "计算原理",
       "evidence": "数字依据",
-      "material": "材料"
+      "material": "材料",
+      "shapeTriangle": "三角形",
+      "base": "底边",
+      "height": "高"
     }
   },
   "SettingsModal": {

@@ -29,4 +29,10 @@ describe("computeBedArea", () => {
   it("has no perimeter for known-area input", () => {
     expect(computeBedArea({ shape: "area", unit: "ft", area: 200 })!.perimeterFt).toBeNull();
   });
+
+  it("computes a triangle as half base × height (base=length, height=width)", () => {
+    const r = computeBedArea({ shape: "triangle", unit: "ft", length: 10, width: 4 })!;
+    expect(r.areaSqft).toBe(20);
+    expect(r.perimeterFt).toBeNull();
+  });
 });

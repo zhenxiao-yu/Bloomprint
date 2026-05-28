@@ -74,7 +74,7 @@ export function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-export type Shape = "rectangle" | "circle" | "area";
+export type Shape = "rectangle" | "circle" | "triangle" | "area";
 export type LenUnit = "ft" | "m";
 
 /**
@@ -95,7 +95,7 @@ export function DimensionGroup({
   onWidth,
   onRadius,
   onArea,
-  shapes = ["rectangle", "circle", "area"],
+  shapes = ["rectangle", "circle", "triangle", "area"],
 }: {
   shape: Shape;
   unit: LenUnit;
@@ -118,6 +118,7 @@ export function DimensionGroup({
   const shapeLabel: Record<Shape, string> = {
     rectangle: t("shapeRectangle"),
     circle: t("shapeCircle"),
+    triangle: t("shapeTriangle"),
     area: t("shapeArea"),
   };
   return (
@@ -154,6 +155,12 @@ export function DimensionGroup({
         <div className="grid grid-cols-2 gap-4">
           <NumberField id="len" label={`${t("length")} (${lenUnit})`} value={length} onChange={onLength} />
           <NumberField id="wid" label={`${t("width")} (${lenUnit})`} value={width} onChange={onWidth} />
+        </div>
+      )}
+      {shape === "triangle" && (
+        <div className="grid grid-cols-2 gap-4">
+          <NumberField id="base" label={`${t("base")} (${lenUnit})`} value={length} onChange={onLength} />
+          <NumberField id="tri-h" label={`${t("height")} (${lenUnit})`} value={width} onChange={onWidth} />
         </div>
       )}
       {shape === "circle" && (
