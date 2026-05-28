@@ -3,6 +3,7 @@ import {
   Beaker,
   Box,
   BrickWall,
+  Calculator,
   Droplets,
   FlaskConical,
   Fence as FenceIcon,
@@ -66,6 +67,8 @@ const COMPONENTS: Record<string, () => Promise<{ default: ComponentType }>> = {
   fence: () => import("@/components/toolbox/tools/FenceCalculator").then((m) => ({ default: m.FenceCalculator })),
   frenchDrain: () =>
     import("@/components/toolbox/tools/FrenchDrainCalculator").then((m) => ({ default: m.FrenchDrainCalculator })),
+  jobQuote: () =>
+    import("@/components/toolbox/tools/JobQuoteCalculator").then((m) => ({ default: m.JobQuoteCalculator })),
 };
 
 const ICONS: Record<string, LucideIcon> = {
@@ -84,6 +87,7 @@ const ICONS: Record<string, LucideIcon> = {
   retainingWall: BrickWall,
   fence: FenceIcon,
   frenchDrain: Waves,
+  jobQuote: Calculator,
 };
 
 export const TOOL_REGISTRY: ToolEntry[] = TOOL_CATALOG.map((meta) => ({

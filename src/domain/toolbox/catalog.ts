@@ -72,6 +72,7 @@ export const TOOL_CATALOG: readonly ToolMeta[] = [
   { slug: "retainingWall", category: "hardscape", personas: ["homeowner", "pro"], effort: "quick" },
   { slug: "fence", category: "hardscape", personas: ["homeowner", "pro"], effort: "quick" },
   { slug: "frenchDrain", category: "hardscape", personas: ["homeowner", "pro"], effort: "quick" },
+  { slug: "jobQuote", category: "budget", personas: ["pro"], effort: "involved" },
 ];
 
 export const TOOL_SLUGS: readonly string[] = TOOL_CATALOG.map((t) => t.slug);

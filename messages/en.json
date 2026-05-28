@@ -1892,6 +1892,35 @@
       ],
       "emptyTitle": "Enter trench length",
       "emptyBody": "Add the trench length; defaults cover width, depth, and pipe."
+    },
+    "jobQuote": {
+      "title": "Job Estimator (Pro)",
+      "intro": "Turn an area + service into labor hours, a material cost band, and a quote range with your margin.",
+      "areaLabel": "Area",
+      "service": "Service",
+      "service_plantingBed": "Planting bed",
+      "service_sod": "Sod install",
+      "service_mulch": "Mulch",
+      "service_paverPatio": "Paver patio",
+      "service_lawnSeed": "Lawn seeding",
+      "service_cleanup": "Cleanup",
+      "crewRate": "Crew rate (/hr)",
+      "margin": "Margin (%)",
+      "priceTitle": "Estimated price",
+      "hoursLabel": "Labor hours",
+      "laborLabel": "Labor cost",
+      "materialLabel": "Materials",
+      "perSqftLabel": "Per sq ft",
+      "disclaimer": "Planning estimate, not a quote — confirm local material prices and your own production rates.",
+      "formula": "price = (labor + materials) × (1 + margin)   ·   labor = rate × area ÷ 100 × 1.15",
+      "how": "We apply an industry production rate (crew-hours per 100 sq ft) for the service, add a 15% setup/cleanup buffer, band the materials by typical $/sq ft, then add your margin. Everything is a range, not a fixed price.",
+      "evidence": [
+        "Production rates and material $/sq ft are typical industry planning figures — tune them to your crew and market.",
+        "The 15% buffer covers mobilization, breaks, and cleanup.",
+        "This is an internal estimate; a real quote needs a site visit."
+      ],
+      "emptyTitle": "Enter the job area",
+      "emptyBody": "Add the area and pick a service."
     }
   }
 }
