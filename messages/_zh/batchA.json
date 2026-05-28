@@ -1,0 +1,137 @@
+{
+  "Home": {
+    "eyebrow": "Bloomprint",
+    "heroTitle": "为真实住宅打造可落地的庭院方案。",
+    "heroSubtitle": "告诉我们一点你的庭院情况，Bloomprint 就能把它变成一份真正能动手实施的方案——买什么、买多少、用什么工具、按什么顺序来。",
+    "startPlan": "开始规划庭院",
+    "tryDemo": "试试演示",
+    "trustLine": "事实第一，AI 第二。每份方案都会列出前提假设、风险和备选方案。",
+    "snapshot": {
+      "confidence": "把握",
+      "confidenceValue": "整体合适，土壤和货源已单独标注待确认",
+      "total": "预计 DIY 总花费",
+      "totalValue": "640–1,120 美元区间，不是假报价",
+      "order": "施工顺序",
+      "orderValue": "放线、整地、栽种、收边、铺护根",
+      "store": "采购实情",
+      "storeValue": "搜索链接、可替代选项，不虚报库存"
+    },
+    "ctas": {
+      "startTitle": "开始我的庭院方案",
+      "startDesc": "回答几个简单问题，得到一份可落地的方案。",
+      "staffTitle": "帮助顾客",
+      "staffDesc": "园艺店员视角：沟通要点、好/更好/最佳方案、可替代选项。",
+      "demoTitle": "试试演示",
+      "demoDesc": "立即查看一份做好的 Oakville 前院方案。"
+    },
+    "chips": {
+      "shoppingList": "采购清单",
+      "installOrder": "施工顺序",
+      "risksEvidence": "风险与依据",
+      "storeChecklist": "采购核对清单"
+    },
+    "trust": {
+      "notAiTitle": "不只是 AI 生成图",
+      "notAiBody": "Bloomprint 给出材料、工具、人工、施工顺序和风险——一份能动手建的方案，不是一张效果图。",
+      "factsTitle": "事实先于 AI",
+      "factsBody": "植物和价格来自 Bloomprint 核心库与规则。AI 只负责解释——它从不决定该种什么。",
+      "honestTitle": "诚实面对不确定",
+      "honestBody": "大致区域、价格区间和本地货源情况都会清楚标注——绝不造假。"
+    },
+    "compare": {
+      "title": "为什么不直接问聊天机器人？",
+      "subtitle": "通用 AI 擅长出点子。Bloomprint 把这些点子变成你真正能动手实现的方案——而且不会在关键之处胡编。",
+      "them": "通用聊天机器人",
+      "us": "Bloomprint",
+      "factsLabel": "植物信息与价格",
+      "factsThem": "自信满满的猜测，却可能悄悄出错。",
+      "factsUs": "锁定到确定性引擎——绝不由 AI 编造。",
+      "sizeLabel": "尺寸与数量",
+      "sizeThem": "根据你的描述凭空编出来。",
+      "sizeUs": "来自你的照片加上你自己的校准——并标注为估算值。",
+      "outputLabel": "你得到的是",
+      "outputThem": "一大段需要反复读、自己拼凑的文字。",
+      "outputUs": "一份可落地方案：采购清单、施工顺序，以及可能出错的地方。",
+      "unsureLabel": "拿不准的时候",
+      "unsureThem": "仍然一副笃定的口吻。",
+      "unsureUs": "会直接说出来，并调低把握分数。",
+      "offlineLabel": "没有密钥或账户时",
+      "offlineThem": "时灵时不灵。",
+      "offlineUs": "完整可用——AI 和云端只是可选的附加项。"
+    },
+    "disclaimer": "方案基于 Bloomprint 核心库和大致的区域规则。价格是区间，不是报价——购买前请确认本地货源。",
+    "showcase": {
+      "eyebrow": "看得见的改变",
+      "title": "从一张照片，到一份能动手建的方案",
+      "subtitle": "真实的材料、真实的数量、正确的顺序——不是一张你无从下手的漂亮效果图。",
+      "shotFrontTitle": "门面颜值",
+      "shotFrontDesc": "前院花床、间距和收边都替你算好了。",
+      "shotBackTitle": "后院花床",
+      "shotBackDesc": "抬高花床和栽种区，按你的空间量身定尺寸。",
+      "shotPlantTitle": "对的植物，对的位置",
+      "shotPlantDesc": "光照、土壤和间距，购买前都已核对。"
+    },
+    "capture": {
+      "title": "拍下你的庭院，我们来读懂它。",
+      "body": "用引导式拍照或直接上传——Bloomprint 会检查照片、估算栽种区，并把不确定的地方变成问题，在生成任何内容前先请你确认。",
+      "cta": "用照片规划",
+      "badge": "用照片规划"
+    },
+    "heroKicker": "能动手建，不只是好看。",
+    "stats": {
+      "heading": "每份方案都包含",
+      "deliverables": "方案板块：采购清单、施工顺序、风险、采购",
+      "steps": "按正确顺序排列的施工步骤",
+      "accounts": "开始所需的账户或密钥"
+    },
+    "bento": {
+      "eyebrow": "每份方案，从头到尾",
+      "title": "一份能动手建的方案，不是效果图",
+      "subtitle": "材料、顺序、风险和采购实情——在你花一分钱之前都已算好。",
+      "photoCaption": "按你真实的庭院定尺寸",
+      "shoppingBody": "植物、材料和数量都来自核心库——绝不由 AI 编造。",
+      "orderBody": "精确的施工先后顺序，避免任何返工。",
+      "risksBody": "可能出错的地方，连同背后的依据，提前标出来。",
+      "storeBody": "搜索链接和可替代选项——不虚报库存。"
+    },
+    "marquee": {
+      "label": "真实庭院，真实蜕变"
+    },
+    "entry": {
+      "heading": "挑一个你想要的开始方式",
+      "recommended": "推荐",
+      "go": "开始"
+    }
+  },
+  "Common": {
+    "startPlan": "开始一份方案",
+    "createAccount": "创建账户",
+    "createAccountAlt": "创建一个账户",
+    "dontKnow": "我不知道",
+    "notSure": "还不确定",
+    "optional": "（可选）"
+  },
+  "Modes": {
+    "simple": "简易",
+    "details": "详情",
+    "staff": "店员助手"
+  },
+  "Workspace": {
+    "planningSession": "规划会话",
+    "project": "项目",
+    "property": "物业",
+    "planVersion": "方案版本",
+    "photoAnalysis": "照片分析",
+    "detectedZones": "识别到的区域",
+    "editableAssumptions": "可编辑的前提假设",
+    "autosaved": "已自动保存",
+    "synced": "已同步",
+    "resumeDraft": "继续草稿",
+    "landscaperMode": "园艺师模式",
+    "storeHelperMode": "店员助手模式"
+  },
+  "Form": {
+    "nameRequired": "请输入你的名字。",
+    "emailInvalid": "请输入有效的邮箱，或留空。"
+  }
+}

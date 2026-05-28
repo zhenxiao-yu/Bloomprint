@@ -1,0 +1,197 @@
+{
+  "Intake": {
+    "scopeQuestion": "这个项目有多大？",
+    "goalQuestion": "你想做点什么？",
+    "problemHint": "或者从需求出发——我们帮你定目标：",
+    "dimsLabel": "量一量（长 × 宽）",
+    "dimsLength": "长",
+    "dimsWidth": "宽",
+    "dimsUnit": "单位",
+    "dimsFeet": "英尺",
+    "dimsMetres": "米",
+    "dimsHint": "自己量过了？这能让用料估算更准。不确定就留空。",
+    "regionQuestion": "庭院在哪里？",
+    "zipLabel": "邮编",
+    "zipHint": "（可选，让分区更精准）",
+    "zipPlaceholder": "如 60601 或 M5V",
+    "areaQuestion": "庭院的哪个位置？",
+    "areaOptional": "（可选）",
+    "areaSqftLabel": "种植区面积（平方英尺）",
+    "areaSqftPlaceholder": "如 140",
+    "areaSqftMeasured": "已根据你的庭院地图测量自动填入。",
+    "budgetQuestion": "大致预算？",
+    "effortQuestion": "你想动手做多少？",
+    "noPhotoNote": "不用照片——你也能拿到可落地的布局。之后补细节让它更精准。",
+    "buildButton": "生成我的方案",
+    "sharpenTitle": "让方案更精准",
+    "sharpenSummary": "可选细节——每填一项都会提升可信度。都不是必填。",
+    "sharpenCount": "已补充 {count} 项——方案会更精准。",
+    "sharpenHint": "不知道某项？保持“不确定”就好——未知只会降低可信度，绝不会卡住流程。",
+    "optionalBadge": "可选",
+    "sunQuestion": "这个位置光照如何？",
+    "soilQuestion": "土壤是什么样的？",
+    "drainageQuestion": "排水情况如何？",
+    "styleQuestion": "喜欢的风格",
+    "styleNoPref": "没偏好——给我惊喜",
+    "helpersQuestion": "谁来动手？",
+    "helpers": {
+      "0": "就我一个人",
+      "1": "我 + 1 个帮手",
+      "2": "几个人一起（2 人以上）"
+    },
+    "petsQuestion": "宠物或小孩会用到这片庭院",
+    "petsHint": "我们会避开对狗、猫或儿童有毒的植物。",
+    "confidenceUp": "已补充 {count} 项细节——可信度更高。",
+    "detailsKicker": "方案详情",
+    "stepDone": "完成",
+    "stepActive": "进行中",
+    "stepNext": "下一步",
+    "previousStep": "返回",
+    "nextStep": "下一步",
+    "buildAnytime": "你可以现在生成，也可以再补点细节。",
+    "unknownsNote": "选最接近的答案，或者留作未知。Bloomprint 会如实标注可信度。",
+    "photoContextTitle": "照片智能识别",
+    "photoContextCount": "{count} 张可用照片正在辅助这一步。",
+    "photoContextEmpty": "未添加照片。仅凭你的回答方案照样能生成。",
+    "photoContextNoMl": "暂无 ML 识别信号",
+    "photoContextConfidence": "照片可信度 {confidence}%",
+    "applyPhotoHints": "应用照片提示",
+    "photoAnswersTitle": "从照片识别出的答案",
+    "photoAnswersVerify": "待确认的建议——下单前请在现场核实。",
+    "steps": {
+      "goal": {
+        "short": "目标",
+        "title": "从庭院的真实需求入手。",
+        "body": "选一个最贴近你想解决的状况的结果或问题表述。"
+      },
+      "basics": {
+        "short": "基础信息",
+        "title": "定好采购和人工的边界。",
+        "body": "地区、预算和投入决定了什么能高效落地、不浪费时间。"
+      },
+      "accuracy": {
+        "short": "精准度",
+        "title": "只补你确定的细节。",
+        "body": "光照、尺寸、排水和安全提示都能提升可信度。未知也没关系。"
+      }
+    },
+    "tips": {
+      "goal": {
+        "title": "如何选出最合适的目标",
+        "body": "看重高度就选私密遮挡，看重门面就选门面颜值，想少干活就选低养护，想让 Bloomprint 全面权衡就选通用方案。"
+      },
+      "budget": {
+        "title": "预算小贴士",
+        "body": "填你愿意花在植物、收边、覆盖物或石材以及小工具上的金额。Bloomprint 用的是价格区间，不是精确报价。"
+      },
+      "accuracy": {
+        "title": "精准度小贴士",
+        "body": "最关键的三项细节是种植区面积、光照和排水。就算不知道，方案照样能生成，只是可信度会低一些。"
+      }
+    }
+  },
+  "Options": {
+    "goals": {
+      "privacy": "挡住邻居的视线",
+      "curb-appeal": "让自家门面更好看",
+      "low-maintenance": "好打理、省心",
+      "pollinator": "吸引蜜蜂和蝴蝶",
+      "shade-tolerant": "填补一处阴凉角落",
+      "general": "给我一个靠谱的方案就行"
+    },
+    "goalBlurbs": {
+      "privacy": "加一道绿屏，挡出私密感。",
+      "curb-appeal": "提升你的门面颜值。",
+      "low-maintenance": "看着精致，养护省心。",
+      "pollinator": "一座引来传粉者的花园。",
+      "shade-tolerant": "在背阴处也长得好的植物。",
+      "general": "一次扎实的全面焕新。"
+    },
+    "budgets": {
+      "0": "500 美元以下",
+      "1": "500–1,000 美元",
+      "2": "1,000–2,000 美元",
+      "3": "2,000 美元以上"
+    },
+    "efforts": {
+      "light": "周末轻松干活",
+      "moderate": "适度 DIY",
+      "heavy": "重活也没问题",
+      "hire-help": "可能会请人帮忙"
+    },
+    "areas": {
+      "foundation-bed": "沿着房屋墙基",
+      "driveway-edge": "沿着车道",
+      "front-walkway": "前院步道",
+      "fence-line": "围栏边 / 侧院",
+      "patio-edge": "露台边",
+      "lawn-corner": "草坪开阔角落"
+    },
+    "sun": {
+      "full-sun": "光照充足（6 小时以上）",
+      "part-sun": "部分光照（3–6 小时）",
+      "shade": "大多遮荫",
+      "unknown": "我不确定"
+    },
+    "soil": {
+      "clay": "板结 / 黏土",
+      "loam": "肥沃 / 壤土",
+      "sandy": "沙质 / 排水快",
+      "unknown": "我不确定"
+    },
+    "drainage": {
+      "well-drained": "排水快",
+      "average": "一般",
+      "poor": "雨后积水",
+      "unknown": "我不确定"
+    },
+    "styles": {
+      "modern-minimal": "现代极简",
+      "warm-cottage": "暖意田园",
+      "clean-japanese": "清雅日式",
+      "layered-pollinator": "层次传粉花境",
+      "soft-prairie": "柔和草原风"
+    },
+    "scope": {
+      "spot_fix": "修一处地方",
+      "section_plan": "规划一个区域",
+      "whole_area_plan": "规划整片区域"
+    },
+    "problems": {
+      "dead_plants": "植物枯死",
+      "empty_bed": "空着的种植区",
+      "overgrown": "杂乱疯长",
+      "privacy_gap": "私密性不足",
+      "muddy_erosion": "泥泞 / 水土流失",
+      "boring_curb": "门面单调",
+      "too_much_upkeep": "打理太费事",
+      "shady_bare_spot": "光秃秃的阴凉角落"
+    }
+  },
+  "Refinements": {
+    "cheaper": "降低预算",
+    "easier": "做得更省事",
+    "less-trimming": "少修剪",
+    "more-flowers": "多点花",
+    "more-colorful": "更多彩",
+    "more-privacy": "更私密",
+    "more-shade": "更耐阴",
+    "more-modern": "更现代",
+    "premium-look": "更高级的质感",
+    "better-resale": "更利于转手卖房",
+    "better-winter": "冬天更好看",
+    "wildlife-friendly": "更友好野生动物",
+    "dog-safe": "对狗和孩子更安全",
+    "salt-safe": "耐盐",
+    "less-watering": "更省浇水",
+    "stone-to-mulch": "石材 → 覆盖物"
+  },
+  "Command": {
+    "title": "告诉 Bloomprint 想改什么",
+    "placeholder": "如 便宜点但仍要高级、更私密、对狗更安全",
+    "apply": "应用",
+    "willApply": "我会应用：",
+    "noMatch": "我能调整这些：降低预算、做得更省事、更私密、更省浇水、耐盐。试试其中一个吧。",
+    "hint": "大白话会变成真实的方案改动——我只调整方案，不做自由聊天。"
+  }
+}
