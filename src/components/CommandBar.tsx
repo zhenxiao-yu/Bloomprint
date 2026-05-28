@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { Sparkles, ArrowRight, Mic } from "lucide-react";
 import type { RefinementAdjustment } from "@/domain/models";
 import { parseCommand } from "@/lib/command/parseCommand";
+import { useVoiceInput } from "@/lib/useVoiceInput";
 
 /**
  * Constrained natural-language command bar. Plain text is parsed (deterministically)
@@ -23,9 +24,23 @@ export function CommandBar({
 }) {
   const t = useTranslations("Command");
   const tr = useTranslations("Refinements");
+  const locale = useLocale();
   const [text, setText] = useState("");
   const [applied, setApplied] = useState<RefinementAdjustment[] | null>(null);
   const [noMatch, setNoMatch] = useState(false);
+  const voice = useVoiceInput(locale === "zh" ? "zh-CN" : "en-US");
+
+  function toggleVoice() {
+    if (voice.listening) {
+      voice.stop();
+      return;
+    }
+    const base = text.trim() ? `${text.trim()} ` : "";
+    voice.start((spoken) => {
+      setText(base + spoken);
+      setNoMatch(false);
+    });
+  }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -52,17 +67,35 @@ export function CommandBar({
       </div>
 
       <form onSubmit={submit} className="mt-3 flex gap-2">
-        <input
-          value={text}
-          onChange={(e) => {
-            setText(e.target.value);
-            setNoMatch(false);
-          }}
-          placeholder={t("placeholder")}
-          aria-label={t("title")}
-          disabled={busy}
-          className="card min-h-11 w-full p-2.5 text-sm"
-        />
+        <div className="relative w-full">
+          <input
+            value={text}
+            onChange={(e) => {
+              setText(e.target.value);
+              setNoMatch(false);
+            }}
+            placeholder={voice.listening ? t("voiceListening") : t("placeholder")}
+            aria-label={t("title")}
+            disabled={busy}
+            className={`card min-h-11 w-full p-2.5 text-sm ${voice.supported ? "pr-12" : ""}`}
+          />
+          {voice.supported ? (
+            <button
+              type="button"
+              onClick={toggleVoice}
+              disabled={busy}
+              aria-pressed={voice.listening}
+              aria-label={voice.listening ? t("voiceStop") : t("voiceStart")}
+              className={`absolute inset-y-0 right-1.5 my-auto flex size-8 items-center justify-center rounded-full transition disabled:opacity-50 ${
+                voice.listening
+                  ? "animate-pulse bg-danger/15 text-danger"
+                  : "text-muted hover:text-foreground"
+              }`}
+            >
+              <Mic className="size-4" aria-hidden />
+            </button>
+          ) : null}
+        </div>
         <button
           type="submit"
           disabled={busy || text.trim().length === 0}

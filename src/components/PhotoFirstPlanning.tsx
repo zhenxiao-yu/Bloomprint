@@ -988,209 +988,205 @@ export function PhotoFirstPlanning({
               <h2 className="text-lg font-semibold text-foreground">{t("photoIntakeHeading")}</h2>
               <p className="mt-1 text-sm text-muted">{t("photoIntakeSubtitle")}</p>
             </div>
-            <div className="flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-2 text-xs text-muted">
-              <ShieldCheck className="size-4 text-brand" aria-hidden />
-              {t("usableSummary", {
-                usable: usableCount,
-                review: reviewCount,
-                unusable: unusableCount,
-              })}
+            {photos.length > 0 ? (
+              <div className="flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-2 text-xs text-muted">
+                <ShieldCheck className="size-4 text-brand" aria-hidden />
+                {t("usableSummary", {
+                  usable: usableCount,
+                  review: reviewCount,
+                  unusable: unusableCount,
+                })}
+              </div>
+            ) : null}
+          </div>
+
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            multiple
+            className="hidden"
+            suppressHydrationWarning
+            onChange={(e) => e.target.files && void addFiles(e.target.files)}
+          />
+
+          {/* Focal add action: prominent before the first photo, compact once the
+              workspace (capture plan + grid) fills in below it. */}
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              void addFiles(e.dataTransfer.files);
+            }}
+            className={`mt-4 flex w-full flex-col items-center justify-center rounded-[1.5rem] border border-dashed p-5 text-center transition ${
+              photos.length > 0 ? "min-h-32 sm:min-h-28" : "min-h-56 sm:min-h-44"
+            } ${
+              dragging
+                ? "border-brand bg-brand-soft"
+                : "border-border bg-background/60 hover:border-brand"
+            }`}
+          >
+            {busy ? (
+              <Loader2 className="mb-2 size-7 animate-spin text-brand" aria-hidden />
+            ) : (
+              <Camera className="mb-2 size-7 text-brand" aria-hidden />
+            )}
+            <span className="text-base font-semibold text-foreground sm:text-sm">
+              {isMobile ? t("dropzoneTitleMobile") : t("dropzoneTitleDesktop")}
+            </span>
+            <span className="mt-1 max-w-md text-xs text-muted">
+              {isMobile ? t("dropzoneBodyMobile") : t("dropzoneBodyDesktop")}
+            </span>
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
+              >
+                <Upload className="size-4" aria-hidden />
+                {t("uploadPhotos")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setCameraOpen(true)}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-border px-5 py-2 text-sm font-semibold transition hover:border-brand"
+              >
+                <Camera className="size-4" aria-hidden />
+                {isMobile ? t("openGuidedCamera") : t("useCamera")}
+              </button>
             </div>
           </div>
 
-          <div className="mt-4 rounded-2xl border border-border bg-background/60 p-3">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                {t("capturePlan")}
+          {/* Live capture plan — only once there's a photo to coach against. A 0%
+              bar before the first upload reads as judgement, not help. */}
+          {photos.length > 0 ? (
+            <div className="mt-4 rounded-2xl border border-border bg-background/60 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                  {t("capturePlan")}
+                </p>
+                <span className="text-xs font-semibold text-brand-strong">
+                  {t("photoConfidence", { percent: liveConfidence })}
+                </span>
+              </div>
+              <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-border">
+                <div
+                  className="h-full rounded-full bg-brand transition-all"
+                  style={{ width: `${liveConfidence}%` }}
+                />
+              </div>
+              <p className="mt-2 text-xs text-muted">
+                {nextShot
+                  ? t("nextBestShot", {
+                      title: t(`exampleShot_${nextShot.type}_title`).toLowerCase(),
+                      desc: t(`exampleShot_${nextShot.type}_desc`),
+                    })
+                  : t("greatCoverage")}
               </p>
-              <span className="text-xs font-semibold text-brand-strong">
-                {t("photoConfidence", { percent: liveConfidence })}
-              </span>
+              <div className="-mx-1 mt-3 flex snap-x gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
+                {EXAMPLE_SHOTS.map((shot) => {
+                  const done = presentTypes.has(shot.type);
+                  return (
+                    <button
+                      key={shot.type}
+                      type="button"
+                      onClick={() => addShotOfType(shot.type)}
+                      className={`flex min-w-[10.75rem] snap-start items-center gap-2 rounded-2xl border px-3 py-2 text-left text-xs transition sm:min-w-0 ${
+                        done
+                          ? "border-brand/30 bg-brand-soft text-brand-strong"
+                          : "border-border bg-surface text-foreground hover:border-brand"
+                      }`}
+                    >
+                      {done ? (
+                        <CheckCircle2 className="size-4 shrink-0 text-brand" aria-hidden />
+                      ) : isMobile ? (
+                        <Camera className="size-4 shrink-0 text-muted" aria-hidden />
+                      ) : (
+                        <Upload className="size-4 shrink-0 text-muted" aria-hidden />
+                      )}
+                      <span className="min-w-0">
+                        <span className="block font-semibold">
+                          {t(`exampleShot_${shot.type}_title`)}
+                        </span>
+                        <span className="block text-[11px] text-muted">
+                          {done ? t("shotAdded") : isMobile ? t("shotTapToAdd") : t("shotUpload")}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-border">
-              <div
-                className="h-full rounded-full bg-brand transition-all"
-                style={{ width: `${liveConfidence}%` }}
-              />
-            </div>
-            <p className="mt-2 text-xs text-muted">
-              {nextShot
-                ? t("nextBestShot", {
-                    title: t(`exampleShot_${nextShot.type}_title`).toLowerCase(),
-                    desc: t(`exampleShot_${nextShot.type}_desc`),
-                  })
-                : t("greatCoverage")}
-            </p>
-            <div className="-mx-1 mt-3 flex snap-x gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
-              {EXAMPLE_SHOTS.map((shot) => {
-                const done = presentTypes.has(shot.type);
-                return (
+          ) : null}
+
+          {photos.length === 0 ? (
+            <div className="mt-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                {t("exampleShots")}
+              </p>
+              <div className="-mx-1 mt-2 flex snap-x gap-3 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
+                {EXAMPLE_SHOTS.map((shot) => (
                   <button
                     key={shot.type}
                     type="button"
                     onClick={() => addShotOfType(shot.type)}
-                    className={`flex min-w-[10.75rem] snap-start items-center gap-2 rounded-2xl border px-3 py-2 text-left text-xs transition sm:min-w-0 ${
-                      done
-                        ? "border-brand/30 bg-brand-soft text-brand-strong"
-                        : "border-border bg-surface text-foreground hover:border-brand"
+                    className={`min-w-[12rem] snap-start overflow-hidden rounded-2xl border text-left transition hover:border-brand sm:min-w-0 ${
+                      photoType === shot.type
+                        ? "border-brand bg-brand-soft"
+                        : "border-border bg-surface"
                     }`}
                   >
-                    {done ? (
-                      <CheckCircle2 className="size-4 shrink-0 text-brand" aria-hidden />
-                    ) : isMobile ? (
-                      <Camera className="size-4 shrink-0 text-muted" aria-hidden />
-                    ) : (
-                      <Upload className="size-4 shrink-0 text-muted" aria-hidden />
-                    )}
-                    <span className="min-w-0">
-                      <span className="block font-semibold">
+                    <div className="relative aspect-[4/3] bg-[linear-gradient(135deg,var(--brand-soft),var(--surface))]">
+                      <div className="absolute inset-x-4 bottom-4 h-8 rounded-t-lg border border-brand/25 bg-surface/70" />
+                      <div className="absolute bottom-4 left-8 h-12 w-7 rounded-full bg-brand/25" />
+                      <div className="absolute bottom-4 right-8 h-16 w-8 rounded-full bg-brand/30" />
+                      {shot.overlay === "wide" ? (
+                        <div className="absolute inset-5 rounded-lg border-2 border-dashed border-brand/60" />
+                      ) : null}
+                      {shot.overlay === "plant" ? (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="flex size-20 items-center justify-center rounded-full border-2 border-dashed border-brand/70 bg-surface/50">
+                            <Leaf className="size-8 text-brand" aria-hidden />
+                          </div>
+                        </div>
+                      ) : null}
+                      {shot.overlay === "measure" ? (
+                        <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 items-center gap-2">
+                          <div className="h-1 flex-1 rounded-full bg-brand/70" />
+                          <Ruler className="size-6 text-brand" aria-hidden />
+                        </div>
+                      ) : null}
+                    </div>
+                    <div className="p-3">
+                      <p className="text-sm font-semibold text-foreground">
                         {t(`exampleShot_${shot.type}_title`)}
+                      </p>
+                      <p className="mt-1 text-xs text-muted">
+                        {t(`exampleShot_${shot.type}_desc`)}
+                      </p>
+                      <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-brand-strong">
+                        {isMobile ? (
+                          <Camera className="size-3.5" aria-hidden />
+                        ) : (
+                          <Upload className="size-3.5" aria-hidden />
+                        )}
+                        {isMobile ? t("shotTapToAdd") : t("shotUpload")}
                       </span>
-                      <span className="block text-[11px] text-muted">
-                        {done ? t("shotAdded") : isMobile ? t("shotTapToAdd") : t("shotUpload")}
-                      </span>
-                    </span>
+                    </div>
                   </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="mt-4 grid gap-3 lg:grid-cols-[220px_1fr]">
-            <div className="rounded-2xl border border-border bg-background/60 p-3">
-              <label
-                htmlFor="photo-type"
-                className="text-xs font-semibold uppercase tracking-wide text-muted"
-              >
-                {t("labelNextPhotos")}
-              </label>
-              <select
-                id="photo-type"
-                value={photoType}
-                onChange={(e) => setPhotoType(e.target.value as PhotoAssetType)}
-                className="mt-2 min-h-11 w-full rounded-xl border border-border bg-surface p-2 text-sm text-foreground"
-              >
-                {PHOTO_TYPES.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {t(`photoType_${type.value}_label`)}
-                  </option>
                 ))}
-              </select>
-              <p className="mt-2 text-xs text-muted">{t(`photoType_${selectedType.value}_hint`)}</p>
+              </div>
               <div className="mt-3 rounded-2xl bg-brand-soft p-3 text-xs text-brand-strong">
                 {t("betterPhotos")}
               </div>
             </div>
-
-            <div>
-              <input
-                ref={inputRef}
-                type="file"
-                accept="image/*"
-                capture="environment"
-                multiple
-                className="hidden"
-                suppressHydrationWarning
-                onChange={(e) => e.target.files && void addFiles(e.target.files)}
-              />
-
-              <div
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragging(true);
-                }}
-                onDragLeave={() => setDragging(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setDragging(false);
-                  void addFiles(e.dataTransfer.files);
-                }}
-                className={`flex min-h-56 w-full flex-col items-center justify-center rounded-[1.5rem] border border-dashed p-5 text-center transition sm:min-h-44 ${
-                  dragging
-                    ? "border-brand bg-brand-soft"
-                    : "border-border bg-background/60 hover:border-brand"
-                }`}
-              >
-                {busy ? (
-                  <Loader2 className="mb-2 size-7 animate-spin text-brand" aria-hidden />
-                ) : (
-                  <Camera className="mb-2 size-7 text-brand" aria-hidden />
-                )}
-                <span className="text-base font-semibold text-foreground sm:text-sm">
-                  {isMobile ? t("dropzoneTitleMobile") : t("dropzoneTitleDesktop")}
-                </span>
-                <span className="mt-1 max-w-md text-xs text-muted">
-                  {isMobile ? t("dropzoneBodyMobile") : t("dropzoneBodyDesktop")}
-                </span>
-                <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                  <button
-                    type="button"
-                    onClick={() => inputRef.current?.click()}
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
-                  >
-                    <Upload className="size-4" aria-hidden />
-                    {t("uploadPhotos")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCameraOpen(true)}
-                    className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-border px-5 py-2 text-sm font-semibold transition hover:border-brand"
-                  >
-                    <Camera className="size-4" aria-hidden />
-                    {isMobile ? t("openGuidedCamera") : t("useCamera")}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-              {t("exampleShots")}
-            </p>
-            <div className="-mx-1 mt-2 flex snap-x gap-3 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
-              {EXAMPLE_SHOTS.map((shot) => (
-                <button
-                  key={shot.type}
-                  type="button"
-                  onClick={() => setPhotoType(shot.type)}
-                  className={`min-w-[12rem] snap-start overflow-hidden rounded-2xl border text-left transition hover:border-brand sm:min-w-0 ${
-                    photoType === shot.type
-                      ? "border-brand bg-brand-soft"
-                      : "border-border bg-surface"
-                  }`}
-                >
-                  <div className="relative aspect-[4/3] bg-[linear-gradient(135deg,var(--brand-soft),var(--surface))]">
-                    <div className="absolute inset-x-4 bottom-4 h-8 rounded-t-lg border border-brand/25 bg-surface/70" />
-                    <div className="absolute bottom-4 left-8 h-12 w-7 rounded-full bg-brand/25" />
-                    <div className="absolute bottom-4 right-8 h-16 w-8 rounded-full bg-brand/30" />
-                    {shot.overlay === "wide" ? (
-                      <div className="absolute inset-5 rounded-lg border-2 border-dashed border-brand/60" />
-                    ) : null}
-                    {shot.overlay === "plant" ? (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="flex size-20 items-center justify-center rounded-full border-2 border-dashed border-brand/70 bg-surface/50">
-                          <Leaf className="size-8 text-brand" aria-hidden />
-                        </div>
-                      </div>
-                    ) : null}
-                    {shot.overlay === "measure" ? (
-                      <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 items-center gap-2">
-                        <div className="h-1 flex-1 rounded-full bg-brand/70" />
-                        <Ruler className="size-6 text-brand" aria-hidden />
-                      </div>
-                    ) : null}
-                  </div>
-                  <div className="p-3">
-                    <p className="text-sm font-semibold text-foreground">
-                      {t(`exampleShot_${shot.type}_title`)}
-                    </p>
-                    <p className="mt-1 text-xs text-muted">{t(`exampleShot_${shot.type}_desc`)}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
+          ) : null}
 
           {issues.length > 0 ? (
             <div className="mt-4 flex flex-col gap-2" aria-live="polite">

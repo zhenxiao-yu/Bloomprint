@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { ArrowRight, FileText, Info, Plus, Settings, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { initials, useAccount } from "@/lib/accountStore";
+import { useSupabaseSession } from "@/lib/supabase/useSession";
 import { useSavedPlans } from "@/lib/plansStore";
 import { CloudSyncCard } from "@/components/CloudSyncCard";
 import { ConnectAccountCard } from "@/components/account/ConnectAccountCard";
@@ -20,8 +21,23 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 export default function AccountPage() {
   const t = useTranslations("Account");
   const tc = useTranslations("Common");
+  const tr = useTranslations("Roles");
   const account = useAccount();
   const plans = useSavedPlans();
+  const { configured, status, user } = useSupabaseSession();
+
+  // A cloud sign-in is mirrored into the account by CloudAccountBridge. While that session
+  // is still resolving (or a user exists but the mirror hasn't landed yet), hold the empty
+  // state back so a freshly-logged-in user never sees "you don't have an account yet".
+  if (!account && configured && (status === "loading" || user)) {
+    return (
+      <main className="page-shell flex-1 py-10 lg:py-14" aria-busy="true">
+        <div className="mx-auto w-full max-w-2xl">
+          <div className="card h-40 animate-pulse rounded-2xl bg-surface-muted" aria-hidden />
+        </div>
+      </main>
+    );
+  }
 
   if (!account) {
     return (
@@ -77,15 +93,43 @@ export default function AccountPage() {
             colorTo="var(--accent)"
             className="opacity-60"
           />
-          <span className="flex size-14 items-center justify-center rounded-full bg-brand text-lg font-semibold text-on-strong lg:size-16">
-            {initials(account.name) || "🌱"}
-          </span>
+          {account.avatarUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={account.avatarUrl}
+              alt=""
+              referrerPolicy="no-referrer"
+              className="size-14 rounded-full object-cover lg:size-16"
+            />
+          ) : (
+            <span className="flex size-14 items-center justify-center rounded-full bg-brand text-lg font-semibold text-on-strong lg:size-16">
+              {initials(account.name) || "🌱"}
+            </span>
+          )}
           <div className="min-w-0">
             <h1 className="title-1 truncate text-foreground">{t("greeting", { name: account.name })}</h1>
             <p className="mt-1 truncate text-sm text-muted-foreground">
               {account.email ? `${account.email} · ` : ""}
               {t("memberSince", { date: new Date(account.createdAt).toLocaleDateString() })}
             </p>
+            {account.role ? (
+              <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-brand-soft px-2.5 py-1 text-xs font-semibold text-brand-strong">
+                {tr(account.role)}
+              </span>
+            ) : null}
+            {account.bio ? (
+              <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                {account.bio}
+              </p>
+            ) : null}
+            {!account.role && !account.bio ? (
+              <Link
+                href="/account/settings"
+                className="mt-2 inline-block text-sm font-medium text-brand transition hover:text-brand-strong"
+              >
+                {t("completeProfile")}
+              </Link>
+            ) : null}
           </div>
         </div>
       </BlurFade>

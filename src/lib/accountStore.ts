@@ -11,11 +11,33 @@ import { useMemo, useSyncExternalStore } from "react";
 
 const KEY = "bloomprint:v1:account";
 
+/** Who the person is, so plans and language can speak to their context. */
+export const ACCOUNT_ROLES = ["homeowner", "pro", "retailer", "renter", "other"] as const;
+export type AccountRole = (typeof ACCOUNT_ROLES)[number];
+
+export const MAX_BIO_LENGTH = 280;
+
 export interface Account {
   id: string;
   name: string;
   email?: string;
+  /** Profile photo URL (e.g. a Google avatar when signed in via cloud). */
+  avatarUrl?: string;
+  /** Self-identified role — drives nothing destructive; just tailors tone/context. */
+  role?: AccountRole;
+  /** Short free-text bio (≤ MAX_BIO_LENGTH chars). */
+  bio?: string;
+  /** "cloud" when mirrored from a Supabase session; "device" (or absent) for a local account. */
+  source?: "cloud" | "device";
   createdAt: number;
+}
+
+/** Provider-agnostic identity the cloud bridge mirrors into the device account. */
+export interface CloudIdentity {
+  id: string;
+  name: string;
+  email?: string;
+  avatarUrl?: string;
 }
 
 const listeners = new Set<() => void>();
@@ -86,19 +108,59 @@ export function createAccount(input: { name: string; email?: string }): Account 
     id: crypto.randomUUID(),
     name: input.name.trim(),
     email: input.email?.trim() || undefined,
+    source: "device",
     createdAt: Date.now(),
   };
   write(account);
   return account;
 }
 
-export function updateAccount(patch: Partial<Pick<Account, "name" | "email">>): void {
+/**
+ * Mirror a cloud session into the device account so the whole app (header, account page,
+ * settings) recognizes a signed-in cloud user. Idempotent — only writes when something
+ * changed, so it's safe to call on every session render. Passing `null` clears a
+ * previously cloud-provisioned account but leaves a purely-local account untouched.
+ */
+export function syncCloudAccount(identity: CloudIdentity | null): void {
+  const acc = current();
+  if (identity) {
+    if (
+      acc &&
+      acc.source === "cloud" &&
+      acc.id === identity.id &&
+      acc.name === identity.name &&
+      acc.email === (identity.email || undefined) &&
+      acc.avatarUrl === (identity.avatarUrl || undefined)
+    ) {
+      return; // already in sync — avoid a redundant write/notify
+    }
+    write({
+      id: identity.id,
+      name: identity.name,
+      email: identity.email || undefined,
+      avatarUrl: identity.avatarUrl || undefined,
+      // Role and bio are edited locally — never clobber them on a cloud re-sync.
+      role: acc?.role,
+      bio: acc?.bio,
+      source: "cloud",
+      createdAt: acc?.createdAt ?? Date.now(),
+    });
+  } else if (acc?.source === "cloud") {
+    write(null); // cloud signed out → remove the mirrored account
+  }
+}
+
+export function updateAccount(
+  patch: Partial<Pick<Account, "name" | "email" | "role" | "bio">>,
+): void {
   const acc = current();
   if (!acc) return;
   write({
     ...acc,
     ...("name" in patch ? { name: (patch.name ?? acc.name).trim() } : {}),
     ...("email" in patch ? { email: patch.email?.trim() || undefined } : {}),
+    ...("role" in patch ? { role: patch.role || undefined } : {}),
+    ...("bio" in patch ? { bio: patch.bio?.trim().slice(0, MAX_BIO_LENGTH) || undefined } : {}),
   });
 }
 

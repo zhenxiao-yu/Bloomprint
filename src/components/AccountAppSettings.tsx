@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Bell, Download, Moon, Smartphone, Wifi } from "lucide-react";
+import { Download, Settings2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useNotificationPrefs, type NotificationPrefs } from "@/lib/notificationPrefs";
+import { SettingsDialog } from "@/components/settings/SettingsDialog";
 
 function standaloneMode() {
   return (
@@ -13,104 +13,42 @@ function standaloneMode() {
   );
 }
 
+/**
+ * "App" tab of /account/settings. Device/app preferences (theme, language, units,
+ * notifications, privacy) all live in the shared Settings dialog — this is the single
+ * pointer to it, so the account page no longer duplicates those controls. The install /
+ * offline status below is unique to this surface.
+ */
 export function AccountAppSettings() {
   const t = useTranslations("Settings");
-  const { prefs, update } = useNotificationPrefs();
-  const [permission, setPermission] = useState<NotificationPermission | "unsupported">("default");
   const [installed, setInstalled] = useState(false);
 
   useEffect(() => {
-    const id = window.setTimeout(() => {
-      setPermission("Notification" in window ? Notification.permission : "unsupported");
-      setInstalled(standaloneMode());
-    }, 0);
+    const id = window.setTimeout(() => setInstalled(standaloneMode()), 0);
     return () => window.clearTimeout(id);
   }, []);
 
-  async function requestNotifications() {
-    if (!("Notification" in window)) {
-      setPermission("unsupported");
-      return;
-    }
-    const next = await Notification.requestPermission();
-    setPermission(next);
-  }
-
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_0.85fr]">
-      <section className="card p-5">
+    <div className="space-y-4">
+      <section className="card flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
           <span className="rounded-full bg-brand-soft p-2 text-brand">
-            <Bell className="size-5" aria-hidden />
+            <Settings2 className="size-5" aria-hidden />
           </span>
-          <div>
-            <h2 className="text-base font-semibold text-foreground">{t("notificationsTitle")}</h2>
-            <p className="mt-1 text-sm text-muted">{t("notificationsBody")}</p>
+          <div className="min-w-0">
+            <h2 className="text-base font-semibold text-foreground">{t("appSettingsTitle")}</h2>
+            <p className="mt-1 text-sm text-muted">{t("appSettingsBody")}</p>
           </div>
         </div>
-
-        <div className="mt-4 flex flex-col gap-3">
-          <ToggleRow
-            icon={Bell}
-            title={t("draftRecovery")}
-            description={t("draftRecoveryBody")}
-            checked={prefs.draftRecovery}
-            onChange={(value) => update({ draftRecovery: value })}
-          />
-          <ToggleRow
-            icon={Smartphone}
-            title={t("careReminders")}
-            description={t("careRemindersBody")}
-            checked={prefs.careReminders}
-            onChange={(value) => update({ careReminders: value })}
-          />
-          <ToggleRow
-            icon={Wifi}
-            title={t("storePrep")}
-            description={t("storePrepBody")}
-            checked={prefs.storePrep}
-            onChange={(value) => update({ storePrep: value })}
-          />
-          <ToggleRow
-            icon={Moon}
-            title={t("quietHours")}
-            description={t("quietHoursBody")}
-            checked={prefs.quietHours}
-            onChange={(value) => update({ quietHours: value })}
-          />
-        </div>
-
-        <label className="mt-4 block">
-          <span className="text-sm font-semibold text-foreground">{t("cadenceLabel")}</span>
-          <select
-            value={prefs.cadence}
-            onChange={(event) =>
-              update({ cadence: event.target.value as NotificationPrefs["cadence"] })
-            }
-            className="card mt-1 w-full p-2.5 text-sm"
-          >
-            <option value="smart">{t("cadenceSmart")}</option>
-            <option value="weekly">{t("cadenceWeekly")}</option>
-            <option value="important">{t("cadenceImportant")}</option>
-          </select>
-        </label>
-
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <SettingsDialog>
           <button
             type="button"
-            onClick={requestNotifications}
-            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-on-strong"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
           >
-            {permission === "granted" ? t("notificationsGranted") : t("enableNotifications")}
+            <Settings2 className="size-4" aria-hidden />
+            {t("openAppSettings")}
           </button>
-          <span className="text-xs text-muted">
-            {permission === "unsupported"
-              ? t("notificationsUnsupported")
-              : permission === "denied"
-                ? t("notificationsDenied")
-                : t("notificationsLocal")}
-          </span>
-        </div>
+        </SettingsDialog>
       </section>
 
       <section className="card p-5">
@@ -135,35 +73,5 @@ export function AccountAppSettings() {
         </div>
       </section>
     </div>
-  );
-}
-
-function ToggleRow({
-  icon: Icon,
-  title,
-  description,
-  checked,
-  onChange,
-}: {
-  icon: typeof Bell;
-  title: string;
-  description: string;
-  checked: boolean;
-  onChange: (checked: boolean) => void;
-}) {
-  return (
-    <label className="flex items-start gap-3 rounded-xl border border-border bg-background/60 p-3">
-      <Icon className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
-      <span className="min-w-0 flex-1">
-        <span className="block text-sm font-semibold text-foreground">{title}</span>
-        <span className="mt-1 block text-xs leading-relaxed text-muted">{description}</span>
-      </span>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(event) => onChange(event.target.checked)}
-        className="mt-1 size-5 accent-[var(--brand)]"
-      />
-    </label>
   );
 }

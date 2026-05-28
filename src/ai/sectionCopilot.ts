@@ -34,6 +34,13 @@ export const SectionQuestion = z.object({
   question: z.string().min(1).max(400),
   region: z.string().max(120).optional(),
   locale: z.enum(["en", "zh"]).default("en"),
+  /**
+   * Honest, on-device scene observations about an attached photo (e.g. "mostly greenery",
+   * "bright light") — short, bounded strings the client already localized. They give the
+   * explanation context; they are never treated as locked facts and never invent plants,
+   * prices, or measurements.
+   */
+  imageContext: z.array(z.string().max(160)).max(6).optional(),
 });
 export type SectionQuestion = z.infer<typeof SectionQuestion>;
 
@@ -100,11 +107,20 @@ const DISCLAIMER = {
 export function mockSectionAnswer(q: SectionQuestion): SectionAnswer {
   const locale = q.locale === "zh" ? "zh" : "en";
   const explanation = EXPLAIN[q.sectionType][locale];
+  // Honest, hedged acknowledgement of an attached photo — describes only the on-device
+  // scene read the client supplied, never a fabricated fact.
+  const seen = (q.imageContext ?? []).filter(Boolean);
+  const prefix =
+    seen.length === 0
+      ? ""
+      : locale === "zh"
+        ? `从你的照片中我大致看到：${seen.join("、")}（仅供参考，请自行确认）。`
+        : `From your photo I can roughly see ${seen.join(", ")} (a rough read — please confirm). `;
   // Reuse the deterministic NL→refinement parser so any change-intent in the question becomes
   // an actionable chip — never a freeform mutation.
   const suggestedRefinements = parseCommand(q.question).matched;
   return {
-    answer: explanation,
+    answer: prefix + explanation,
     suggestedRefinements,
     disclaimer: DISCLAIMER[locale],
   };

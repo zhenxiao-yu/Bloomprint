@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Lightbulb, Send, Sparkles } from "lucide-react";
+import { Lightbulb, Mic, Paperclip, Send, Sparkles, X } from "lucide-react";
 
 import type { RefinementAdjustment } from "@/domain/models";
 import { SectionAnswer, type SectionType } from "@/ai/sectionCopilot";
@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useVoiceInput } from "@/lib/useVoiceInput";
+import { fileToDataUrl, readImageRegions } from "@/lib/workspace/sceneRead";
 
 export interface CopilotSection {
   type: SectionType;
@@ -49,6 +51,52 @@ export function PlanCopilotDrawer({
   const [busy, setBusy] = useState(false);
   const [answer, setAnswer] = useState<SectionAnswer | null>(null);
   const [errored, setErrored] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [observations, setObservations] = useState<string[]>([]);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const voice = useVoiceInput(locale === "zh" ? "zh-CN" : "en-US");
+
+  // On-device scene read of an attached photo → honest, localized "I can see…" chips.
+  async function handleImage(file: File) {
+    if (!file.type.startsWith("image/")) return;
+    setAnalyzing(true);
+    try {
+      const url = await fileToDataUrl(file);
+      setImagePreview(url);
+      const region = await readImageRegions(url);
+      const obs: string[] = [];
+      if (region) {
+        if (region.greenRatio > 0.18) obs.push(t("sceneGreenery"));
+        if (region.hardscapeRatio > 0.18) obs.push(t("sceneHardscape"));
+        if (region.skyRatio > 0.16) obs.push(t("sceneSky"));
+        if (region.shadowRatio > 0.28) obs.push(t("sceneShade"));
+      }
+      setObservations(obs);
+    } catch {
+      setObservations([]);
+    } finally {
+      setAnalyzing(false);
+    }
+  }
+
+  function clearImage() {
+    setImagePreview(null);
+    setObservations([]);
+    setAnalyzing(false);
+    if (fileRef.current) fileRef.current.value = "";
+  }
+
+  // Doubao-style dictation: append the running transcript to whatever's already typed.
+  function toggleVoice() {
+    if (voice.listening) {
+      voice.stop();
+      return;
+    }
+    const base = question.trim() ? `${question.trim()} ` : "";
+    voice.start((text) => setQuestion(base + text));
+  }
 
   async function ask(q: string) {
     const text = q.trim();
@@ -65,6 +113,7 @@ export function PlanCopilotDrawer({
           question: text,
           region,
           locale: locale === "zh" ? "zh" : "en",
+          imageContext: observations.length > 0 ? observations : undefined,
         }),
       });
       if (!res.ok) throw new Error("ask failed");
@@ -91,13 +140,37 @@ export function PlanCopilotDrawer({
       setQuestion("");
       setAnswer(null);
       setErrored(false);
+      voice.stop();
+      clearImage();
     }
     onOpenChange(next);
   }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent
+        className="relative max-w-lg"
+        onDragOver={(e) => {
+          if (e.dataTransfer.types.includes("Files")) {
+            e.preventDefault();
+            setDragging(true);
+          }
+        }}
+        onDragLeave={(e) => {
+          if (e.currentTarget === e.target) setDragging(false);
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragging(false);
+          const file = e.dataTransfer.files?.[0];
+          if (file) void handleImage(file);
+        }}
+      >
+        {dragging ? (
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-[inherit] border-2 border-dashed border-brand bg-brand-soft/85 backdrop-blur-sm">
+            <p className="text-sm font-semibold text-brand-strong">{t("dropImage")}</p>
+          </div>
+        ) : null}
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="size-4 text-brand" aria-hidden />
@@ -129,6 +202,47 @@ export function PlanCopilotDrawer({
           </div>
         ) : null}
 
+        {/* Attached-photo context: thumbnail + honest on-device "I can see…" chips. */}
+        {imagePreview ? (
+          <div className="flex items-start gap-3 rounded-xl border border-border bg-surface-muted/30 p-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={imagePreview}
+              alt=""
+              className="size-14 shrink-0 rounded-lg object-cover"
+            />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <p className="eyebrow text-muted-foreground">{t("imageContextLabel")}</p>
+                <button
+                  type="button"
+                  onClick={clearImage}
+                  aria-label={t("removeImage")}
+                  className="-m-1 rounded-full p-1 text-muted transition hover:text-foreground"
+                >
+                  <X className="size-4" aria-hidden />
+                </button>
+              </div>
+              {analyzing ? (
+                <p className="mt-1 text-xs text-muted-foreground">{t("imageAnalyzing")}</p>
+              ) : observations.length > 0 ? (
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {observations.map((o) => (
+                    <span
+                      key={o}
+                      className="rounded-full bg-brand-soft px-2.5 py-1 text-[11px] font-medium text-brand-strong"
+                    >
+                      {o}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-1 text-xs text-muted-foreground">{t("imageNoRead")}</p>
+              )}
+            </div>
+          </div>
+        ) : null}
+
         <form
           className="mt-1 flex gap-2"
           onSubmit={(e) => {
@@ -136,17 +250,56 @@ export function PlanCopilotDrawer({
             void ask(question);
           }}
         >
-          <Input
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder={t("placeholder")}
-            maxLength={400}
-            aria-label={t("placeholder")}
-          />
+          <div className="relative flex-1">
+            <Input
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder={voice.listening ? t("voiceListening") : t("placeholder")}
+              maxLength={400}
+              aria-label={t("placeholder")}
+              className="pr-19"
+            />
+            <div className="absolute inset-y-0 right-1.5 flex items-center gap-0.5">
+              {voice.supported ? (
+                <button
+                  type="button"
+                  onClick={toggleVoice}
+                  aria-pressed={voice.listening}
+                  aria-label={voice.listening ? t("voiceStop") : t("voiceStart")}
+                  className={`flex size-8 items-center justify-center rounded-full transition ${
+                    voice.listening
+                      ? "animate-pulse bg-danger/15 text-danger"
+                      : "text-muted hover:text-foreground"
+                  }`}
+                >
+                  <Mic className="size-4" aria-hidden />
+                </button>
+              ) : null}
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                aria-label={t("attachImage")}
+                className="flex size-8 items-center justify-center rounded-full text-muted transition hover:text-foreground"
+              >
+                <Paperclip className="size-4" aria-hidden />
+              </button>
+            </div>
+          </div>
           <Button type="submit" size="icon" disabled={busy || !question.trim()} aria-label={t("ask")}>
             <Send className="size-4" aria-hidden />
           </Button>
         </form>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) void handleImage(file);
+            e.target.value = "";
+          }}
+        />
 
         {busy ? <p className="text-sm text-muted-foreground">{t("thinking")}</p> : null}
         {errored ? <p className="text-sm text-[var(--danger)]">{t("error")}</p> : null}

@@ -1725,7 +1725,11 @@
         "小气候有差异——背风的城市庭院可能暖半个区。"
       ],
       "emptyTitle": "输入邮编",
-      "emptyBody": "我们会查出你的 USDA 耐寒区。"
+      "emptyBody": "我们会查出你的 USDA 耐寒区。",
+      "zoneManualLabel": "或选择你的耐寒区",
+      "zoneManualNone": "选择……",
+      "manualSource": "手动选择的耐寒区——USDA 标准区间。",
+      "caPostalHint": "加拿大邮编？加拿大使用相同的耐寒区——在下方选择你的区。"
     },
     "soilPh": {
       "title": "土壤 pH 调节",

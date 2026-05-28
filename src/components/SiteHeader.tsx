@@ -5,7 +5,8 @@ import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
 import { ChevronDown, LogOut, Plus, Settings, UserRound } from "lucide-react";
 
-import { initials, signOut, useAccount } from "@/lib/accountStore";
+import { initials, useAccount } from "@/lib/accountStore";
+import { signOutEverywhere } from "@/lib/supabase/signOutEverywhere";
 import { Link, usePathname } from "@/i18n/navigation";
 import { SettingsButton } from "@/components/settings/SettingsButton";
 import { SyncStatusBadge } from "@/components/SyncStatusBadge";
@@ -169,9 +170,19 @@ export function SiteHeader() {
                     aria-label={t("account")}
                     className="group flex cursor-pointer list-none items-center gap-2 rounded-full border border-border py-1 pl-1 pr-2.5 outline-none transition hover:border-brand focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface data-[state=open]:border-brand"
                   >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-strong text-xs font-semibold text-on-strong">
-                      {initials(account.name) || "🌱"}
-                    </span>
+                    {account.avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={account.avatarUrl}
+                        alt=""
+                        referrerPolicy="no-referrer"
+                        className="h-7 w-7 rounded-full object-cover"
+                      />
+                    ) : (
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-strong text-xs font-semibold text-on-strong">
+                        {initials(account.name) || "🌱"}
+                      </span>
+                    )}
                     <span className="hidden max-w-[8rem] truncate text-sm font-medium text-foreground sm:inline">
                       {account.name}
                     </span>
@@ -186,7 +197,9 @@ export function SiteHeader() {
               <DropdownMenuContent align="end" sideOffset={8} className="w-52 rounded-xl border-border bg-surface/95 backdrop-blur-xl">
                 <DropdownMenuLabel className="flex flex-col gap-0.5">
                   <span className="truncate text-sm font-semibold text-foreground">{account.name}</span>
-                  <span className="eyebrow text-muted">Bloomprint</span>
+                  <span className="truncate text-xs font-normal text-muted">
+                    {account.email ?? "Bloomprint"}
+                  </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild className="cursor-pointer gap-2.5 rounded-lg">
@@ -204,7 +217,7 @@ export function SiteHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   variant="destructive"
-                  onSelect={() => signOut()}
+                  onSelect={() => void signOutEverywhere()}
                   className="cursor-pointer gap-2.5 rounded-lg"
                 >
                   <LogOut className="size-4" aria-hidden />

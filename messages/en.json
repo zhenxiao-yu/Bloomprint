@@ -1725,7 +1725,11 @@
         "Microclimates vary — a sheltered city yard can run a half-zone warmer."
       ],
       "emptyTitle": "Enter your ZIP",
-      "emptyBody": "We'll look up your USDA hardiness zone."
+      "emptyBody": "We'll look up your USDA hardiness zone.",
+      "zoneManualLabel": "Or choose your zone",
+      "zoneManualNone": "Select…",
+      "manualSource": "Zone entered manually — standard USDA band.",
+      "caPostalHint": "Canadian postal code? Canada uses the same zones — pick yours below."
     },
     "soilPh": {
       "title": "Soil pH Amendment",

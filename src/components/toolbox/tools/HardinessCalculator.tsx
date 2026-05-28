@@ -4,9 +4,22 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2, MapPin } from "lucide-react";
 
-import { isValidUsZip, type HardinessResult } from "@/domain/toolbox/hardiness";
+import {
+  isCanadianPostal,
+  isValidUsZip,
+  USDA_ZONES,
+  zoneTempRangeF,
+  type HardinessResult,
+} from "@/domain/toolbox/hardiness";
 import { Link } from "@/i18n/navigation";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Field, ToolExplainer } from "@/components/toolbox/_shared";
 
 type Status = "idle" | "loading" | "ok" | "error";
@@ -20,6 +33,7 @@ export function HardinessCalculator() {
   const t = useTranslations("Tools.hardiness");
 
   const [zip, setZip] = useState("");
+  const [manualZone, setManualZone] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [result, setResult] = useState<ApiOk | null>(null);
   const [errorKey, setErrorKey] = useState<"errNotFound" | "errUnreachable">("errUnreachable");
@@ -27,6 +41,7 @@ export function HardinessCalculator() {
   const [forZip, setForZip] = useState("");
 
   const valid = isValidUsZip(zip);
+  const showCaHint = isCanadianPostal(zip);
 
   useEffect(() => {
     if (!isValidUsZip(zip)) return;

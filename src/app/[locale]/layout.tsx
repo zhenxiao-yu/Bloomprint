@@ -12,6 +12,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { MobileNav } from "@/components/MobileNav";
 import { PwaClient } from "@/components/PwaClient";
+import { CloudAccountBridge } from "@/components/account/CloudAccountBridge";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
@@ -119,6 +120,7 @@ export default async function LocaleLayout({
               <TooltipProvider delayDuration={200}>
                 <SiteHeader />
                 <PwaClient />
+                <CloudAccountBridge />
                 <div className="flex flex-1 flex-col">{children}</div>
                 <SiteFooter />
                 <MobileNav />
