@@ -45,6 +45,12 @@ export const TOOL_CATALOG: readonly ToolMeta[] = [
   { slug: "bedArea", category: "hardscape", personas: ["homeowner", "pro", "yard-enthusiast"], effort: "instant" },
   { slug: "spacing", category: "planting", personas: ["homeowner", "pro", "yard-enthusiast"], effort: "quick" },
   { slug: "watering", category: "lawn", personas: ["homeowner", "yard-enthusiast"], effort: "quick" },
+  {
+    slug: "plantFinder",
+    category: "lookup",
+    personas: ["homeowner", "pro", "store-staff", "plant-enthusiast"],
+    effort: "involved",
+  },
 ];
 
 export const TOOL_SLUGS: readonly string[] = TOOL_CATALOG.map((t) => t.slug);

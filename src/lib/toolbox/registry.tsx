@@ -1,5 +1,14 @@
 import { lazy, type ComponentType, type LazyExoticComponent } from "react";
-import { Droplets, Layers, Mountain, Ruler, Scissors, Sprout, type LucideIcon } from "lucide-react";
+import {
+  Droplets,
+  Layers,
+  Leaf,
+  Mountain,
+  Ruler,
+  Scissors,
+  Sprout,
+  type LucideIcon,
+} from "lucide-react";
 
 import { TOOL_CATALOG, type ToolMeta } from "@/domain/toolbox/catalog";
 
@@ -27,6 +36,10 @@ const COMPONENTS: Record<string, () => Promise<{ default: ComponentType }>> = {
     import("@/components/toolbox/tools/SpacingCalculator").then((m) => ({ default: m.SpacingCalculator })),
   watering: () =>
     import("@/components/toolbox/tools/WateringCalculator").then((m) => ({ default: m.WateringCalculator })),
+  plantFinder: () =>
+    import("@/components/toolbox/tools/PlantFinderCalculator").then((m) => ({
+      default: m.PlantFinderCalculator,
+    })),
 };
 
 const ICONS: Record<string, LucideIcon> = {
@@ -36,6 +49,7 @@ const ICONS: Record<string, LucideIcon> = {
   bedArea: Ruler,
   spacing: Sprout,
   watering: Droplets,
+  plantFinder: Leaf,
 };
 
 export const TOOL_REGISTRY: ToolEntry[] = TOOL_CATALOG.map((meta) => ({
