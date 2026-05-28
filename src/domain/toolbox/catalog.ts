@@ -58,6 +58,9 @@ export const TOOL_CATALOG: readonly ToolMeta[] = [
     effort: "involved",
     usesLiveData: true,
   },
+  { slug: "soilPh", category: "lawn", personas: ["homeowner", "pro", "yard-enthusiast"], effort: "quick" },
+  { slug: "fertilizer", category: "lawn", personas: ["homeowner", "pro", "store-staff"], effort: "quick" },
+  { slug: "raisedBed", category: "planting", personas: ["homeowner", "yard-enthusiast"], effort: "quick" },
 ];
 
 export const TOOL_SLUGS: readonly string[] = TOOL_CATALOG.map((t) => t.slug);

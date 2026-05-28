@@ -1684,6 +1684,80 @@
       ],
       "emptyTitle": "Enter your ZIP",
       "emptyBody": "We'll look up your USDA hardiness zone."
+    },
+    "soilPh": {
+      "title": "Soil pH Amendment",
+      "intro": "How much lime to raise — or sulfur to lower — your soil pH to a target, scaled by soil texture.",
+      "currentPh": "Current pH",
+      "targetPh": "Target pH",
+      "texture": "Soil texture",
+      "texture_sandy": "Sandy",
+      "texture_loam": "Loam",
+      "texture_clay": "Clay",
+      "limeUnit": "lb lime",
+      "sulfurUnit": "lb sulfur",
+      "kgNote": "≈ {low}–{high} kg",
+      "deltaLabel": "pH change",
+      "noneTitle": "Already at your target pH",
+      "noneBody": "No lime or sulfur needed — re-test in a year.",
+      "shiftWarnTitle": "That's a big pH shift",
+      "shiftWarnBody": "Move pH no more than ~1.5 units per season. Apply in stages and re-test before adding more.",
+      "assumeRate": "Rates: extension-service figures per 1,000 sq ft per 1.0 pH unit, by texture.",
+      "assumeRetest": "A soil test is the real answer — this is a planning estimate.",
+      "formula": "amount = |Δ pH| × rate(texture) × area ÷ 1,000",
+      "how": "Limestone raises pH; elemental sulfur lowers it. Clay resists change (more product) and sand changes fast (less). We scale a per-1,000-sq-ft rate by your pH change, texture, and area.",
+      "evidence": [
+        "Lime to raise 1.0 unit / 1,000 sq ft ≈ 25 lb (sand) · 40 (loam) · 50 (clay).",
+        "Sulfur to lower 1.0 unit / 1,000 sq ft ≈ 10 · 15 · 20 lb.",
+        "Soils buffer differently — confirm with a soil test before large changes."
+      ],
+      "emptyTitle": "Enter your bed + pH",
+      "emptyBody": "Add the area and your current and target pH."
+    },
+    "fertilizer": {
+      "title": "Fertilizer (NPK) Calculator",
+      "intro": "How much of a fertilizer to apply to hit a target nitrogen rate — and when to split it.",
+      "targetN": "Target nitrogen (lb N / 1,000 sq ft)",
+      "nitrogenPct": "Fertilizer nitrogen (first NPK number, %)",
+      "productUnit": "lb of product",
+      "kgNote": "≈ {kg} kg",
+      "nApplied": "Nitrogen applied",
+      "applications": "Applications",
+      "perApp": "Per application",
+      "lbN": "{n} lb N",
+      "lb": "{n} lb",
+      "formula": "product = (target N × area ÷ 1,000) ÷ (N% ÷ 100)",
+      "how": "The bag's first number is its nitrogen percent. We work out the pounds of actual N your area needs, then divide by that percent to get product weight. Rates above 1 lb N are split into multiple feeds.",
+      "evidence": [
+        "1 lb N per 1,000 sq ft is a common single-feed turf rate.",
+        "Never apply more than ~1 lb soluble N at once — split higher rates.",
+        "Water in after applying; follow the product label."
+      ],
+      "emptyTitle": "Enter your area",
+      "emptyBody": "Add the area, target nitrogen, and the bag's N%."
+    },
+    "raisedBed": {
+      "title": "Raised-Bed Soil Blend",
+      "intro": "Total fill for a raised bed, split into a topsoil / compost / aeration recipe — bags and cubic yards per part.",
+      "height": "Fill depth",
+      "topsoilPct": "Topsoil %",
+      "compostPct": "Compost %",
+      "aerationPct": "Aeration %",
+      "topsoil": "Topsoil",
+      "compost": "Compost",
+      "aeration": "Aeration (perlite/bark)",
+      "total": "Total fill",
+      "bagsValue": "{n} bags",
+      "pctWarn": "Percentages add to {sum}% — adjust them to total 100%.",
+      "formula": "total = L × W × depth   ·   part = total × part%",
+      "how": "We compute the bed's fill volume, then split it by your recipe. A 60/30/10 topsoil-compost-aeration mix is a solid default for most vegetables.",
+      "evidence": [
+        "Default recipe: 60% topsoil, 30% compost, 10% aeration (perlite or fine bark).",
+        "1 cubic yard = 27 cubic feet; bagged mix is ~1.5 cu ft.",
+        "Beds settle — top up with compost each season."
+      ],
+      "emptyTitle": "Enter your bed size",
+      "emptyBody": "Add length, width, and fill depth."
     }
   }
 }

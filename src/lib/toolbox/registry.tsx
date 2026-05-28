@@ -1,6 +1,9 @@
 import { lazy, type ComponentType, type LazyExoticComponent } from "react";
 import {
+  Beaker,
+  Box,
   Droplets,
+  FlaskConical,
   Layers,
   Leaf,
   MapPin,
@@ -45,6 +48,11 @@ const COMPONENTS: Record<string, () => Promise<{ default: ComponentType }>> = {
     import("@/components/toolbox/tools/HardinessCalculator").then((m) => ({
       default: m.HardinessCalculator,
     })),
+  soilPh: () => import("@/components/toolbox/tools/SoilPhCalculator").then((m) => ({ default: m.SoilPhCalculator })),
+  fertilizer: () =>
+    import("@/components/toolbox/tools/FertilizerCalculator").then((m) => ({ default: m.FertilizerCalculator })),
+  raisedBed: () =>
+    import("@/components/toolbox/tools/RaisedBedCalculator").then((m) => ({ default: m.RaisedBedCalculator })),
 };
 
 const ICONS: Record<string, LucideIcon> = {
@@ -56,6 +64,9 @@ const ICONS: Record<string, LucideIcon> = {
   watering: Droplets,
   plantFinder: Leaf,
   hardiness: MapPin,
+  soilPh: FlaskConical,
+  fertilizer: Beaker,
+  raisedBed: Box,
 };
 
 export const TOOL_REGISTRY: ToolEntry[] = TOOL_CATALOG.map((meta) => ({
