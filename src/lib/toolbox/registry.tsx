@@ -4,6 +4,7 @@ import {
   Box,
   BrickWall,
   Calculator,
+  CalendarDays,
   Droplets,
   FlaskConical,
   Fence as FenceIcon,
@@ -69,6 +70,10 @@ const COMPONENTS: Record<string, () => Promise<{ default: ComponentType }>> = {
     import("@/components/toolbox/tools/FrenchDrainCalculator").then((m) => ({ default: m.FrenchDrainCalculator })),
   jobQuote: () =>
     import("@/components/toolbox/tools/JobQuoteCalculator").then((m) => ({ default: m.JobQuoteCalculator })),
+  seedStarting: () =>
+    import("@/components/toolbox/tools/SeedStartingCalculator").then((m) => ({
+      default: m.SeedStartingCalculator,
+    })),
 };
 
 const ICONS: Record<string, LucideIcon> = {
@@ -88,6 +93,7 @@ const ICONS: Record<string, LucideIcon> = {
   fence: FenceIcon,
   frenchDrain: Waves,
   jobQuote: Calculator,
+  seedStarting: CalendarDays,
 };
 
 export const TOOL_REGISTRY: ToolEntry[] = TOOL_CATALOG.map((meta) => ({

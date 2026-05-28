@@ -635,6 +635,9 @@
   "Command": {
     "title": "Tell Bloomprint what to change",
     "placeholder": "e.g. cheaper but still premium, more privacy, safer for dogs",
+    "voiceStart": "Speak your change",
+    "voiceStop": "Stop dictation",
+    "voiceListening": "Listening…",
     "apply": "Apply",
     "willApply": "I'll apply:",
     "noMatch": "I can adjust things like: cheaper, easier, more privacy, less watering, salt-tolerant. Try one of those.",
@@ -1497,6 +1500,19 @@
   },
   "Copilot": {
     "askAi": "Ask AI",
+    "voiceStart": "Speak your question",
+    "voiceStop": "Stop dictation",
+    "voiceListening": "Listening…",
+    "attachImage": "Attach a photo for context",
+    "removeImage": "Remove photo",
+    "dropImage": "Drop a photo to add context",
+    "imageContextLabel": "From your photo",
+    "imageAnalyzing": "Reading your photo on this device…",
+    "imageNoRead": "Couldn't read much from this photo — your question still works.",
+    "sceneGreenery": "mostly greenery",
+    "sceneHardscape": "lots of hard surface",
+    "sceneSky": "bright, open light",
+    "sceneShade": "shadier light",
     "title": "Ask about {section}",
     "titleGeneric": "Ask about this plan",
     "disclaimer": "Explains your plan only — it never changes the numbers. Apply a suggestion to actually adjust it.",
@@ -1921,6 +1937,38 @@
       ],
       "emptyTitle": "Enter the job area",
       "emptyBody": "Add the area and pick a service."
+    },
+    "seedStarting": {
+      "title": "Seed-Starting Schedule",
+      "intro": "From your last spring frost date, when to start each crop indoors, transplant, or sow direct.",
+      "frostMonth": "Last frost — month",
+      "frostDay": "Day",
+      "frostHint": "Not sure? Look up your last spring frost date (Old Farmer's Almanac) by ZIP or postal code.",
+      "colCrop": "Crop",
+      "indoorSow": "Start indoors",
+      "transplant": "Transplant",
+      "directSow": "Direct sow",
+      "crop_tomato": "Tomato",
+      "crop_pepper": "Pepper",
+      "crop_lettuce": "Lettuce",
+      "crop_cucumber": "Cucumber",
+      "crop_squash": "Squash",
+      "crop_beans": "Beans",
+      "crop_peas": "Peas",
+      "crop_broccoli": "Broccoli",
+      "crop_kale": "Kale",
+      "crop_basil": "Basil",
+      "crop_carrots": "Carrots",
+      "crop_onion": "Onion",
+      "formula": "date = last frost ± crop's weeks-from-frost",
+      "how": "Each crop has a known number of weeks it should be started before or after your last spring frost. We offset your frost date accordingly for indoor sowing, transplanting out, and direct sowing.",
+      "evidence": [
+        "Weeks-from-frost are standard seed-packet/extension guidelines.",
+        "Frost date is the universal anchor — it works anywhere in the US and Canada.",
+        "Adjust for your microclimate and always check the seed packet."
+      ],
+      "emptyTitle": "Enter your frost date",
+      "emptyBody": "Pick the month and day of your last spring frost."
     }
   }
 }
