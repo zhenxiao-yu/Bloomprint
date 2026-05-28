@@ -1,0 +1,95 @@
+/**
+ * Toolbox catalog — the single source of truth for which tools exist.
+ *
+ * Framework-free (no React/icons): imported by `generateStaticParams`, tests, and the
+ * lib-level registry (which adds icons + lazy components). Every slug here MUST have a
+ * component + icon in `src/lib/toolbox/registry.tsx` and a `Tools.<slug>` block in both
+ * messages/en.json and messages/zh.json — enforced by the registry-integrity test.
+ */
+export const TOOL_PERSONAS = [
+  "homeowner",
+  "pro",
+  "store-staff",
+  "yard-enthusiast",
+  "plant-enthusiast",
+] as const;
+export type ToolPersona = (typeof TOOL_PERSONAS)[number];
+
+export const TOOL_CATEGORIES = [
+  "materials",
+  "hardscape",
+  "lawn",
+  "planting",
+  "lookup",
+  "climate",
+  "budget",
+  "ai",
+] as const;
+export type ToolCategory = (typeof TOOL_CATEGORIES)[number];
+
+export type ToolEffort = "instant" | "quick" | "involved";
+
+export interface ToolMeta {
+  /** URL segment + i18n key under `Tools.<slug>`. */
+  slug: string;
+  category: ToolCategory;
+  personas: ToolPersona[];
+  effort: ToolEffort;
+  /** Tool enriches with a live API but still works fully offline. */
+  usesLiveData?: boolean;
+}
+
+export const TOOL_CATALOG: readonly ToolMeta[] = [
+  { slug: "mulch", category: "materials", personas: ["homeowner", "pro", "store-staff"], effort: "instant" },
+  { slug: "material", category: "materials", personas: ["homeowner", "pro", "yard-enthusiast"], effort: "instant" },
+  { slug: "edging", category: "hardscape", personas: ["homeowner", "pro"], effort: "instant" },
+  { slug: "bedArea", category: "hardscape", personas: ["homeowner", "pro", "yard-enthusiast"], effort: "instant" },
+  { slug: "spacing", category: "planting", personas: ["homeowner", "pro", "yard-enthusiast"], effort: "quick" },
+  { slug: "watering", category: "lawn", personas: ["homeowner", "yard-enthusiast"], effort: "quick" },
+  {
+    slug: "plantFinder",
+    category: "lookup",
+    personas: ["homeowner", "pro", "store-staff", "plant-enthusiast"],
+    effort: "involved",
+  },
+  {
+    slug: "hardiness",
+    category: "climate",
+    personas: ["homeowner", "pro", "store-staff", "plant-enthusiast"],
+    effort: "involved",
+    usesLiveData: true,
+  },
+  { slug: "soilPh", category: "lawn", personas: ["homeowner", "pro", "yard-enthusiast"], effort: "quick" },
+  { slug: "fertilizer", category: "lawn", personas: ["homeowner", "pro", "store-staff"], effort: "quick" },
+  { slug: "raisedBed", category: "planting", personas: ["homeowner", "yard-enthusiast"], effort: "quick" },
+  {
+    slug: "gardenAi",
+    category: "ai",
+    personas: ["homeowner", "pro", "store-staff", "yard-enthusiast", "plant-enthusiast"],
+    effort: "involved",
+    usesLiveData: true,
+  },
+  { slug: "retainingWall", category: "hardscape", personas: ["homeowner", "pro"], effort: "quick" },
+  { slug: "fence", category: "hardscape", personas: ["homeowner", "pro"], effort: "quick" },
+  { slug: "frenchDrain", category: "hardscape", personas: ["homeowner", "pro"], effort: "quick" },
+  { slug: "jobQuote", category: "budget", personas: ["pro"], effort: "involved" },
+  {
+    slug: "seedStarting",
+    category: "climate",
+    personas: ["homeowner", "yard-enthusiast", "plant-enthusiast"],
+    effort: "quick",
+  },
+  {
+    slug: "companion",
+    category: "planting",
+    personas: ["homeowner", "yard-enthusiast", "plant-enthusiast"],
+    effort: "quick",
+  },
+  { slug: "grassType", category: "lawn", personas: ["homeowner", "pro"], effort: "quick" },
+];
+
+export const TOOL_SLUGS: readonly string[] = TOOL_CATALOG.map((t) => t.slug);
+
+export function getToolMeta(slug: string): ToolMeta | undefined {
+  return TOOL_CATALOG.find((t) => t.slug === slug);
+}

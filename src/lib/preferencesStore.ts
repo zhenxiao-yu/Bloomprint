@@ -88,7 +88,9 @@ function emit() {
 export function applyPreferences(prefs: Preferences) {
   if (typeof document === "undefined") return;
   const el = document.documentElement;
-  el.dataset.fontScale = prefs.fontScale;
+  // Text-size scaling was removed from Settings; pin to the neutral baseline so any
+  // previously-stored scale no longer affects the document.
+  el.dataset.fontScale = "default";
   el.dataset.reduceMotion = String(prefs.reduceMotion);
   el.dataset.contrast = prefs.highContrast ? "high" : "normal";
   el.dataset.tap = prefs.largeTapTargets ? "large" : "normal";

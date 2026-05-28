@@ -110,14 +110,18 @@ export async function analyzeYardPhotos(photos: PhotoAsset[]): Promise<PhotoAnal
   };
 }
 
+// Display copy (label/value/missingInfo) is emitted as STABLE i18n KEYS, not prose, so
+// this stays framework-free (no next-intl) while the UI resolves them per-locale at the
+// render boundary (PhotoIntake namespace). Keys fall back to themselves if unresolved,
+// so older persisted drafts and test fixtures with literal text still render.
 export function extractPhotoAssumptions(photos: PhotoAsset[]): PhotoAssumption[] {
   const types = new Set(photos.map((p) => p.type));
   const assumptions: PhotoAssumption[] = [];
   if (types.has("front_yard")) {
     assumptions.push({
       id: "area-type",
-      label: "Area type",
-      value: "Looks like a front foundation or curb-appeal bed",
+      label: "assumeAreaTypeLabel",
+      value: "assumeAreaTypeValue",
       confidence: "medium",
       editable: true,
     });
@@ -125,8 +129,8 @@ export function extractPhotoAssumptions(photos: PhotoAsset[]): PhotoAssumption[]
   if (types.has("side_yard")) {
     assumptions.push({
       id: "privacy-corridor",
-      label: "Possible privacy gap",
-      value: "Side-yard photos often need screening and salt/walkway checks",
+      label: "assumePrivacyLabel",
+      value: "assumePrivacyValue",
       confidence: "low",
       editable: true,
     });
@@ -134,8 +138,8 @@ export function extractPhotoAssumptions(photos: PhotoAsset[]): PhotoAssumption[]
   if (types.has("measurement")) {
     assumptions.push({
       id: "measurements",
-      label: "Measurements",
-      value: "A measurement photo is available; confirm exact length and width before generating",
+      label: "assumeMeasureLabel",
+      value: "assumeMeasureValue",
       confidence: "good",
       editable: true,
     });
@@ -143,17 +147,16 @@ export function extractPhotoAssumptions(photos: PhotoAsset[]): PhotoAssumption[]
   if (types.has("existing_plants")) {
     assumptions.push({
       id: "plant-id",
-      label: "Plant identification",
-      value:
-        "Plant material is visible, but species is not confirmed. Add a leaf close-up or confirm plant names if known.",
+      label: "assumePlantLabel",
+      value: "assumePlantValue",
       confidence: "low",
       editable: true,
     });
   }
   assumptions.push({
     id: "sun",
-    label: "Sun exposure",
-    value: "Not enough information yet",
+    label: "assumeSunLabel",
+    value: "assumeSunValue",
     confidence: "low",
     editable: true,
   });
@@ -167,17 +170,17 @@ export function detectPlanningZones(photos: PhotoAsset[]): PhotoAnalysisResult["
       ? [
           {
             id: "front-bed",
-            label: "Front planting bed",
+            label: "zoneFrontBed",
             type: "planting_bed" as const,
             confidence: 0.62,
           },
         ]
       : []),
     ...(types.has("problem_area")
-      ? [{ id: "problem", label: "Problem area", type: "problem_area" as const, confidence: 0.55 }]
+      ? [{ id: "problem", label: "zoneProblemArea", type: "problem_area" as const, confidence: 0.55 }]
       : []),
     ...(types.has("side_yard")
-      ? [{ id: "privacy-gap", label: "Privacy gap", type: "privacy_gap" as const, confidence: 0.5 }]
+      ? [{ id: "privacy-gap", label: "zonePrivacyGap", type: "privacy_gap" as const, confidence: 0.5 }]
       : []),
   ];
 }
@@ -185,12 +188,10 @@ export function detectPlanningZones(photos: PhotoAsset[]): PhotoAnalysisResult["
 export function suggestMeasurementsToAsk(photos: PhotoAsset[], unusableCount = 0): string[] {
   const types = new Set(photos.map((p) => p.type));
   return [
-    ...(unusableCount > 0 ? ["Retake unusable photos before relying on planting zones."] : []),
-    ...(types.has("measurement")
-      ? ["Confirm length and width from the measurement photo."]
-      : ["Add bed length and width if you know them."]),
-    "Confirm sun exposure: 6+ hours, 3-6 hours, or mostly shade.",
-    "Confirm whether water sits here after rain.",
+    ...(unusableCount > 0 ? ["missingRetakeUnusable"] : []),
+    ...(types.has("measurement") ? ["missingConfirmMeasure"] : ["missingAddDims"]),
+    "missingConfirmSun",
+    "missingConfirmDrainage",
   ];
 }
 

@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
-import { ChevronDown, LogOut, Settings, UserRound } from "lucide-react";
+import { ChevronDown, LogOut, Plus, Settings, UserRound } from "lucide-react";
 
-import { initials, signOut, useAccount } from "@/lib/accountStore";
+import { initials, useAccount } from "@/lib/accountStore";
+import { signOutEverywhere } from "@/lib/supabase/signOutEverywhere";
 import { Link, usePathname } from "@/i18n/navigation";
 import { SettingsButton } from "@/components/settings/SettingsButton";
 import { SyncStatusBadge } from "@/components/SyncStatusBadge";
@@ -24,11 +25,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const NAV = [
-  { href: "/dashboard", key: "dashboard" },
-  { href: "/plan", key: "plan" },
-  { href: "/plans", key: "saved" },
+// The working surface stays inline; business + info pages tuck into a "More"
+// overflow so the bar reads as one calm row instead of eight flat links.
+const PRIMARY_NAV = [
+  { href: "/plans", key: "myPlans" },
   { href: "/toolbox", key: "toolbox" },
+] as const;
+
+const MORE_NAV = [
   { href: "/pro", key: "pro" },
   { href: "/pricing", key: "pricing" },
   { href: "/guide", key: "guide" },
@@ -40,6 +44,8 @@ export function SiteHeader() {
   const account = useAccount();
   const t = useTranslations("Nav");
   const [scrolled, setScrolled] = useState(false);
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const moreActive = MORE_NAV.some((n) => isActive(n.href));
 
   // Scroll-aware elevation: the header firms up (more opaque + a soft shadow)
   // once the page scrolls, the way native apps lift a top bar over content.
@@ -80,9 +86,8 @@ export function SiteHeader() {
 
         {/* Primary nav is hidden on mobile — the fixed bottom MobileNav carries it there. */}
         <nav className="ml-3 hidden items-center gap-1 text-base lg:gap-1.5 sm:flex">
-          {NAV.map((n) => {
-            const href = n.href as string;
-            const active = pathname === href || pathname.startsWith(`${href}/`);
+          {PRIMARY_NAV.map((n) => {
+            const active = isActive(n.href);
             return (
               <Link
                 key={n.href}
@@ -105,9 +110,54 @@ export function SiteHeader() {
               </Link>
             );
           })}
+
+          {/* Secondary pages (business + info) tuck into a calm overflow menu. */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              aria-label={t("moreDescription")}
+              className={`group relative inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1 rounded-full px-3.5 font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand/50 ${
+                moreActive ? "text-brand-strong" : "text-muted hover:text-foreground"
+              }`}
+            >
+              <span
+                className={`absolute inset-0 -z-10 rounded-full transition ${
+                  moreActive
+                    ? "bg-brand-soft"
+                    : "scale-90 bg-foreground/[0.04] opacity-0 group-hover:scale-100 group-hover:opacity-100 group-data-[state=open]:scale-100 group-data-[state=open]:opacity-100"
+                }`}
+              />
+              {t("more")}
+              <ChevronDown
+                className="size-3.5 transition-transform duration-200 group-data-[state=open]:rotate-180"
+                aria-hidden
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              sideOffset={8}
+              className="w-44 rounded-xl border-border bg-surface/95 backdrop-blur-xl"
+            >
+              {MORE_NAV.map((n) => (
+                <DropdownMenuItem key={n.href} asChild className="cursor-pointer rounded-lg">
+                  <Link href={n.href} aria-current={isActive(n.href) ? "page" : undefined}>
+                    {t(n.key)}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          {/* Primary action lives here, not as a nav tab — start a plan from anywhere.
+              Mobile uses the bottom nav's Plan tab, so this shows on sm+ only. */}
+          <Link
+            href="/plan"
+            className="hidden items-center gap-1.5 rounded-full bg-brand px-3.5 py-2 text-sm font-semibold text-on-strong shadow-sm outline-none transition hover:bg-brand-strong focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface active:scale-[0.97] sm:inline-flex"
+          >
+            <Plus className="size-4" aria-hidden />
+            {t("newPlan")}
+          </Link>
           <span className="hidden md:inline-flex">
             <SyncStatusBadge />
           </span>
@@ -120,9 +170,19 @@ export function SiteHeader() {
                     aria-label={t("account")}
                     className="group flex cursor-pointer list-none items-center gap-2 rounded-full border border-border py-1 pl-1 pr-2.5 outline-none transition hover:border-brand focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface data-[state=open]:border-brand"
                   >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-strong text-xs font-semibold text-on-strong">
-                      {initials(account.name) || "🌱"}
-                    </span>
+                    {account.avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={account.avatarUrl}
+                        alt=""
+                        referrerPolicy="no-referrer"
+                        className="h-7 w-7 rounded-full object-cover"
+                      />
+                    ) : (
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-brand to-brand-strong text-xs font-semibold text-on-strong">
+                        {initials(account.name) || "🌱"}
+                      </span>
+                    )}
                     <span className="hidden max-w-[8rem] truncate text-sm font-medium text-foreground sm:inline">
                       {account.name}
                     </span>
@@ -137,7 +197,9 @@ export function SiteHeader() {
               <DropdownMenuContent align="end" sideOffset={8} className="w-52 rounded-xl border-border bg-surface/95 backdrop-blur-xl">
                 <DropdownMenuLabel className="flex flex-col gap-0.5">
                   <span className="truncate text-sm font-semibold text-foreground">{account.name}</span>
-                  <span className="eyebrow text-muted">Bloomprint</span>
+                  <span className="truncate text-xs font-normal text-muted">
+                    {account.email ?? "Bloomprint"}
+                  </span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild className="cursor-pointer gap-2.5 rounded-lg">
@@ -155,7 +217,7 @@ export function SiteHeader() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   variant="destructive"
-                  onSelect={() => signOut()}
+                  onSelect={() => void signOutEverywhere()}
                   className="cursor-pointer gap-2.5 rounded-lg"
                 >
                   <LogOut className="size-4" aria-hidden />

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
 import {
-  Bookmark,
+  Calculator,
   GraduationCap,
   Home,
   Info,
@@ -28,14 +28,14 @@ import {
 
 const ITEMS = [
   { href: "/", key: "home", icon: Home, exact: true },
-  { href: "/dashboard", key: "dashboard", icon: LayoutDashboard, exact: false },
   { href: "/plan", key: "plan", icon: Sprout, exact: false },
-  { href: "/plans", key: "saved", icon: Bookmark, exact: false },
+  { href: "/plans", key: "myPlans", icon: LayoutDashboard, exact: false },
   { href: "/account", key: "account", icon: User, exact: false },
 ] as const;
 
 // Secondary destinations that don't earn a permanent slot in the bottom bar.
 const MORE = [
+  { href: "/toolbox", key: "toolbox", icon: Calculator },
   { href: "/pro", key: "pro", icon: Wrench },
   { href: "/pricing", key: "pricing", icon: Tag },
   { href: "/guide", key: "guide", icon: GraduationCap },

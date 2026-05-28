@@ -215,9 +215,11 @@ export function ProDashboard() {
         </TabsContent>
       </Tabs>
 
-      <p className="flex items-center gap-2 text-sm text-muted-foreground">
-        <CheckCircle2 className="size-4 text-brand" aria-hidden />
-        {t("footerNote")}
+      <div className="flex flex-col gap-3 border-t border-border/60 pt-5 sm:flex-row sm:items-center">
+        <p className="flex items-start gap-2 text-sm text-muted-foreground">
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
+          <span>{t("footerNote")}</span>
+        </p>
         <button
           type="button"
           onClick={() => {
@@ -226,11 +228,12 @@ export function ProDashboard() {
               toast.success(t("toastWorkspaceCleared"));
             }
           }}
-          className="ml-auto min-h-11 rounded-full border border-border px-3 py-1.5 font-semibold text-muted-foreground transition hover:border-danger/40 hover:text-danger"
+          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 self-start whitespace-nowrap rounded-full border border-border px-4 py-1.5 text-sm font-semibold text-muted-foreground transition hover:border-danger/40 hover:text-danger sm:ml-auto sm:self-auto"
         >
+          <Trash2 className="size-3.5" aria-hidden />
           {t("clearWorkspace")}
         </button>
-      </p>
+      </div>
 
       {editing ? (
         <ProjectDialog
@@ -359,33 +362,43 @@ function PipelineBoard({
   const t = useTranslations("Pro");
   const groups = useMemo(() => groupByStatus(projects), [projects]);
   const clientName = (id?: string) => clients.find((c) => c.id === id)?.name;
+  // Mobile: stack stages vertically and hide empty ones (the per-card stage
+  // picker handles moves, so empty drop columns add only noise on small screens).
+  // Desktop (lg+): a horizontal Kanban board with every stage as a drop target.
   return (
-    <div className="-mx-1 flex gap-3 overflow-x-auto pb-2">
-      {PRO_STATUSES.map((status) => (
-        <div key={status} className="flex min-w-[230px] flex-1 flex-col gap-2">
-          <div className="flex items-center justify-between px-1">
-            <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_TONE[status]}`}>
-              {t(`status.${status}`)}
-            </span>
-            <span className="text-xs text-muted">{groups[status].length}</span>
+    <div className="flex flex-col gap-5 lg:-mx-1 lg:flex-row lg:items-start lg:gap-3 lg:overflow-x-auto lg:pb-2">
+      {PRO_STATUSES.map((status) => {
+        const items = groups[status];
+        const empty = items.length === 0;
+        return (
+          <div
+            key={status}
+            className={`${empty ? "hidden lg:flex" : "flex"} flex-col gap-2 lg:min-w-[230px] lg:flex-1`}
+          >
+            <div className="flex items-center justify-between gap-2 px-0.5">
+              <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_TONE[status]}`}>
+                {t(`status.${status}`)}
+              </span>
+              <span className="text-xs font-medium tabular-nums text-muted">{items.length}</span>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+              {items.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  clientName={clientName(project.clientId)}
+                  onOpen={() => onOpen(project)}
+                />
+              ))}
+              {empty ? (
+                <div className="rounded-xl border border-dashed border-border p-3 text-center text-xs text-muted">
+                  {t("nothingHere")}
+                </div>
+              ) : null}
+            </div>
           </div>
-          <div className="flex flex-col gap-2">
-            {groups[status].map((project) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                clientName={clientName(project.clientId)}
-                onOpen={() => onOpen(project)}
-              />
-            ))}
-            {groups[status].length === 0 ? (
-              <div className="rounded-xl border border-dashed border-border p-3 text-center text-xs text-muted">
-                {t("nothingHere")}
-              </div>
-            ) : null}
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -402,9 +415,9 @@ function ProjectCard({
   const t = useTranslations("Pro");
   return (
     <div className="card hover-lift p-3 text-left shadow-sm">
-      <button type="button" onClick={onOpen} className="block w-full text-left">
-        <p className="text-base font-semibold text-foreground">{project.title}</p>
-        {clientName ? <p className="mt-0.5 text-sm text-muted-foreground">{clientName}</p> : null}
+      <button type="button" onClick={onOpen} className="block w-full min-w-0 text-left">
+        <p className="truncate text-base font-semibold text-foreground">{project.title}</p>
+        {clientName ? <p className="mt-0.5 truncate text-sm text-muted-foreground">{clientName}</p> : null}
         <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
           {project.savedPlanId ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 font-semibold text-brand-strong">

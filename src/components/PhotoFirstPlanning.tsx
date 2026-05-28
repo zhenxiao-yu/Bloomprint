@@ -1,6 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
+import { z } from "zod";
 import {
   AlertTriangle,
   ArrowDown,
@@ -12,7 +15,6 @@ import {
   ImageOff,
   Leaf,
   Loader2,
-  Maximize2,
   Ruler,
   ShieldCheck,
   Sparkles,
@@ -35,6 +37,7 @@ import {
   estimateConfidenceFromPhotoData,
 } from "@/lib/workspace/photoAnalysis";
 import { saveDraftPhoto } from "@/lib/workspace/draftStore";
+import { ConfidenceBadge } from "@/components/plan/TrustBadges";
 import {
   analyzeRegions,
   areNearDuplicates,
@@ -50,95 +53,38 @@ import {
 const MAX_PHOTOS = 8;
 const MAX_FILE_MB = 12;
 
-const PHOTO_TYPES: { value: PhotoAssetType; label: string; hint: string }[] = [
-  { value: "front_yard", label: "Front yard", hint: "Best wide shot from the street or walkway." },
-  { value: "backyard", label: "Backyard", hint: "Show the main usable area and edges." },
-  {
-    value: "side_yard",
-    label: "Side yard",
-    hint: "Good for privacy, drainage, and path constraints.",
-  },
-  {
-    value: "problem_area",
-    label: "Problem area",
-    hint: "Dead shrubs, bare spots, slope, or damage.",
-  },
-  {
-    value: "existing_plants",
-    label: "Existing plants",
-    hint: "Close enough to see leaves and spacing.",
-  },
-  {
-    value: "soil_drainage",
-    label: "Soil/drainage",
-    hint: "Mud, pooling water, downspouts, or low spots.",
-  },
-  {
-    value: "measurement",
-    label: "Measurements",
-    hint: "Tape measure, sketch, or known dimensions.",
-  },
-  { value: "inspiration", label: "Inspiration", hint: "Optional style reference." },
+type Translator = ReturnType<typeof useTranslations>;
+
+// Display text (label/hint/desc/title) is resolved with t() at render — the
+// constants carry only stable keys and presentation metadata (value/icon/overlay).
+const PHOTO_TYPES: { value: PhotoAssetType }[] = [
+  { value: "front_yard" },
+  { value: "backyard" },
+  { value: "side_yard" },
+  { value: "problem_area" },
+  { value: "existing_plants" },
+  { value: "soil_drainage" },
+  { value: "measurement" },
+  { value: "inspiration" },
 ];
 
-const PROJECT_TYPES: { value: ProjectKind; label: string; desc: string; icon: typeof Home }[] = [
-  {
-    value: "my_home",
-    label: "My home",
-    desc: "Plan your own yard and continue later.",
-    icon: Home,
-  },
-  {
-    value: "client_property",
-    label: "Client property",
-    desc: "Organize photos, versions, and quote-ready notes.",
-    icon: Users,
-  },
-  {
-    value: "store_customer",
-    label: "Store customer",
-    desc: "Fast operational help for a shopper in front of you.",
-    icon: Store,
-  },
+const PROJECT_TYPES: { value: ProjectKind; icon: typeof Home }[] = [
+  { value: "my_home", icon: Home },
+  { value: "client_property", icon: Users },
+  { value: "store_customer", icon: Store },
 ];
 
-const STEPS = [
-  { key: "project", label: "Project" },
-  { key: "photos", label: "Photos" },
-  { key: "confirm", label: "Confirm" },
-] as const;
+const STEPS = [{ key: "project" }, { key: "photos" }, { key: "confirm" }] as const;
 
-const CAMERA_TIPS = [
-  "Hold steady and include the bed edges.",
-  "Keep the house, walkway, or fence line level.",
-  "Use the center box for the main problem area.",
-  "Step back if plants or bed corners are cropped.",
-];
+const CAMERA_TIP_COUNT = 4;
 
 const EXAMPLE_SHOTS: {
   type: PhotoAssetType;
-  title: string;
-  desc: string;
   overlay: "wide" | "plant" | "measure";
 }[] = [
-  {
-    type: "front_yard",
-    title: "Wide context",
-    desc: "House edge, walkway, and full planting bed visible.",
-    overlay: "wide",
-  },
-  {
-    type: "existing_plants",
-    title: "Plant close-up",
-    desc: "Leaves and branching clear enough for a cautious ID note.",
-    overlay: "plant",
-  },
-  {
-    type: "measurement",
-    title: "Measurement proof",
-    desc: "Tape, sketch, or known width visible before buying.",
-    overlay: "measure",
-  },
+  { type: "front_yard", overlay: "wide" },
+  { type: "existing_plants", overlay: "plant" },
+  { type: "measurement", overlay: "measure" },
 ];
 
 type PhotoIssue = {
@@ -166,16 +112,24 @@ type FrameSignal = {
   lowDetail: boolean;
 };
 
-type VisionSuggestion = {
-  sun?: string;
-  observations?: string[];
-  note?: string;
-};
+// Validate the vision endpoint's payload at the boundary — an upstream/model change
+// can never inject an unexpected shape into the honest-AI presentation below.
+const VisionSuggestionSchema = z.object({
+  sun: z.string().optional(),
+  observations: z.array(z.string()).optional(),
+  note: z.string().optional(),
+});
+type VisionSuggestion = z.infer<typeof VisionSuggestionSchema>;
 
-function qualityLabel(quality: PhotoQuality | undefined): string {
-  if (quality === "unusable") return "Retake";
-  if (quality === "needs_review") return "Needs review";
-  return "Good";
+/** Stable id for a UI issue. `crypto.randomUUID` is missing on some insecure origins. */
+function issueId(): string {
+  return crypto.randomUUID?.() ?? `issue-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function qualityLabel(quality: PhotoQuality | undefined, t: Translator): string {
+  if (quality === "unusable") return t("quality_retake");
+  if (quality === "needs_review") return t("quality_needsReview");
+  return t("quality_good");
 }
 
 function qualityClass(quality: PhotoQuality | undefined): string {
@@ -190,11 +144,11 @@ function activeStep(photos: PhotoAsset[], analysis: PhotoAnalysisResult | null) 
   return "photos";
 }
 
-function sunLabel(value: string): string {
-  if (value === "full-sun") return "lots of sun";
-  if (value === "part-sun") return "some sun";
-  if (value === "shade") return "mostly shade";
-  return "unknown sun";
+function sunLabel(value: string, t: Translator): string {
+  if (value === "full-sun") return t("confidenceFullSun");
+  if (value === "part-sun") return t("confidencePartSun");
+  if (value === "shade") return t("confidenceShade");
+  return t("confidenceUnknownSun");
 }
 
 function dataUrlParts(
@@ -224,8 +178,9 @@ async function readVisionSuggestion(photos: PhotoAsset[]): Promise<VisionSuggest
       signal: controller.signal,
     });
     if (!res.ok) return null;
-    const data = (await res.json()) as { suggestion?: VisionSuggestion };
-    return data.suggestion ?? null;
+    const data = (await res.json()) as { suggestion?: unknown };
+    const parsed = VisionSuggestionSchema.safeParse(data.suggestion);
+    return parsed.success ? parsed.data : null;
   } catch {
     return null;
   } finally {
@@ -263,17 +218,30 @@ async function analyzeFirstPhotoRegions(photos: PhotoAsset[]): Promise<RegionSum
   }
 }
 
-const REGION_STYLE: Record<RegionClass, { fill: string; label: string }> = {
-  greenery: { fill: "rgba(34,197,94,0.30)", label: "Greenery" },
-  hardscape: { fill: "rgba(148,163,184,0.34)", label: "Hard surface" },
-  sky: { fill: "rgba(56,189,248,0.26)", label: "Sky / open light" },
-  shadow: { fill: "rgba(30,41,59,0.40)", label: "Shade" },
-  mixed: { fill: "rgba(0,0,0,0)", label: "Mixed" },
+const REGION_STYLE: Record<RegionClass, { fill: string }> = {
+  greenery: { fill: "rgba(34,197,94,0.30)" },
+  hardscape: { fill: "rgba(148,163,184,0.34)" },
+  sky: { fill: "rgba(56,189,248,0.26)" },
+  shadow: { fill: "rgba(30,41,59,0.40)" },
+  mixed: { fill: "rgba(0,0,0,0)" },
 };
+
+const REGION_LABEL_KEY: Record<RegionClass, string> = {
+  greenery: "region_greenery_label",
+  hardscape: "region_hardscape_label",
+  sky: "region_sky_label",
+  shadow: "region_shadow_label",
+  mixed: "region_mixed_label",
+};
+
+function regionLabel(cls: RegionClass, t: Translator): string {
+  return t(REGION_LABEL_KEY[cls]);
+}
 
 function mergeVisionSuggestion(
   analysis: PhotoAnalysisResult,
   suggestion: VisionSuggestion | null,
+  t: Translator,
 ): PhotoAnalysisResult {
   if (!suggestion) return analysis;
   const observations = (suggestion.observations ?? []).slice(0, 4);
@@ -287,12 +255,17 @@ function mergeVisionSuggestion(
       item.id === "sun" && suggestion.sun && suggestion.sun !== "unknown"
         ? {
             ...item,
-            value: `Photo ML estimates ${sunLabel(suggestion.sun)}. Please confirm before buying plants.`,
+            value: `Photo ML estimates ${sunLabel(suggestion.sun, t)}. Please confirm before buying plants.`,
             confidence: "medium",
           }
         : item,
     ),
-    risks: [...analysis.risks, ...(suggestion.note ? [`Photo ML note: ${suggestion.note}`] : [])],
+    // A free-form model note is never presented as a fact — it's hedged like the other
+    // vision-derived fields (honest-AI contract: AI explains, it never asserts).
+    risks: [
+      ...analysis.risks,
+      ...(suggestion.note ? [`Photo ML thinks (unconfirmed): ${suggestion.note}`] : []),
+    ],
     confidence: Math.min(0.82, analysis.confidence + (observations.length > 0 ? 0.04 : 0)),
   };
 }
@@ -302,7 +275,13 @@ function readLiveFrame(canvas: HTMLCanvasElement): { signal: FrameSignal; fill: 
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   if (!ctx) {
     return {
-      signal: { brightness: null, contrast: null, tooDark: false, tooBright: false, lowDetail: false },
+      signal: {
+        brightness: null,
+        contrast: null,
+        tooDark: false,
+        tooBright: false,
+        lowDetail: false,
+      },
       fill: 1,
     };
   }
@@ -321,12 +300,11 @@ function readLiveFrame(canvas: HTMLCanvasElement): { signal: FrameSignal; fill: 
   };
 }
 
-async function inspectDataUrl(source: string): Promise<ImageInspection> {
+async function inspectDataUrl(source: string, t: Translator): Promise<ImageInspection> {
   const img = await new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve(image);
-    image.onerror = () =>
-      reject(new Error("This image could not be opened. Try a different photo."));
+    image.onerror = () => reject(new Error(t("errorCouldNotOpen")));
     image.src = source;
   });
 
@@ -355,7 +333,7 @@ async function inspectDataUrl(source: string): Promise<ImageInspection> {
   canvas.width = Math.round(img.width * scale);
   canvas.height = Math.round(img.height * scale);
   const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Your browser could not process this photo.");
+  if (!ctx) throw new Error(t("errorBrowserProcess"));
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
   return {
@@ -369,22 +347,22 @@ async function inspectDataUrl(source: string): Promise<ImageInspection> {
   };
 }
 
-async function inspectAndCompress(file: File): Promise<ImageInspection> {
+async function inspectAndCompress(file: File, t: Translator): Promise<ImageInspection> {
   if (!file.type.startsWith("image/")) {
-    throw new Error("This file is not an image. Upload a JPG, PNG, HEIC, or WebP photo.");
+    throw new Error(t("errorNotImage"));
   }
   if (file.size > MAX_FILE_MB * 1024 * 1024) {
-    throw new Error(`This photo is over ${MAX_FILE_MB}MB. Use a smaller image or retake it.`);
+    throw new Error(t("errorTooLarge", { max: MAX_FILE_MB }));
   }
 
   const source = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(new Error("Bloomprint could not read this photo."));
+    reader.onerror = () => reject(new Error(t("errorCouldNotRead")));
     reader.readAsDataURL(file);
   });
 
-  return inspectDataUrl(source);
+  return inspectDataUrl(source, t);
 }
 
 export function PhotoFirstPlanning({
@@ -408,10 +386,15 @@ export function PhotoFirstPlanning({
   onContinue: () => void;
   onSkip: () => void;
 }) {
+  const t = useTranslations("PhotoIntake");
+  // Resolve an engine-emitted finding key (zone/assumption/missing-info) to localized
+  // copy, falling back to the raw string so legacy persisted drafts and test fixtures
+  // with literal text still render.
+  const findingText = useCallback((key: string): string => (t.has(key) ? t(key) : key), [t]);
   const [photoType, setPhotoType] = useState<PhotoAssetType>("front_yard");
   const [dragging, setDragging] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState("Draft saved locally");
+  const [status, setStatus] = useState(() => t("statusDraftSaved"));
   const [issues, setIssues] = useState<PhotoIssue[]>([]);
   const [assumptionEdits, setAssumptionEdits] = useState<Record<string, string>>({});
   const [cameraOpen, setCameraOpen] = useState(false);
@@ -434,6 +417,19 @@ export function PhotoFirstPlanning({
   const inputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  // Latest-committed photos, read at await-resume so concurrent/slow adds never
+  // commit against a stale list and silently drop an interleaved change.
+  const photosRef = useRef(photos);
+  photosRef.current = photos;
+  // Guards setState after awaits so a mid-upload unmount (user navigates away)
+  // doesn't warn or touch a torn-down tree.
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const currentStep = activeStep(photos, analysis);
   const usableCount = photos.filter((photo) => photo.quality !== "unusable").length;
@@ -444,17 +440,19 @@ export function PhotoFirstPlanning({
   const presentTypes = new Set(photos.map((photo) => photo.type));
   const liveConfidence = Math.round(estimateConfidenceFromPhotoData(photos) * 100);
   const nextShot = EXAMPLE_SHOTS.find((shot) => !presentTypes.has(shot.type));
-  const heroPhoto = photos.find((photo) => photo.quality !== "unusable" && photo.previewUrl) ?? null;
+  const heroPhoto =
+    photos.find((photo) => photo.quality !== "unusable" && photo.previewUrl) ?? null;
 
   // Pixel-grounded "I can see…" chips: real ratios from the photo + any vision ML notes.
   const sceneChips = useMemo(() => {
     const chips: { label: string; tone: "green" | "neutral" | "sky" | "shade" }[] = [];
     if (regionSummary) {
-      if (regionSummary.greenRatio > 0.18) chips.push({ label: "Greenery / planting", tone: "green" });
+      if (regionSummary.greenRatio > 0.18)
+        chips.push({ label: t("sceneChipGreenery"), tone: "green" });
       if (regionSummary.hardscapeRatio > 0.18)
-        chips.push({ label: "Paths / hard surfaces", tone: "neutral" });
-      if (regionSummary.skyRatio > 0.16) chips.push({ label: "Open sky · bright light", tone: "sky" });
-      if (regionSummary.shadowRatio > 0.28) chips.push({ label: "Shaded areas", tone: "shade" });
+        chips.push({ label: t("sceneChipHardscape"), tone: "neutral" });
+      if (regionSummary.skyRatio > 0.16) chips.push({ label: t("sceneChipSky"), tone: "sky" });
+      if (regionSummary.shadowRatio > 0.28) chips.push({ label: t("sceneChipShade"), tone: "shade" });
     }
     for (const obj of analysis?.detectedObjects ?? []) {
       if (obj.toLowerCase().startsWith("photo ml observation")) {
@@ -462,21 +460,21 @@ export function PhotoFirstPlanning({
       }
     }
     return chips.slice(0, 6);
-  }, [regionSummary, analysis]);
+  }, [regionSummary, analysis, t]);
 
   const draftRead = useMemo(() => {
     if (!analysis) return null;
     const parts: string[] = [];
     if (regionSummary) {
       const { greenRatio: g, hardscapeRatio: h, skyRatio: s, shadowRatio: d } = regionSummary;
-      if (g > h && g > 0.2) parts.push("mostly greenery");
-      else if (h > g && h > 0.2) parts.push("a lot of hard surface");
-      else if (g > 0.1 || h > 0.1) parts.push("a mix of planting and paving");
-      if (s > 0.2) parts.push("bright open light");
-      else if (d > 0.3) parts.push("shadier light");
+      if (g > h && g > 0.2) parts.push(t("draftReadMostlyGreenery"));
+      else if (h > g && h > 0.2) parts.push(t("draftReadLotsHardSurface"));
+      else if (g > 0.1 || h > 0.1) parts.push(t("draftReadMix"));
+      if (s > 0.2) parts.push(t("draftReadBrightLight"));
+      else if (d > 0.3) parts.push(t("draftReadShadierLight"));
     }
-    return `Draft read: ${parts.length ? parts.join(", ") : "your yard"}. Confirm the details below before planning.`;
-  }, [analysis, regionSummary]);
+    return t("draftRead", { parts: parts.length ? parts.join(", ") : t("draftReadYourYard") });
+  }, [analysis, regionSummary, t]);
 
   const coverageFor = (cls: RegionClass): number => {
     if (!regionSummary) return 0;
@@ -497,31 +495,28 @@ export function PhotoFirstPlanning({
     analysis?.detectedObjects.some((item) => item.toLowerCase().includes("measurement")),
   );
   const cameraTip = liveSignal.tooDark
-    ? "Too dark. Move closer to daylight."
+    ? t("cameraTipTooDark")
     : liveSignal.tooBright
-      ? "Too much glare. Tilt away from direct sun."
+      ? t("cameraTipTooBright")
       : liveSignal.lowDetail
-        ? "Low detail. Hold steady and step back."
+        ? t("cameraTipLowDetail")
         : tilted
-          ? "Straighten your phone with the house or walkway."
+          ? t("cameraTipStraighten")
           : liveFill < 0.12
-            ? "Move closer so the bed or yard fills the frame."
-            : CAMERA_TIPS[tipIndex % CAMERA_TIPS.length];
+            ? t("cameraTipFillFrame")
+            : t(`cameraTip_${tipIndex % CAMERA_TIP_COUNT}`);
   // Block capture only when light AND detail AND level are all bad — a frame this
   // poor would just be rejected on inspection, so stop it before the shutter.
   const captureBlocked =
-    cameraReady &&
-    (liveSignal.tooDark || liveSignal.tooBright) &&
-    liveSignal.lowDetail &&
-    tilted;
+    cameraReady && (liveSignal.tooDark || liveSignal.tooBright) && liveSignal.lowDetail && tilted;
 
   const analysisStatus = useMemo(() => {
     if (busy) return status;
     if (analysis)
-      return `${Math.round(analysis.confidence * 100)}% photo confidence. Please confirm before planning.`;
-    if (photos.length > 0) return "Photos saved. Preparing assumptions...";
-    return "Upload photos or continue without them.";
-  }, [analysis, busy, photos.length, status]);
+      return t("statusConfidence", { percent: Math.round(analysis.confidence * 100) });
+    if (photos.length > 0) return t("statusPreparing");
+    return t("statusUploadOrContinue");
+  }, [analysis, busy, photos.length, status, t]);
 
   useEffect(() => {
     // Coarse pointer ≈ phone/tablet → guided camera is useful; otherwise prefer upload.
@@ -544,17 +539,17 @@ export function PhotoFirstPlanning({
         setBusy(true);
         try {
           // Each status reflects a real step, not a faked timer.
-          setStatus("Reading your photo...");
+          setStatus(t("statusReadingPhoto"));
           const base = await analyzeYardPhotos(photos);
           if (!active) return;
-          setStatus("Mapping greenery and surfaces...");
+          setStatus(t("statusMappingSurfaces"));
           const region = await analyzeFirstPhotoRegions(photos);
           if (!active) return;
           setRegionSummary(region);
-          setStatus("Checking optional photo ML...");
+          setStatus(t("statusCheckingVision"));
           const suggestion = await readVisionSuggestion(photos);
           if (!active) return;
-          const merged = mergeVisionSuggestion(base, suggestion);
+          const merged = mergeVisionSuggestion(base, suggestion, t);
           const next: PhotoAnalysisResult = {
             ...merged,
             derived: derivePhotoIntake({
@@ -566,13 +561,15 @@ export function PhotoFirstPlanning({
           onAnalysis(next);
           setAssumptionEdits((current) => {
             const merged = { ...current };
-            for (const item of next.assumptions) merged[item.id] = merged[item.id] ?? item.value;
+            // Seed with resolved copy, not the raw key, so the textarea shows real text.
+            for (const item of next.assumptions)
+              merged[item.id] = merged[item.id] ?? findingText(item.value);
             return merged;
           });
-          setStatus("Photo assumptions ready to confirm");
+          setStatus(t("statusAssumptionsReady"));
         } catch {
           // Analysis is optional — never strand the user on a spinner; let them continue manually.
-          if (active) setStatus("Couldn't read that photo automatically — you can still continue.");
+          if (active) setStatus(t("statusCouldNotRead"));
         } finally {
           if (active) setBusy(false);
         }
@@ -582,12 +579,14 @@ export function PhotoFirstPlanning({
       active = false;
       window.clearTimeout(timer);
     };
-  }, [photos, onAnalysis]);
+  }, [photos, onAnalysis, t, findingText]);
 
   useEffect(() => {
+    // Tips only show in the camera modal — don't re-render the whole tree otherwise.
+    if (!cameraOpen) return;
     const id = window.setInterval(() => setTipIndex((current) => current + 1), 3500);
     return () => window.clearInterval(id);
-  }, []);
+  }, [cameraOpen]);
 
   useEffect(() => {
     if (!cameraOpen) return;
@@ -597,9 +596,7 @@ export function PhotoFirstPlanning({
       setCameraReady(false);
       try {
         if (!navigator.mediaDevices?.getUserMedia) {
-          throw new Error(
-            "Camera capture is not available in this browser. Use photo upload instead.",
-          );
+          throw new Error(t("cameraErrorNotAvailable"));
         }
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
@@ -620,11 +617,7 @@ export function PhotoFirstPlanning({
           setCameraReady(true);
         }
       } catch (error) {
-        setCameraError(
-          error instanceof Error
-            ? error.message
-            : "Bloomprint could not open the camera. You can still upload photos.",
-        );
+        setCameraError(error instanceof Error ? error.message : t("cameraErrorCouldNotOpen"));
       }
     }
     void startCamera();
@@ -634,7 +627,7 @@ export function PhotoFirstPlanning({
       streamRef.current = null;
       setCameraReady(false);
     };
-  }, [cameraOpen]);
+  }, [cameraOpen, t]);
 
   useEffect(() => {
     if (!cameraOpen || !cameraReady) return;
@@ -656,11 +649,16 @@ export function PhotoFirstPlanning({
 
   useEffect(() => {
     if (!cameraOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setCameraOpen(false);
     };
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
   }, [cameraOpen]);
 
   useEffect(() => {
@@ -677,40 +675,44 @@ export function PhotoFirstPlanning({
     const allIncoming = Array.from(files);
     if (allIncoming.length === 0) return;
     setBusy(true);
-    setStatus("Checking and compressing photos locally...");
-    const remaining = Math.max(0, MAX_PHOTOS - photos.length);
+    setStatus(t("statusCheckingCompressing"));
+    const remaining = Math.max(0, MAX_PHOTOS - photosRef.current.length);
     const incoming = allIncoming.slice(0, remaining);
     const nextIssues: PhotoIssue[] = [];
     if (allIncoming.length > remaining) {
       nextIssues.push({
-        id: crypto.randomUUID(),
-        fileName: "Photo limit",
-        message: `Bloomprint keeps up to ${MAX_PHOTOS} photos per planning draft. Extra photos were not added.`,
+        id: issueId(),
+        fileName: t("issueFileNamePhotoLimit"),
+        message: t("photoLimit", { max: MAX_PHOTOS }),
         severity: "warning",
       });
     }
 
-    const existingNames = new Set(photos.map((photo) => photo.fileName).filter(Boolean));
-    const knownSignatures = photos.map((photo) => photo.signature).filter(Boolean) as string[];
+    const existingNames = new Set(photosRef.current.map((photo) => photo.fileName).filter(Boolean));
+    const knownSignatures = photosRef.current
+      .map((photo) => photo.signature)
+      .filter(Boolean) as string[];
     const next: PhotoAsset[] = [];
     for (const file of incoming) {
       try {
         if (existingNames.has(file.name)) {
           nextIssues.push({
-            id: crypto.randomUUID(),
+            id: issueId(),
             fileName: file.name,
-            message:
-              "A photo with this name is already in the draft. It was skipped to avoid duplicates.",
+            message: t("issueDuplicateName"),
             severity: "warning",
           });
           continue;
         }
-        const inspected = await inspectAndCompress(file);
-        if (inspected.signature && knownSignatures.some((sig) => areNearDuplicates(sig, inspected.signature))) {
+        const inspected = await inspectAndCompress(file, t);
+        if (
+          inspected.signature &&
+          knownSignatures.some((sig) => areNearDuplicates(sig, inspected.signature))
+        ) {
           nextIssues.push({
-            id: crypto.randomUUID(),
+            id: issueId(),
             fileName: file.name,
-            message: "This looks like a near-duplicate of a photo already added. Capture a different angle instead.",
+            message: t("issueNearDuplicate"),
             severity: "warning",
           });
           continue;
@@ -730,7 +732,7 @@ export function PhotoFirstPlanning({
         next.push(asset);
         if (inspected.warnings.length > 0) {
           nextIssues.push({
-            id: crypto.randomUUID(),
+            id: issueId(),
             fileName: file.name,
             message: inspected.warnings[0],
             severity: inspected.quality === "unusable" ? "error" : "warning",
@@ -738,27 +740,30 @@ export function PhotoFirstPlanning({
         }
       } catch (error) {
         nextIssues.push({
-          id: crypto.randomUUID(),
+          id: issueId(),
           fileName: file.name,
-          message: error instanceof Error ? error.message : "This photo could not be processed.",
+          message: error instanceof Error ? error.message : t("errorPhotoNotProcessed"),
           severity: "error",
         });
       }
     }
+    // The user may have navigated away during the per-file awaits above.
+    if (!mountedRef.current) return;
     setIssues((current) => [...nextIssues, ...current].slice(0, 6));
-    if (next.length > 0) onPhotos([...photos, ...next]);
-    setStatus(next.length > 0 ? "Photos saved locally" : "No usable photos were added");
+    // Commit against the latest committed list, not the one captured before awaits.
+    if (next.length > 0) onPhotos([...photosRef.current, ...next]);
+    setStatus(next.length > 0 ? t("statusPhotosSaved") : t("statusNoUsablePhotos"));
     setBusy(false);
     if (inputRef.current) inputRef.current.value = "";
   }
 
   async function addCapturedPhoto(dataUrl: string) {
-    if (photos.length >= MAX_PHOTOS) {
+    if (photosRef.current.length >= MAX_PHOTOS) {
       setIssues((current) => [
         {
-          id: crypto.randomUUID(),
-          fileName: "Camera capture",
-          message: `This draft already has ${MAX_PHOTOS} photos. Remove one before capturing another.`,
+          id: issueId(),
+          fileName: t("issueFileNameCameraCapture"),
+          message: t("cameraMaxPhotos", { max: MAX_PHOTOS }),
           severity: "warning",
         },
         ...current,
@@ -766,10 +771,13 @@ export function PhotoFirstPlanning({
       return;
     }
     setBusy(true);
-    setStatus("Checking camera photo locally...");
+    setStatus(t("statusCheckingCameraPhoto"));
     try {
-      const inspected = await inspectDataUrl(dataUrl);
-      const knownSignatures = photos.map((photo) => photo.signature).filter(Boolean) as string[];
+      const inspected = await inspectDataUrl(dataUrl, t);
+      if (!mountedRef.current) return;
+      const knownSignatures = photosRef.current
+        .map((photo) => photo.signature)
+        .filter(Boolean) as string[];
       if (
         inspected.signature &&
         knownSignatures.some((sig) => areNearDuplicates(sig, inspected.signature))
@@ -777,10 +785,9 @@ export function PhotoFirstPlanning({
         setIssues((current) =>
           [
             {
-              id: crypto.randomUUID(),
-              fileName: "Camera capture",
-              message:
-                "This looks like a near-duplicate of a photo already added. Capture a different angle instead.",
+              id: issueId(),
+              fileName: t("issueFileNameCameraCapture"),
+              message: t("issueNearDuplicate"),
               severity: "warning" as const,
             },
             ...current,
@@ -790,9 +797,7 @@ export function PhotoFirstPlanning({
       }
       const warnings = [
         ...inspected.warnings,
-        ...(tilted
-          ? ["Phone looked tilted during capture. Confirm bed edges and measurements."]
-          : []),
+        ...(tilted ? [t("warningTilted")] : []),
       ];
       const asset = await saveDraftPhoto({
         sessionId,
@@ -806,13 +811,14 @@ export function PhotoFirstPlanning({
         warnings,
         signature: inspected.signature,
       });
-      onPhotos([...photos, asset]);
+      if (!mountedRef.current) return;
+      onPhotos([...photosRef.current, asset]);
       if (warnings.length > 0) {
         setIssues((current) =>
           [
             {
-              id: crypto.randomUUID(),
-              fileName: "Camera capture",
+              id: issueId(),
+              fileName: t("issueFileNameCameraCapture"),
               message: warnings[0],
               severity: asset.quality === "unusable" ? ("error" as const) : ("warning" as const),
             },
@@ -821,29 +827,29 @@ export function PhotoFirstPlanning({
         );
       }
       setCameraOpen(false);
-      setStatus("Camera photo saved locally");
+      setStatus(t("statusCameraPhotoSaved"));
     } catch (error) {
+      if (!mountedRef.current) return;
       setIssues((current) =>
         [
           {
-            id: crypto.randomUUID(),
-            fileName: "Camera capture",
-            message:
-              error instanceof Error ? error.message : "This camera photo could not be processed.",
+            id: issueId(),
+            fileName: t("issueFileNameCameraCapture"),
+            message: error instanceof Error ? error.message : t("errorCameraPhotoNotProcessed"),
             severity: "error" as const,
           },
           ...current,
         ].slice(0, 6),
       );
     } finally {
-      setBusy(false);
+      if (mountedRef.current) setBusy(false);
     }
   }
 
   function captureFromCamera() {
     const video = videoRef.current;
     if (!video || video.videoWidth === 0 || video.videoHeight === 0) {
-      setCameraError("Camera is still warming up. Try again in a moment.");
+      setCameraError(t("cameraStillWarming"));
       return;
     }
     const canvas = document.createElement("canvas");
@@ -851,7 +857,7 @@ export function PhotoFirstPlanning({
     canvas.height = video.videoHeight;
     const ctx = canvas.getContext("2d");
     if (!ctx) {
-      setCameraError("Your browser could not capture this frame.");
+      setCameraError(t("cameraCouldNotCapture"));
       return;
     }
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -893,7 +899,8 @@ export function PhotoFirstPlanning({
         ...analysis,
         assumptions: analysis.assumptions.map((item) => ({
           ...item,
-          value: assumptionEdits[item.id] ?? item.value,
+          // Persist resolved copy (or the user's edit), never the raw i18n key.
+          value: assumptionEdits[item.id] ?? findingText(item.value),
         })),
       });
     }
@@ -902,778 +909,842 @@ export function PhotoFirstPlanning({
 
   return (
     // Sits in the comfortable intake column alongside the form; no viewport breakout.
-    <div>
-     <div className="flex flex-col gap-4">
-      <section className="card overflow-hidden">
-        <div className="bg-brand-soft p-4 sm:p-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-brand">
-                Planning workspace
-              </p>
-              <h1 className="mt-1 text-2xl font-semibold text-foreground sm:text-3xl">
-                Upload the yard first. Confirm the assumptions. Then build the plan.
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm text-muted">
-                Bloomprint checks photo quality, estimates planning zones, and turns uncertainty
-                into editable questions before it generates anything.
-              </p>
-            </div>
-            <div className="rounded-xl border border-brand/20 bg-surface/80 p-3 text-xs text-muted shadow-sm">
-              <p className="font-semibold text-foreground">Autosave-first</p>
-              <p className="mt-1">Photos and choices are saved locally while you work.</p>
-            </div>
-          </div>
-
-          <div className="mt-5 grid grid-cols-3 gap-2">
-            {STEPS.map((step, index) => {
-              const done =
-                step.key === "project" ||
-                (step.key === "photos" && photos.length > 0) ||
-                (step.key === "confirm" && Boolean(analysis));
-              const active = currentStep === step.key;
-              return (
-                <div
-                  key={step.key}
-                  className={`rounded-xl border px-3 py-2 text-xs transition ${
-                    active
-                      ? "border-brand bg-surface text-foreground shadow-sm"
-                      : done
-                        ? "border-brand/20 bg-surface/70 text-brand-strong"
-                        : "border-border bg-surface/50 text-muted"
-                  }`}
-                >
-                  <span className="block font-semibold">
-                    {index + 1}. {step.label}
-                  </span>
-                  <span className="mt-0.5 block">{done ? "Ready" : "Next"}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="grid gap-2 p-4 sm:grid-cols-3 sm:p-5">
-          {PROJECT_TYPES.map(({ value, label, desc, icon: Icon }) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => onProjectKind(value)}
-              aria-pressed={projectKind === value}
-              className={`rounded-xl border p-3 text-left transition hover:border-brand hover:shadow-sm ${
-                projectKind === value ? "border-brand bg-brand-soft" : "border-border bg-surface"
-              }`}
-            >
-              <Icon className="mb-2 size-5 text-brand" aria-hidden />
-              <span className="block text-sm font-semibold text-foreground">{label}</span>
-              <span className="mt-1 block text-xs text-muted">{desc}</span>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="card p-4 sm:p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Photo intake</h2>
-            <p className="mt-1 text-sm text-muted">
-              Add 2-5 photos for best results. Wide shots help layout; close-ups help risk and plant
-              notes.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-2 text-xs text-muted">
-            <ShieldCheck className="size-4 text-brand" aria-hidden />
-            {usableCount} usable · {reviewCount} review · {unusableCount} retake
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-xl border border-border bg-background/60 p-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Capture plan</p>
-            <span className="text-xs font-semibold text-brand-strong">{liveConfidence}% photo confidence</span>
-          </div>
-          <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-border">
-            <div
-              className="h-full rounded-full bg-brand transition-all"
-              style={{ width: `${liveConfidence}%` }}
-            />
-          </div>
-          <p className="mt-2 text-xs text-muted">
-            {nextShot
-              ? `Next best shot: ${nextShot.title.toLowerCase()} — ${nextShot.desc}`
-              : "Great coverage. Add more angles or continue to confirm."}
-          </p>
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-            {EXAMPLE_SHOTS.map((shot) => {
-              const done = presentTypes.has(shot.type);
-              return (
-                <button
-                  key={shot.type}
-                  type="button"
-                  onClick={() => addShotOfType(shot.type)}
-                  className={`flex flex-1 items-center gap-2 rounded-lg border px-3 py-2 text-left text-xs transition ${
-                    done
-                      ? "border-brand/30 bg-brand-soft text-brand-strong"
-                      : "border-border bg-surface text-foreground hover:border-brand"
-                  }`}
-                >
-                  {done ? (
-                    <CheckCircle2 className="size-4 shrink-0 text-brand" aria-hidden />
-                  ) : isMobile ? (
-                    <Camera className="size-4 shrink-0 text-muted" aria-hidden />
-                  ) : (
-                    <Upload className="size-4 shrink-0 text-muted" aria-hidden />
-                  )}
-                  <span className="min-w-0">
-                    <span className="block font-semibold">{shot.title}</span>
-                    <span className="block text-[11px] text-muted">
-                      {done ? "Added" : isMobile ? "Tap to add" : "Upload"}
-                    </span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="mt-4 grid gap-3 lg:grid-cols-[220px_1fr]">
-          <div className="rounded-xl border border-border bg-background/60 p-3">
-            <label
-              htmlFor="photo-type"
-              className="text-xs font-semibold uppercase tracking-wide text-muted"
-            >
-              Label next photos
-            </label>
-            <select
-              id="photo-type"
-              value={photoType}
-              onChange={(e) => setPhotoType(e.target.value as PhotoAssetType)}
-              className="mt-2 w-full rounded-lg border border-border bg-surface p-2 text-sm text-foreground"
-            >
-              {PHOTO_TYPES.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
-            </select>
-            <p className="mt-2 text-xs text-muted">{selectedType.hint}</p>
-            <div className="mt-3 rounded-lg bg-brand-soft p-3 text-xs text-brand-strong">
-              Better photos: stand back, include house/walkway edges, avoid night shots, and add one
-              close-up of the problem area.
-            </div>
-          </div>
-
-          <div>
-            <input
-              ref={inputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              multiple
-              className="hidden"
-              suppressHydrationWarning
-              onChange={(e) => e.target.files && void addFiles(e.target.files)}
-            />
-
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragging(true);
-              }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setDragging(false);
-                void addFiles(e.dataTransfer.files);
-              }}
-              className={`flex min-h-44 w-full flex-col items-center justify-center rounded-2xl border border-dashed p-5 text-center transition ${
-                dragging
-                  ? "border-brand bg-brand-soft"
-                  : "border-border bg-background/60 hover:border-brand"
-              }`}
-            >
-              {busy ? (
-                <Loader2 className="mb-2 size-7 animate-spin text-brand" aria-hidden />
-              ) : (
-                <Camera className="mb-2 size-7 text-brand" aria-hidden />
-              )}
-              <span className="text-sm font-semibold text-foreground">
-                {isMobile ? "Take guided photos or upload existing images" : "Drag photos here or upload to review"}
-              </span>
-              <span className="mt-1 max-w-md text-xs text-muted">
-                {isMobile
-                  ? "Camera mode adds gridlines, framing templates, and live lighting hints. Uploads use the same local quality checks and review."
-                  : "Upload one or more yard photos and Bloomprint reviews each one — quality, greenery, and suggested answers — right here. The guided camera is best on a phone."}
-              </span>
-              <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={() => inputRef.current?.click()}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
-                >
-                  <Upload className="size-4" aria-hidden />
-                  Upload photos
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCameraOpen(true)}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold transition hover:border-brand"
-                >
-                  <Camera className="size-4" aria-hidden />
-                  {isMobile ? "Open guided camera" : "Use camera"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Example shots</p>
-          <div className="mt-2 grid gap-3 sm:grid-cols-3">
-            {EXAMPLE_SHOTS.map((shot) => (
-              <button
-                key={shot.type}
-                type="button"
-                onClick={() => setPhotoType(shot.type)}
-                className={`overflow-hidden rounded-xl border text-left transition hover:border-brand ${
-                  photoType === shot.type
-                    ? "border-brand bg-brand-soft"
-                    : "border-border bg-surface"
-                }`}
-              >
-                <div className="relative aspect-[4/3] bg-[linear-gradient(135deg,var(--brand-soft),var(--surface))]">
-                  <div className="absolute inset-x-4 bottom-4 h-8 rounded-t-lg border border-brand/25 bg-surface/70" />
-                  <div className="absolute bottom-4 left-8 h-12 w-7 rounded-full bg-brand/25" />
-                  <div className="absolute bottom-4 right-8 h-16 w-8 rounded-full bg-brand/30" />
-                  {shot.overlay === "wide" ? (
-                    <div className="absolute inset-5 rounded-lg border-2 border-dashed border-brand/60" />
-                  ) : null}
-                  {shot.overlay === "plant" ? (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="flex size-20 items-center justify-center rounded-full border-2 border-dashed border-brand/70 bg-surface/50">
-                        <Leaf className="size-8 text-brand" aria-hidden />
-                      </div>
-                    </div>
-                  ) : null}
-                  {shot.overlay === "measure" ? (
-                    <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 items-center gap-2">
-                      <div className="h-1 flex-1 rounded-full bg-brand/70" />
-                      <Ruler className="size-6 text-brand" aria-hidden />
-                    </div>
-                  ) : null}
-                </div>
-                <div className="p-3">
-                  <p className="text-sm font-semibold text-foreground">{shot.title}</p>
-                  <p className="mt-1 text-xs text-muted">{shot.desc}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {issues.length > 0 ? (
-          <div className="mt-4 flex flex-col gap-2" aria-live="polite">
-            {issues.map((issue) => (
-              <div
-                key={issue.id}
-                className={`rounded-xl border px-3 py-2 text-sm ${
-                  issue.severity === "error"
-                    ? "border-danger/30 bg-danger/10 text-danger"
-                    : "border-[var(--warn)]/30 bg-[var(--warn)]/10 text-[var(--warn)]"
-                }`}
-              >
-                <span className="font-semibold">{issue.fileName}: </span>
-                {issue.message}
-              </div>
-            ))}
-          </div>
-        ) : null}
-
-        {photos.length > 0 ? (
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {photos.map((photo, index) => (
-              <figure
-                key={photo.id}
-                className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm"
-              >
-                <div className="relative">
-                  {photo.previewUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={photo.previewUrl}
-                      alt={`${PHOTO_TYPES.find((type) => type.value === photo.type)?.label ?? "Yard"} photo ${index + 1}`}
-                      className="aspect-[4/3] w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex aspect-[4/3] items-center justify-center bg-brand-soft">
-                      <ImageOff className="size-8 text-brand" aria-hidden />
-                    </div>
-                  )}
-                  <span
-                    className={`absolute left-2 top-2 rounded-full border px-2 py-1 text-[11px] font-semibold ${qualityClass(photo.quality)}`}
-                  >
-                    {qualityLabel(photo.quality)}
-                  </span>
-                </div>
-                <figcaption className="flex flex-col gap-2 p-3 text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full bg-brand-soft px-2 py-0.5 font-semibold text-brand-strong">
-                      {index + 1}
-                    </span>
-                    <span className="min-w-0 flex-1 truncate text-muted">
-                      {photo.fileName ?? "Yard photo"}
-                    </span>
-                  </div>
-                  <select
-                    value={photo.type}
-                    onChange={(e) => updatePhotoType(photo.id, e.target.value as PhotoAssetType)}
-                    className="w-full rounded-lg border border-border bg-background p-2 text-xs text-foreground"
-                    aria-label="Photo type"
-                  >
-                    {PHOTO_TYPES.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.label}
-                      </option>
-                    ))}
-                  </select>
-                  {photo.warnings && photo.warnings.length > 0 ? (
-                    <p className="rounded-lg bg-background/70 p-2 text-[11px] leading-relaxed text-muted">
-                      {photo.warnings[0]}
-                    </p>
-                  ) : null}
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => movePhoto(photo.id, -1)}
-                      disabled={index === 0}
-                      className="rounded-full border border-border p-1.5 text-muted transition hover:text-foreground disabled:opacity-40"
-                      aria-label="Move photo earlier"
-                    >
-                      <ArrowUp className="size-3.5" aria-hidden />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => movePhoto(photo.id, 1)}
-                      disabled={index === photos.length - 1}
-                      className="rounded-full border border-border p-1.5 text-muted transition hover:text-foreground disabled:opacity-40"
-                      aria-label="Move photo later"
-                    >
-                      <ArrowDown className="size-3.5" aria-hidden />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => addShotOfType(photo.type)}
-                      className={`ml-auto inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold transition ${
-                        photo.quality === "good"
-                          ? "border-border text-muted hover:border-brand hover:text-foreground"
-                          : "border-brand/40 bg-brand-soft text-brand-strong"
-                      }`}
-                    >
-                      {isMobile ? (
-                        <Camera className="size-3.5" aria-hidden />
-                      ) : (
-                        <Upload className="size-3.5" aria-hidden />
-                      )}
-                      {isMobile ? "Retake" : "Replace"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => removePhoto(photo.id)}
-                      className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-1 text-[11px] font-semibold text-danger transition hover:border-danger/40"
-                    >
-                      <Trash2 className="size-3.5" aria-hidden />
-                      Remove
-                    </button>
-                  </div>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        ) : null}
-      </section>
-
-      <section className="card p-4 sm:p-5">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="flex items-center gap-2">
-            {busy ? (
-              <Loader2 className="size-4 animate-spin text-brand" aria-hidden />
-            ) : (
-              <CheckCircle2 className="size-4 text-brand" aria-hidden />
-            )}
-            <h2 className="text-lg font-semibold text-foreground">Confirm before planning</h2>
-          </div>
-          <span className="text-xs text-muted sm:ml-auto">{analysisStatus}</span>
-        </div>
-
-        {analysis ? (
-          <div className="mt-4 flex flex-col gap-4">
-            {draftRead ? (
-              <div className="flex items-start gap-2 rounded-xl border border-brand/25 bg-brand-soft p-3">
-                <Sparkles className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
-                <p className="text-sm font-medium text-brand-strong">{draftRead}</p>
-              </div>
-            ) : null}
-
-            {heroPhoto?.previewUrl && regionSummary ? (
-              <div className="rounded-xl border border-border bg-background/60 p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                  What Bloomprint sees
-                </p>
-                <p className="mt-1 text-[11px] text-muted">
-                  A rough read of your photo — greenery, surfaces, and light. An estimate to confirm,
-                  not a measurement. Tap a tile for detail.
-                </p>
-                <div className="mt-2 grid gap-3 sm:grid-cols-[1.4fr_1fr]">
-                  <div className="relative overflow-hidden rounded-lg border border-border">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={heroPhoto.previewUrl}
-                      alt="Your yard with a rough greenery and surface read"
-                      className="aspect-[3/2] w-full object-cover"
-                    />
-                    <div
-                      className="absolute inset-0 grid"
-                      style={{
-                        gridTemplateColumns: `repeat(${regionSummary.cols}, 1fr)`,
-                        gridTemplateRows: `repeat(${regionSummary.rows}, 1fr)`,
-                      }}
-                    >
-                      {regionSummary.cells.map((cell, i) => (
-                        <button
-                          key={i}
-                          type="button"
-                          onClick={() => setSelectedCell(selectedCell === i ? null : i)}
-                          className={`transition ${selectedCell === i ? "ring-2 ring-inset ring-white" : ""}`}
-                          style={{ backgroundColor: REGION_STYLE[cell.cls].fill }}
-                          aria-label={REGION_STYLE[cell.cls].label}
-                        />
-                      ))}
-                    </div>
-                    {selectedCell !== null && regionSummary.cells[selectedCell] ? (
-                      <div className="absolute inset-x-2 bottom-2 rounded-lg bg-black/75 px-3 py-1.5 text-xs text-white">
-                        {REGION_STYLE[regionSummary.cells[selectedCell].cls].label} — about{" "}
-                        {Math.round(coverageFor(regionSummary.cells[selectedCell].cls) * 100)}% of the
-                        photo
-                      </div>
-                    ) : null}
-                  </div>
-                  <div className="flex flex-col gap-3">
-                    <div className="flex flex-wrap gap-1.5">
-                      {sceneChips.length > 0 ? (
-                        sceneChips.map((chip, i) => (
-                          <span
-                            key={`${chip.label}-${i}`}
-                            className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
-                              chip.tone === "green"
-                                ? "bg-brand-soft text-brand-strong"
-                                : chip.tone === "sky"
-                                  ? "bg-sky-500/15 text-sky-700 dark:text-sky-300"
-                                  : chip.tone === "shade"
-                                    ? "bg-slate-500/15 text-slate-600 dark:text-slate-300"
-                                    : "bg-border/70 text-muted"
-                            }`}
-                          >
-                            {chip.label}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-xs text-muted">
-                          Not enough detail to read confidently — confirm below.
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
-                        Greenery vs. hard surfaces
-                      </p>
-                      <div className="mt-1 flex h-3 overflow-hidden rounded-full bg-border">
-                        <div
-                          className="bg-brand"
-                          style={{ width: `${Math.round(regionSummary.greenRatio * 100)}%` }}
-                        />
-                        <div
-                          className="bg-slate-400"
-                          style={{ width: `${Math.round(regionSummary.hardscapeRatio * 100)}%` }}
-                        />
-                      </div>
-                      <p className="mt-1 text-[11px] text-muted">
-                        ~{Math.round(regionSummary.greenRatio * 100)}% greenery · ~
-                        {Math.round(regionSummary.hardscapeRatio * 100)}% hard surface (estimate)
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              <ReadinessCheck
-                label="Details detected"
-                value={detailsDetected}
-                yes="Zones or constraints found"
-                no="Add a wide context photo"
-              />
-              <ReadinessCheck
-                label="Plant identified"
-                value={plantIdentified}
-                yes="Plant material visible"
-                no="Add existing-plant close-up"
-              />
-              <ReadinessCheck
-                label="Measurements seen"
-                value={measurementDetected}
-                yes="Measurement reference present"
-                no="Add dimensions manually"
-              />
-            </div>
-
-            <div className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
-              <div className="flex flex-col gap-3">
-                <div className="rounded-xl border border-border bg-background/60 p-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                    Detected zones
-                  </p>
-                  <ul className="mt-2 flex flex-col gap-2">
-                    {analysis.zones.length > 0 ? (
-                      analysis.zones.map((zone) => (
-                        <li
-                          key={zone.id}
-                          className="rounded-lg bg-brand-soft px-3 py-2 text-sm text-brand-strong"
-                        >
-                          Looks like: {zone.label} ({Math.round(zone.confidence * 100)}% confidence)
-                        </li>
-                      ))
-                    ) : (
-                      <li className="rounded-lg bg-border/50 px-3 py-2 text-sm text-muted">
-                        Not enough usable photo information yet.
-                      </li>
-                    )}
-                  </ul>
-                </div>
-                <div className="rounded-xl border border-border bg-background/60 p-3">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                    Needs checking
-                  </p>
-                  <ul className="mt-2 flex flex-col gap-2 text-sm text-muted">
-                    {analysis.missingInfo.map((item) => (
-                      <li key={item} className="flex gap-2">
-                        <AlertTriangle
-                          className="mt-0.5 size-4 shrink-0 text-[var(--warn)]"
-                          aria-hidden
-                        />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-border bg-background/60 p-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                  Editable assumptions
-                </p>
-                <div className="mt-3 flex flex-col gap-3">
-                  {analysis.assumptions.map((item) => (
-                    <label key={item.id} className="flex flex-col gap-1 text-sm">
-                      <span className="flex items-center gap-2 font-medium text-foreground">
-                        {item.label}
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wide ${
-                            item.confidence === "good"
-                              ? "bg-brand-soft text-brand-strong"
-                              : item.confidence === "medium"
-                                ? "bg-[var(--warn)]/10 text-[var(--warn)]"
-                                : "bg-border/60 text-muted"
-                          }`}
-                        >
-                          {item.confidence}
-                        </span>
-                      </span>
-                      <textarea
-                        value={assumptionEdits[item.id] ?? item.value}
-                        onChange={(e) =>
-                          setAssumptionEdits((current) => ({
-                            ...current,
-                            [item.id]: e.target.value,
-                          }))
-                        }
-                        className="min-h-16 rounded-lg border border-border bg-surface p-2 text-sm text-foreground"
-                        disabled={!item.editable}
-                      />
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="mt-4 rounded-xl border border-border bg-background/60 p-4">
-            <Sparkles className="mb-2 size-5 text-brand" aria-hidden />
-            <p className="text-sm font-semibold text-foreground">No photo assumptions yet.</p>
-            <p className="mt-1 text-sm text-muted">
-              Add photos to detect planning zones, or continue without photos and answer the garden
-              details manually.
-            </p>
-          </div>
-        )}
-
-        <div className="sticky bottom-3 mt-4 flex flex-col gap-2 rounded-2xl border border-border bg-surface/95 p-3 shadow-lg backdrop-blur sm:static sm:flex-row sm:items-center sm:shadow-none">
-          <button
-            type="button"
-            onClick={confirmAndContinue}
-            disabled={busy}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
-          >
-            <ClipboardEdit className="size-4" aria-hidden />
-            Confirm and add garden details
-          </button>
-          <button
-            type="button"
-            onClick={onSkip}
-            className="rounded-full border border-border px-5 py-2.5 text-sm font-semibold transition hover:border-brand"
-          >
-            Continue without photos
-          </button>
-          <span className="text-center text-[11px] text-muted sm:ml-auto sm:text-left">
-            Draft saved locally. You can safely leave and come back.
-          </span>
-        </div>
-      </section>
-
-      {cameraOpen ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Guided camera"
-        >
-          <div className="flex max-h-[96vh] w-full max-w-md flex-col overflow-hidden rounded-2xl bg-surface shadow-2xl">
-            <div className="flex items-center gap-3 border-b border-border p-3">
+    <div className="min-w-0">
+      <div className="flex min-w-0 flex-col gap-4">
+        <section className="overflow-hidden rounded-[1.5rem] border border-border bg-surface shadow-sm sm:rounded-2xl">
+          <div className="bg-brand-soft p-4 sm:p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <p className="text-sm font-semibold text-foreground">Guided camera</p>
-                <p className="text-xs text-muted">
-                  {selectedType.label}: {selectedType.hint}
+                <p className="text-xs font-semibold uppercase tracking-wide text-brand">
+                  {t("headerEyebrow")}
+                </p>
+                <h1 className="mt-1 text-2xl font-semibold leading-tight text-foreground sm:text-3xl">
+                  {t("headerTitle")}
+                </h1>
+                <p className="mt-2 line-clamp-2 max-w-2xl text-sm text-muted sm:line-clamp-none">
+                  {t("headerSubtitle")}
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setCameraOpen(false)}
-                className="ml-auto rounded-full border border-border p-2 text-muted transition hover:text-foreground"
-                aria-label="Close camera"
-              >
-                <X className="size-4" aria-hidden />
-              </button>
+              <div className="hidden rounded-2xl border border-brand/20 bg-surface/80 p-3 text-xs text-muted shadow-sm sm:block">
+                <p className="font-semibold text-foreground">{t("autosaveTitle")}</p>
+                <p className="mt-1">{t("autosaveBody")}</p>
+              </div>
             </div>
 
-            <div className="relative aspect-[3/4] bg-black">
-              <video ref={videoRef} playsInline muted className="h-full w-full object-cover" />
-
-              <div className="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3">
-                {Array.from({ length: 9 }).map((_, index) => (
+            <div className="mt-5 grid grid-cols-3 gap-2">
+              {STEPS.map((step, index) => {
+                const done =
+                  step.key === "project" ||
+                  (step.key === "photos" && photos.length > 0) ||
+                  (step.key === "confirm" && Boolean(analysis));
+                const active = currentStep === step.key;
+                return (
                   <div
-                    key={index}
-                    className={`${index % 3 !== 2 ? "border-r" : ""} ${
-                      index < 6 ? "border-b" : ""
-                    } border-white/25`}
-                  />
-                ))}
-              </div>
-
-              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3">
-                <div
-                  className={`border-2 border-dashed ${
-                    photoType === "measurement"
-                      ? "h-20 w-64 rounded-lg border-sky-300/80"
-                      : photoType === "existing_plants"
-                        ? "size-44 rounded-full border-lime-300/80"
-                        : "h-56 w-64 rounded-2xl border-yellow-300/80"
-                  }`}
-                />
-                <span className="max-w-[18rem] rounded-lg bg-black/65 px-3 py-1 text-center text-[11px] text-white/90 backdrop-blur-sm">
-                  Frame the {selectedType.label.toLowerCase()}: {selectedType.hint}
-                </span>
-              </div>
-
-              <div className="pointer-events-none absolute left-0 right-0 top-3 flex justify-center px-3">
-                <span className="rounded-full border border-white/15 bg-black/70 px-4 py-1.5 text-center text-xs font-semibold text-white shadow-lg backdrop-blur-md">
-                  {cameraTip}
-                </span>
-              </div>
-
-              <div className="pointer-events-none absolute bottom-3 left-3 right-3 grid grid-cols-3 gap-2 text-[11px]">
-                <LiveMetric label="Light" ok={!liveSignal.tooDark && !liveSignal.tooBright} />
-                <LiveMetric label="Detail" ok={!liveSignal.lowDetail} />
-                <LiveMetric label="Level" ok={!tilted} />
-              </div>
-
-              {(liveSignal.tooDark || liveSignal.tooBright || liveSignal.lowDetail) && (
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-danger/10">
-                  <span className="rounded-full bg-danger px-3 py-1 text-xs font-bold uppercase tracking-wide text-on-strong">
-                    Check photo before capture
-                  </span>
-                </div>
-              )}
-
-              {!cameraReady ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white">
-                  <div className="text-center">
-                    <Loader2 className="mx-auto mb-2 size-6 animate-spin" aria-hidden />
-                    <p className="text-sm font-semibold">
-                      {cameraError ? "Camera unavailable" : "Opening camera..."}
-                    </p>
-                    {cameraError ? (
-                      <p className="mt-1 max-w-xs text-xs text-white/75">{cameraError}</p>
-                    ) : null}
+                    key={step.key}
+                    className={`rounded-2xl border px-3 py-2 text-xs transition ${
+                      active
+                        ? "border-brand bg-surface text-foreground shadow-sm"
+                        : done
+                          ? "border-brand/20 bg-surface/70 text-brand-strong"
+                          : "border-border bg-surface/50 text-muted"
+                    }`}
+                  >
+                    <span className="block font-semibold">
+                      {index + 1}. {t(`step_${step.key}_label`)}
+                    </span>
+                    <span className="mt-0.5 block">{done ? t("stepReady") : t("stepNext")}</span>
                   </div>
-                </div>
-              ) : null}
+                );
+              })}
             </div>
+          </div>
 
-            <div className="flex flex-col gap-3 p-3">
-              <div className="grid grid-cols-3 gap-2">
-                {(["front_yard", "existing_plants", "measurement"] as PhotoAssetType[]).map(
-                  (type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setPhotoType(type)}
-                      className={`rounded-xl border px-2 py-2 text-xs font-semibold ${
-                        photoType === type
-                          ? "border-brand bg-brand-soft text-brand-strong"
-                          : "border-border text-muted"
-                      }`}
-                    >
-                      {PHOTO_TYPES.find((item) => item.value === type)?.label}
-                    </button>
-                  ),
-                )}
-              </div>
+          <div className="grid grid-cols-3 gap-2 p-3 sm:p-5">
+            {PROJECT_TYPES.map(({ value, icon: Icon }) => (
               <button
+                key={value}
                 type="button"
-                onClick={captureFromCamera}
-                disabled={!cameraReady || busy || captureBlocked}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
+                onClick={() => onProjectKind(value)}
+                aria-pressed={projectKind === value}
+                className={`rounded-2xl border p-2 text-left transition hover:border-brand hover:shadow-sm sm:p-3 ${
+                  projectKind === value ? "border-brand bg-brand-soft" : "border-border bg-surface"
+                }`}
               >
-                <Maximize2 className="size-4" aria-hidden />
-                {captureBlocked ? "Adjust the shot to capture" : "Capture guided photo"}
+                <Icon className="mb-1 size-5 text-brand sm:mb-2" aria-hidden />
+                <span className="block text-xs font-semibold leading-tight text-foreground sm:text-sm">
+                  {t(`projectType_${value}_label`)}
+                </span>
+                <span className="mt-1 hidden text-xs text-muted sm:block">
+                  {t(`projectType_${value}_desc`)}
+                </span>
               </button>
-              {captureBlocked ? (
-                <p className="text-center text-xs font-medium text-danger">
-                  Lighting, detail, and level all need fixing before this photo is usable.
-                </p>
-              ) : null}
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-[1.5rem] border border-border bg-surface p-4 shadow-sm sm:rounded-2xl sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">{t("photoIntakeHeading")}</h2>
+              <p className="mt-1 text-sm text-muted">{t("photoIntakeSubtitle")}</p>
+            </div>
+            {photos.length > 0 ? (
+              <div className="flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-2 text-xs text-muted">
+                <ShieldCheck className="size-4 text-brand" aria-hidden />
+                {t("usableSummary", {
+                  usable: usableCount,
+                  review: reviewCount,
+                  unusable: unusableCount,
+                })}
+              </div>
+            ) : null}
+          </div>
+
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            multiple
+            className="hidden"
+            suppressHydrationWarning
+            onChange={(e) => e.target.files && void addFiles(e.target.files)}
+          />
+
+          {/* Focal add action: prominent before the first photo, compact once the
+              workspace (capture plan + grid) fills in below it. */}
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setDragging(false);
+              void addFiles(e.dataTransfer.files);
+            }}
+            className={`mt-4 flex w-full flex-col items-center justify-center rounded-[1.5rem] border border-dashed p-5 text-center transition ${
+              photos.length > 0 ? "min-h-32 sm:min-h-28" : "min-h-56 sm:min-h-44"
+            } ${
+              dragging
+                ? "border-brand bg-brand-soft"
+                : "border-border bg-background/60 hover:border-brand"
+            }`}
+          >
+            {busy ? (
+              <Loader2 className="mb-2 size-7 animate-spin text-brand" aria-hidden />
+            ) : (
+              <Camera className="mb-2 size-7 text-brand" aria-hidden />
+            )}
+            <span className="text-base font-semibold text-foreground sm:text-sm">
+              {isMobile ? t("dropzoneTitleMobile") : t("dropzoneTitleDesktop")}
+            </span>
+            <span className="mt-1 max-w-md text-xs text-muted">
+              {isMobile ? t("dropzoneBodyMobile") : t("dropzoneBodyDesktop")}
+            </span>
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="rounded-full border border-border px-5 py-2 text-sm font-semibold"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-brand px-5 py-2 text-sm font-semibold text-on-strong transition hover:bg-brand-strong"
               >
-                Use upload instead
+                <Upload className="size-4" aria-hidden />
+                {t("uploadPhotos")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setCameraOpen(true)}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-border px-5 py-2 text-sm font-semibold transition hover:border-brand"
+              >
+                <Camera className="size-4" aria-hidden />
+                {isMobile ? t("openGuidedCamera") : t("useCamera")}
               </button>
             </div>
           </div>
-        </div>
-      ) : null}
-     </div>
+
+          {/* Live capture plan — only once there's a photo to coach against. A 0%
+              bar before the first upload reads as judgement, not help. */}
+          {photos.length > 0 ? (
+            <div className="mt-4 rounded-2xl border border-border bg-background/60 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                  {t("capturePlan")}
+                </p>
+                <span className="text-xs font-semibold text-brand-strong">
+                  {t("photoConfidence", { percent: liveConfidence })}
+                </span>
+              </div>
+              <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-border">
+                <div
+                  className="h-full rounded-full bg-brand transition-all"
+                  style={{ width: `${liveConfidence}%` }}
+                />
+              </div>
+              <p className="mt-2 text-xs text-muted">
+                {nextShot
+                  ? t("nextBestShot", {
+                      title: t(`exampleShot_${nextShot.type}_title`).toLowerCase(),
+                      desc: t(`exampleShot_${nextShot.type}_desc`),
+                    })
+                  : t("greatCoverage")}
+              </p>
+              <div className="-mx-1 mt-3 flex snap-x gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
+                {EXAMPLE_SHOTS.map((shot) => {
+                  const done = presentTypes.has(shot.type);
+                  return (
+                    <button
+                      key={shot.type}
+                      type="button"
+                      onClick={() => addShotOfType(shot.type)}
+                      className={`flex min-w-[10.75rem] snap-start items-center gap-2 rounded-2xl border px-3 py-2 text-left text-xs transition sm:min-w-0 ${
+                        done
+                          ? "border-brand/30 bg-brand-soft text-brand-strong"
+                          : "border-border bg-surface text-foreground hover:border-brand"
+                      }`}
+                    >
+                      {done ? (
+                        <CheckCircle2 className="size-4 shrink-0 text-brand" aria-hidden />
+                      ) : isMobile ? (
+                        <Camera className="size-4 shrink-0 text-muted" aria-hidden />
+                      ) : (
+                        <Upload className="size-4 shrink-0 text-muted" aria-hidden />
+                      )}
+                      <span className="min-w-0">
+                        <span className="block font-semibold">
+                          {t(`exampleShot_${shot.type}_title`)}
+                        </span>
+                        <span className="block text-[11px] text-muted">
+                          {done ? t("shotAdded") : isMobile ? t("shotTapToAdd") : t("shotUpload")}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
+
+          {photos.length === 0 ? (
+            <div className="mt-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                {t("exampleShots")}
+              </p>
+              <div className="-mx-1 mt-2 flex snap-x gap-3 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0">
+                {EXAMPLE_SHOTS.map((shot) => (
+                  <button
+                    key={shot.type}
+                    type="button"
+                    onClick={() => addShotOfType(shot.type)}
+                    className={`min-w-[12rem] snap-start overflow-hidden rounded-2xl border text-left transition hover:border-brand sm:min-w-0 ${
+                      photoType === shot.type
+                        ? "border-brand bg-brand-soft"
+                        : "border-border bg-surface"
+                    }`}
+                  >
+                    <div className="relative aspect-[4/3] bg-[linear-gradient(135deg,var(--brand-soft),var(--surface))]">
+                      <div className="absolute inset-x-4 bottom-4 h-8 rounded-t-lg border border-brand/25 bg-surface/70" />
+                      <div className="absolute bottom-4 left-8 h-12 w-7 rounded-full bg-brand/25" />
+                      <div className="absolute bottom-4 right-8 h-16 w-8 rounded-full bg-brand/30" />
+                      {shot.overlay === "wide" ? (
+                        <div className="absolute inset-5 rounded-lg border-2 border-dashed border-brand/60" />
+                      ) : null}
+                      {shot.overlay === "plant" ? (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="flex size-20 items-center justify-center rounded-full border-2 border-dashed border-brand/70 bg-surface/50">
+                            <Leaf className="size-8 text-brand" aria-hidden />
+                          </div>
+                        </div>
+                      ) : null}
+                      {shot.overlay === "measure" ? (
+                        <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 items-center gap-2">
+                          <div className="h-1 flex-1 rounded-full bg-brand/70" />
+                          <Ruler className="size-6 text-brand" aria-hidden />
+                        </div>
+                      ) : null}
+                    </div>
+                    <div className="p-3">
+                      <p className="text-sm font-semibold text-foreground">
+                        {t(`exampleShot_${shot.type}_title`)}
+                      </p>
+                      <p className="mt-1 text-xs text-muted">
+                        {t(`exampleShot_${shot.type}_desc`)}
+                      </p>
+                      <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-brand-strong">
+                        {isMobile ? (
+                          <Camera className="size-3.5" aria-hidden />
+                        ) : (
+                          <Upload className="size-3.5" aria-hidden />
+                        )}
+                        {isMobile ? t("shotTapToAdd") : t("shotUpload")}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <div className="mt-3 rounded-2xl bg-brand-soft p-3 text-xs text-brand-strong">
+                {t("betterPhotos")}
+              </div>
+            </div>
+          ) : null}
+
+          {issues.length > 0 ? (
+            <div className="mt-4 flex flex-col gap-2" aria-live="polite">
+              {issues.map((issue) => (
+                <div
+                  key={issue.id}
+                  className={`rounded-xl border px-3 py-2 text-sm ${
+                    issue.severity === "error"
+                      ? "border-danger/30 bg-danger/10 text-danger"
+                      : "border-[var(--warn)]/30 bg-[var(--warn)]/10 text-[var(--warn)]"
+                  }`}
+                >
+                  <span className="font-semibold">{issue.fileName}: </span>
+                  {issue.message}
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          {photos.length > 0 ? (
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {photos.map((photo, index) => (
+                <figure
+                  key={photo.id}
+                  className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm"
+                >
+                  <div className="relative">
+                    {photo.previewUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={photo.previewUrl}
+                        alt={t("photoAlt", {
+                          label: PHOTO_TYPES.some((type) => type.value === photo.type)
+                            ? t(`photoType_${photo.type}_label`)
+                            : t("yardFallback"),
+                          index: index + 1,
+                        })}
+                        className="aspect-[4/3] w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex aspect-[4/3] items-center justify-center bg-brand-soft">
+                        <ImageOff className="size-8 text-brand" aria-hidden />
+                      </div>
+                    )}
+                    <span
+                      className={`absolute left-2 top-2 rounded-full border px-2 py-1 text-[11px] font-semibold ${qualityClass(photo.quality)}`}
+                    >
+                      {qualityLabel(photo.quality, t)}
+                    </span>
+                  </div>
+                  <figcaption className="flex flex-col gap-2 p-3 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-full bg-brand-soft px-2 py-0.5 font-semibold text-brand-strong">
+                        {index + 1}
+                      </span>
+                      <span className="min-w-0 flex-1 truncate text-muted">
+                        {photo.fileName ?? t("yardPhotoFallback")}
+                      </span>
+                    </div>
+                    <select
+                      value={photo.type}
+                      onChange={(e) => updatePhotoType(photo.id, e.target.value as PhotoAssetType)}
+                      className="min-h-11 w-full rounded-xl border border-border bg-background p-2 text-xs text-foreground"
+                      aria-label={t("photoTypeAria")}
+                    >
+                      {PHOTO_TYPES.map((type) => (
+                        <option key={type.value} value={type.value}>
+                          {t(`photoType_${type.value}_label`)}
+                        </option>
+                      ))}
+                    </select>
+                    {photo.warnings && photo.warnings.length > 0 ? (
+                      <p className="rounded-lg bg-background/70 p-2 text-[11px] leading-relaxed text-muted">
+                        {photo.warnings[0]}
+                      </p>
+                    ) : null}
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => movePhoto(photo.id, -1)}
+                        disabled={index === 0}
+                        className="rounded-full border border-border p-1.5 text-muted transition hover:text-foreground disabled:opacity-40"
+                        aria-label={t("movePhotoEarlier")}
+                      >
+                        <ArrowUp className="size-3.5" aria-hidden />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => movePhoto(photo.id, 1)}
+                        disabled={index === photos.length - 1}
+                        className="rounded-full border border-border p-1.5 text-muted transition hover:text-foreground disabled:opacity-40"
+                        aria-label={t("movePhotoLater")}
+                      >
+                        <ArrowDown className="size-3.5" aria-hidden />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => addShotOfType(photo.type)}
+                        className={`ml-auto inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold transition ${
+                          photo.quality === "good"
+                            ? "border-border text-muted hover:border-brand hover:text-foreground"
+                            : "border-brand/40 bg-brand-soft text-brand-strong"
+                        }`}
+                      >
+                        {isMobile ? (
+                          <Camera className="size-3.5" aria-hidden />
+                        ) : (
+                          <Upload className="size-3.5" aria-hidden />
+                        )}
+                        {isMobile ? t("retake") : t("replace")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(photo.id)}
+                        className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-1 text-[11px] font-semibold text-danger transition hover:border-danger/40"
+                      >
+                        <Trash2 className="size-3.5" aria-hidden />
+                        {t("remove")}
+                      </button>
+                    </div>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          ) : null}
+        </section>
+
+        <section className="card p-4 sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-2">
+              {busy ? (
+                <Loader2 className="size-4 animate-spin text-brand" aria-hidden />
+              ) : (
+                <CheckCircle2 className="size-4 text-brand" aria-hidden />
+              )}
+              <h2 className="text-lg font-semibold text-foreground">{t("confirmHeading")}</h2>
+            </div>
+            <span className="text-xs text-muted sm:ml-auto">{analysisStatus}</span>
+          </div>
+
+          {analysis ? (
+            <div className="mt-4 flex flex-col gap-4">
+              {draftRead ? (
+                <div className="flex items-start gap-2 rounded-xl border border-brand/25 bg-brand-soft p-3">
+                  <Sparkles className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
+                  <p className="text-sm font-medium text-brand-strong">{draftRead}</p>
+                </div>
+              ) : null}
+
+              {heroPhoto?.previewUrl && regionSummary ? (
+                <div className="rounded-xl border border-border bg-background/60 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                    {t("whatBloomprintSees")}
+                  </p>
+                  <p className="mt-1 text-[11px] text-muted">{t("whatBloomprintSeesBody")}</p>
+                  <div className="mt-2 grid gap-3 sm:grid-cols-[1.4fr_1fr]">
+                    <div className="relative overflow-hidden rounded-lg border border-border">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={heroPhoto.previewUrl}
+                        alt={t("heroPhotoAlt")}
+                        className="aspect-[3/2] w-full object-cover"
+                      />
+                      <div
+                        className="absolute inset-0 grid"
+                        style={{
+                          gridTemplateColumns: `repeat(${regionSummary.cols}, 1fr)`,
+                          gridTemplateRows: `repeat(${regionSummary.rows}, 1fr)`,
+                        }}
+                      >
+                        {regionSummary.cells.map((cell, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => setSelectedCell(selectedCell === i ? null : i)}
+                            aria-pressed={selectedCell === i}
+                            className={`transition ${selectedCell === i ? "ring-2 ring-inset ring-white" : ""}`}
+                            style={{ backgroundColor: REGION_STYLE[cell.cls].fill }}
+                            aria-label={t("cellAria", {
+                              label: regionLabel(cell.cls, t),
+                              index: i + 1,
+                              total: regionSummary.cells.length,
+                              percent: Math.round(coverageFor(cell.cls) * 100),
+                            })}
+                          />
+                        ))}
+                      </div>
+                      {selectedCell !== null && regionSummary.cells[selectedCell] ? (
+                        <div
+                          className="absolute inset-x-2 bottom-2 rounded-lg bg-black/75 px-3 py-1.5 text-xs text-white"
+                          aria-live="polite"
+                        >
+                          {t("cellDetail", {
+                            label: regionLabel(regionSummary.cells[selectedCell].cls, t),
+                            percent: Math.round(
+                              coverageFor(regionSummary.cells[selectedCell].cls) * 100,
+                            ),
+                          })}
+                        </div>
+                      ) : null}
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex flex-wrap gap-1.5">
+                        {sceneChips.length > 0 ? (
+                          sceneChips.map((chip, i) => (
+                            <span
+                              key={`${chip.label}-${i}`}
+                              className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
+                                chip.tone === "green"
+                                  ? "bg-brand-soft text-brand-strong"
+                                  : chip.tone === "sky"
+                                    ? "bg-sky-500/15 text-sky-700 dark:text-sky-300"
+                                    : chip.tone === "shade"
+                                      ? "bg-slate-500/15 text-slate-600 dark:text-slate-300"
+                                      : "bg-border/70 text-muted"
+                              }`}
+                            >
+                              {chip.label}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-xs text-muted">{t("notEnoughDetail")}</span>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">
+                          {t("greeneryVsHard")}
+                        </p>
+                        <div className="mt-1 flex h-3 overflow-hidden rounded-full bg-border">
+                          <div
+                            className="bg-brand"
+                            style={{ width: `${Math.round(regionSummary.greenRatio * 100)}%` }}
+                          />
+                          <div
+                            className="bg-slate-400"
+                            style={{ width: `${Math.round(regionSummary.hardscapeRatio * 100)}%` }}
+                          />
+                        </div>
+                        <p className="mt-1 text-[11px] text-muted">
+                          {t("greeneryHardSummary", {
+                            green: Math.round(regionSummary.greenRatio * 100),
+                            hard: Math.round(regionSummary.hardscapeRatio * 100),
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                <ReadinessCheck
+                  label={t("readinessDetailsLabel")}
+                  value={detailsDetected}
+                  yes={t("readinessDetailsYes")}
+                  no={t("readinessDetailsNo")}
+                  t={t}
+                />
+                <ReadinessCheck
+                  label={t("readinessPlantLabel")}
+                  value={plantIdentified}
+                  yes={t("readinessPlantYes")}
+                  no={t("readinessPlantNo")}
+                  t={t}
+                />
+                <ReadinessCheck
+                  label={t("readinessMeasureLabel")}
+                  value={measurementDetected}
+                  yes={t("readinessMeasureYes")}
+                  no={t("readinessMeasureNo")}
+                  t={t}
+                />
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
+                <div className="flex flex-col gap-3">
+                  <div className="rounded-xl border border-border bg-background/60 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                      {t("detectedZones")}
+                    </p>
+                    <ul className="mt-2 flex flex-col gap-2">
+                      {analysis.zones.length > 0 ? (
+                        analysis.zones.map((zone) => (
+                          <li
+                            key={zone.id}
+                            className="rounded-lg bg-brand-soft px-3 py-2 text-sm text-brand-strong"
+                          >
+                            {t("zoneItem", {
+                              label: findingText(zone.label),
+                              percent: Math.round(zone.confidence * 100),
+                            })}
+                          </li>
+                        ))
+                      ) : (
+                        <li className="rounded-lg bg-border/50 px-3 py-2 text-sm text-muted">
+                          {t("noUsableInfo")}
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                  <div className="rounded-xl border border-border bg-background/60 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                      {t("needsChecking")}
+                    </p>
+                    <ul className="mt-2 flex flex-col gap-2 text-sm text-muted">
+                      {analysis.missingInfo.map((item) => (
+                        <li key={item} className="flex gap-2">
+                          <AlertTriangle
+                            className="mt-0.5 size-4 shrink-0 text-[var(--warn)]"
+                            aria-hidden
+                          />
+                          <span>{findingText(item)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-border bg-background/60 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                    {t("editableAssumptions")}
+                  </p>
+                  <div className="mt-3 flex flex-col gap-3">
+                    {analysis.assumptions.map((item) => (
+                      <label key={item.id} className="flex flex-col gap-1 text-sm">
+                        <span className="flex flex-wrap items-center gap-2 font-medium text-foreground">
+                          {findingText(item.label)}
+                          {/* Shared trust language with the plan workspace (Phase 4) — same
+                              calm confidence read, with a tooltip explainer. */}
+                          <ConfidenceBadge level={item.confidence} />
+                        </span>
+                        <textarea
+                          value={assumptionEdits[item.id] ?? findingText(item.value)}
+                          onChange={(e) =>
+                            setAssumptionEdits((current) => ({
+                              ...current,
+                              [item.id]: e.target.value,
+                            }))
+                          }
+                          className="min-h-16 rounded-lg border border-border bg-surface p-2 text-sm text-foreground"
+                          disabled={!item.editable}
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 rounded-xl border border-border bg-background/60 p-4">
+              <Sparkles className="mb-2 size-5 text-brand" aria-hidden />
+              <p className="text-sm font-semibold text-foreground">{t("noAssumptionsTitle")}</p>
+              <p className="mt-1 text-sm text-muted">{t("noAssumptionsBody")}</p>
+            </div>
+          )}
+
+          <div className="sticky bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-20 mt-4 flex flex-col gap-2 rounded-3xl border border-border bg-surface/95 p-3 shadow-lg backdrop-blur sm:static sm:flex-row sm:items-center sm:rounded-2xl sm:shadow-none">
+            <button
+              type="button"
+              onClick={confirmAndContinue}
+              disabled={busy}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-on-strong transition hover:bg-brand-strong disabled:opacity-50"
+            >
+              <ClipboardEdit className="size-4" aria-hidden />
+              {t("confirmAndContinue")}
+            </button>
+            <button
+              type="button"
+              onClick={onSkip}
+              className="min-h-12 rounded-full border border-border px-5 py-2.5 text-sm font-semibold transition hover:border-brand"
+            >
+              {t("continueWithoutPhotos")}
+            </button>
+            <span className="text-center text-[11px] text-muted sm:ml-auto sm:text-left">
+              {t("draftSafeToLeave")}
+            </span>
+          </div>
+        </section>
+
+        {cameraOpen && typeof document !== "undefined"
+          ? createPortal(
+              <div
+                className="fixed inset-0 z-50 bg-black"
+                role="dialog"
+                aria-modal="true"
+                aria-label={t("guidedCamera")}
+              >
+                <div className="relative flex h-[100dvh] w-screen flex-col overflow-hidden bg-black text-white">
+                  <div
+                    className="absolute inset-x-0 top-0 z-20 flex items-start gap-3 bg-gradient-to-b from-black/75 via-black/35 to-transparent px-4 pb-8 pt-4"
+                    style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-white">{t("guidedCamera")}</p>
+                      <p className="line-clamp-2 text-xs text-white/75">
+                        {t("selectedTypeLine", {
+                          label: t(`photoType_${selectedType.value}_label`),
+                          hint: t(`photoType_${selectedType.value}_hint`),
+                        })}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setCameraOpen(false)}
+                      className="ml-auto flex size-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/45 text-white backdrop-blur transition hover:bg-white/10"
+                      aria-label={t("closeCamera")}
+                    >
+                      <X className="size-5" aria-hidden />
+                    </button>
+                  </div>
+
+                  <div className="relative min-h-0 flex-1 bg-black">
+                    <video
+                      ref={videoRef}
+                      playsInline
+                      muted
+                      className="h-full w-full object-cover"
+                    />
+
+                    <div className="pointer-events-none absolute inset-0 grid grid-cols-3 grid-rows-3">
+                      {Array.from({ length: 9 }).map((_, index) => (
+                        <div
+                          key={index}
+                          className={`${index % 3 !== 2 ? "border-r" : ""} ${
+                            index < 6 ? "border-b" : ""
+                          } border-white/25`}
+                        />
+                      ))}
+                    </div>
+
+                    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3">
+                      <div
+                        className={`border-2 border-dashed ${
+                          photoType === "measurement"
+                            ? "h-20 w-[min(78vw,22rem)] rounded-xl border-sky-300/80"
+                            : photoType === "existing_plants"
+                              ? "size-[min(54vw,13rem)] rounded-full border-lime-300/80"
+                              : photoType === "problem_area"
+                                ? "h-[min(44dvh,20rem)] w-[min(76vw,24rem)] rounded-[2rem] border-danger/85"
+                                : "h-[min(46dvh,22rem)] w-[min(78vw,24rem)] rounded-[2rem] border-yellow-300/80"
+                        }`}
+                      />
+                      <span className="mx-5 max-w-[21rem] rounded-full bg-black/65 px-4 py-2 text-center text-xs font-medium text-white/90 backdrop-blur-sm">
+                        {t("frameLine", {
+                          label: t(`photoType_${selectedType.value}_label`).toLowerCase(),
+                          hint: t(`photoType_${selectedType.value}_hint`),
+                        })}
+                      </span>
+                    </div>
+
+                    <div
+                      className="pointer-events-none absolute left-0 right-0 top-24 z-10 flex justify-center px-3"
+                      aria-live="polite"
+                    >
+                      <span className="rounded-full border border-white/15 bg-black/70 px-4 py-1.5 text-center text-xs font-semibold text-white shadow-lg backdrop-blur-md">
+                        {cameraTip}
+                      </span>
+                    </div>
+
+                    <div className="pointer-events-none absolute bottom-36 left-3 right-3 grid grid-cols-3 gap-2 text-[11px] sm:bottom-40">
+                      <LiveMetric
+                        label={t("metricLight")}
+                        ok={!liveSignal.tooDark && !liveSignal.tooBright}
+                        t={t}
+                      />
+                      <LiveMetric label={t("metricDetail")} ok={!liveSignal.lowDetail} t={t} />
+                      <LiveMetric label={t("metricLevel")} ok={!tilted} t={t} />
+                    </div>
+
+                    {(liveSignal.tooDark || liveSignal.tooBright || liveSignal.lowDetail) && (
+                      <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-danger/10">
+                        <span className="rounded-full bg-danger px-3 py-1 text-xs font-bold uppercase tracking-wide text-on-strong">
+                          {t("checkPhotoBeforeCapture")}
+                        </span>
+                      </div>
+                    )}
+
+                    {!cameraReady ? (
+                      <div
+                        className="absolute inset-0 flex items-center justify-center bg-black/70 text-white"
+                        role={cameraError ? "alert" : undefined}
+                      >
+                        <div className="text-center">
+                          <Loader2 className="mx-auto mb-2 size-6 animate-spin" aria-hidden />
+                          <p className="text-sm font-semibold">
+                            {cameraError ? t("cameraUnavailable") : t("openingCamera")}
+                          </p>
+                          {cameraError ? (
+                            <p className="mt-1 max-w-xs text-xs text-white/75">{cameraError}</p>
+                          ) : null}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  <div
+                    className="absolute inset-x-0 bottom-0 z-20 flex flex-col gap-4 bg-gradient-to-t from-black via-black/82 to-transparent px-4 pb-4 pt-10"
+                    style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}
+                  >
+                    <div className="-mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-1">
+                      {(
+                        [
+                          "front_yard",
+                          "problem_area",
+                          "existing_plants",
+                          "soil_drainage",
+                          "measurement",
+                        ] as PhotoAssetType[]
+                      ).map((type) => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => setPhotoType(type)}
+                          className={`min-h-10 shrink-0 snap-start rounded-full border px-3 text-xs font-semibold backdrop-blur ${
+                            photoType === type
+                              ? "border-white bg-white text-black"
+                              : "border-white/20 bg-white/10 text-white/78"
+                          }`}
+                        >
+                          {t(`photoType_${type}_label`)}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => inputRef.current?.click()}
+                        className="justify-self-start rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white backdrop-blur"
+                      >
+                        {t("uploadShort")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={captureFromCamera}
+                        disabled={!cameraReady || busy || captureBlocked}
+                        className="flex size-20 items-center justify-center rounded-full border-4 border-white bg-white/20 shadow-[0_0_0_6px_rgba(255,255,255,0.18)] backdrop-blur transition active:scale-95 disabled:opacity-45"
+                        aria-label={
+                          captureBlocked ? t("adjustShotToCapture") : t("captureGuidedPhoto")
+                        }
+                      >
+                        <span className="size-14 rounded-full bg-white" />
+                      </button>
+                      <span className="justify-self-end text-right text-[11px] font-medium text-white/65">
+                        {t("photoCount", { count: photos.length, max: MAX_PHOTOS })}
+                      </span>
+                    </div>
+                    {captureBlocked ? (
+                      <p className="text-center text-xs font-medium text-red-200">
+                        {t("captureBlockedNote")}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+              </div>,
+              document.body,
+            )
+          : null}
+      </div>
     </div>
   );
 }
@@ -1683,11 +1754,13 @@ function ReadinessCheck({
   value,
   yes,
   no,
+  t,
 }: {
   label: string;
   value: boolean;
   yes: string;
   no: string;
+  t: Translator;
 }) {
   return (
     <div className="rounded-xl border border-border bg-background/60 p-3">
@@ -1699,19 +1772,21 @@ function ReadinessCheck({
         )}
         <p className="text-sm font-semibold text-foreground">{label}</p>
       </div>
-      <p className="mt-1 text-xs text-muted">{value ? `Yes — ${yes}` : `No — ${no}`}</p>
+      <p className="mt-1 text-xs text-muted">
+        {value ? t("readinessYes", { text: yes }) : t("readinessNo", { text: no })}
+      </p>
     </div>
   );
 }
 
-function LiveMetric({ label, ok }: { label: string; ok: boolean }) {
+function LiveMetric({ label, ok, t }: { label: string; ok: boolean; t: Translator }) {
   return (
     <div
       className={`rounded-full border px-2 py-1 text-center font-semibold ${
         ok ? "border-white/20 bg-black/55 text-white" : "border-danger/40 bg-danger text-on-strong"
       }`}
     >
-      {label}: {ok ? "OK" : "Fix"}
+      {t("metricLabel", { label, state: ok ? t("metricOk") : t("metricFix") })}
     </div>
   );
 }

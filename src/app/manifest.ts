@@ -28,16 +28,10 @@ export default function manifest(): MetadataRoute.Manifest {
         description: "Start a photo-first yard plan",
       },
       {
-        name: "Dashboard",
-        short_name: "Dashboard",
-        url: "/dashboard",
-        description: "Resume saved projects",
-      },
-      {
-        name: "Saved plans",
-        short_name: "Saved",
+        name: "My plans",
+        short_name: "My plans",
         url: "/plans",
-        description: "Open saved yard plans",
+        description: "Resume drafts and open saved plans",
       },
     ],
   };

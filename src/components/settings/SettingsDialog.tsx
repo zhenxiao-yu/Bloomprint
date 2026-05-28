@@ -20,7 +20,6 @@ import {
   Sparkles,
   Sun,
   Trash2,
-  Type,
 } from "lucide-react";
 
 import { usePathname, useRouter } from "@/i18n/navigation";
@@ -31,7 +30,6 @@ import {
   setPreferences,
   usePreferences,
   type Currency,
-  type FontScale,
   type Units,
 } from "@/lib/preferencesStore";
 import {
@@ -49,12 +47,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
 import { BorderBeam } from "@/components/ui/border-beam";
 
 type SectionId = "appearance" | "language" | "units" | "notifications" | "privacy";
 
-const FONT_ORDER: FontScale[] = ["compact", "default", "comfortable", "large"];
 const THEME_ORDER = ["light", "dark", "system"] as const;
 
 export function SettingsDialog({ children }: { children: React.ReactNode }) {
@@ -75,25 +71,27 @@ export function SettingsDialog({ children }: { children: React.ReactNode }) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
         showCloseButton
-        className="top-auto bottom-0 max-h-[92dvh] w-full max-w-2xl translate-y-0 gap-0 overflow-hidden rounded-t-3xl rounded-b-none border-border bg-surface/95 p-0 backdrop-blur-2xl data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2 sm:rounded-3xl"
+        className="top-auto bottom-0 flex max-h-[90dvh] w-full max-w-2xl translate-y-0 flex-col gap-0 overflow-hidden rounded-t-3xl rounded-b-none border-border bg-surface/95 p-0 backdrop-blur-2xl data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom sm:top-1/2 sm:bottom-auto sm:max-h-[85vh] sm:min-h-120 sm:max-w-4xl sm:-translate-y-1/2 sm:rounded-3xl"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <BorderBeam size={120} duration={8} borderWidth={1.2} className="opacity-50" />
 
-        <DialogHeader className="relative gap-1 border-b border-border/70 px-5 pt-4 pb-3 text-left sm:px-6">
+        <DialogHeader className="relative gap-1.5 border-b border-border/70 px-5 pt-4 pb-3.5 text-left sm:px-7 sm:pt-6 sm:pb-5">
           <span aria-hidden className="mx-auto mb-1 h-1.5 w-10 rounded-full bg-border sm:hidden" />
-          <DialogTitle className="title-3 flex items-center gap-2 text-lg">
-            <Sparkles className="size-4 text-brand" aria-hidden />
+          <DialogTitle className="title-3 flex items-center gap-2 text-lg sm:text-xl">
+            <Sparkles className="size-5 text-brand" aria-hidden />
             {t("title")}
           </DialogTitle>
-          <DialogDescription className="text-sm text-muted">{t("subtitle")}</DialogDescription>
+          <DialogDescription className="text-sm leading-relaxed text-muted">
+            {t("subtitle")}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex min-h-0 flex-1 flex-col sm:flex-row">
           {/* Section nav — horizontal pills on mobile, vertical rail on desktop. */}
           <nav
             aria-label={t("title")}
-            className="flex shrink-0 gap-1 overflow-x-auto border-b border-border/70 px-3 py-2 sm:w-48 sm:flex-col sm:overflow-visible sm:border-r sm:border-b-0 sm:px-2 sm:py-3"
+            className="flex shrink-0 gap-1 overflow-x-auto border-b border-border/70 px-3 py-2 sm:w-60 sm:flex-col sm:gap-1.5 sm:overflow-visible sm:border-r sm:border-b-0 sm:px-3 sm:py-4"
           >
             {SECTIONS.map(({ id, icon: Icon }) => {
               const active = section === id;
@@ -122,7 +120,7 @@ export function SettingsDialog({ children }: { children: React.ReactNode }) {
           </nav>
 
           {/* Scrollable section body. */}
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-6 sm:py-5">
+          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-8 sm:py-6">
             <AnimatePresence mode="wait">
               <motion.div
                 key={section}
@@ -161,17 +159,21 @@ function Row({
   htmlFor?: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-background/50 px-3.5 py-3">
-      <label htmlFor={htmlFor} className="min-w-0 flex-1 cursor-pointer">
-        <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
+    <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3 rounded-2xl border border-border bg-background/50 px-4 py-3.5 transition-colors hover:border-border/80">
+      <label htmlFor={htmlFor} className="min-w-0 flex-1 basis-48 cursor-pointer">
+        <span className="flex items-center gap-2 text-[0.9375rem] font-semibold text-foreground">
           {Icon && <Icon className="size-4 shrink-0 text-brand" aria-hidden />}
           {title}
         </span>
         {description && (
-          <span className="mt-0.5 block text-xs leading-relaxed text-muted">{description}</span>
+          <span className="mt-1 block text-[0.8125rem] leading-relaxed text-muted">
+            {description}
+          </span>
         )}
       </label>
-      <div className="shrink-0">{control}</div>
+      {/* No shrink-0: the control must be allowed to shrink so a wide Segmented wraps its
+          options instead of overflowing the modal edge. */}
+      <div className="flex min-w-0 max-w-full justify-end">{control}</div>
     </div>
   );
 }
@@ -189,7 +191,11 @@ function Segmented<T extends string>({
 }) {
   const groupId = useId();
   return (
-    <div role="group" aria-label={ariaLabel} className="flex rounded-full border border-border p-0.5">
+    <div
+      role="group"
+      aria-label={ariaLabel}
+      className="flex max-w-full flex-wrap justify-end rounded-full border border-border p-0.5"
+    >
       {options.map((opt) => {
         const active = value === opt.value;
         const Icon = opt.icon;
@@ -238,7 +244,6 @@ function AppearanceSection() {
     mounted && THEME_ORDER.includes(theme as (typeof THEME_ORDER)[number])
       ? (theme as (typeof THEME_ORDER)[number])
       : "system";
-  const fontIndex = Math.max(0, FONT_ORDER.indexOf(prefs.fontScale));
 
   return (
     <div className="space-y-3">
@@ -260,29 +265,6 @@ function AppearanceSection() {
           />
         }
       />
-
-      {/* Font size slider with live preview. */}
-      <div className="rounded-2xl border border-border bg-background/50 px-3.5 py-3">
-        <div className="flex items-center justify-between gap-3">
-          <span className="flex items-center gap-2 text-sm font-semibold text-foreground">
-            <Type className="size-4 text-brand" aria-hidden />
-            {t("fontSize")}
-          </span>
-          <span className="text-xs font-medium text-muted">{t(`font_${prefs.fontScale}`)}</span>
-        </div>
-        <Slider
-          className="mt-3"
-          min={0}
-          max={3}
-          step={1}
-          value={[fontIndex]}
-          onValueChange={([v]) => setPreferences({ fontScale: FONT_ORDER[v] ?? "default" })}
-          aria-label={t("fontSize")}
-        />
-        <p className="mt-2 truncate text-muted" aria-hidden>
-          {t("fontPreview")}
-        </p>
-      </div>
 
       <Row
         icon={Gauge}

@@ -8,6 +8,6 @@ import { STORAGE_KEY } from "@/lib/preferencesStore";
 export function PreferencesScript() {
   const js = `(function(){try{var p=JSON.parse(localStorage.getItem(${JSON.stringify(
     STORAGE_KEY,
-  )})||"{}");var e=document.documentElement;e.dataset.fontScale=p.fontScale||"default";e.dataset.reduceMotion=String(!!p.reduceMotion);e.dataset.contrast=p.highContrast?"high":"normal";e.dataset.tap=p.largeTapTargets?"large":"normal";}catch(_){}})();`;
+  )})||"{}");var e=document.documentElement;e.dataset.fontScale="default";e.dataset.reduceMotion=String(!!p.reduceMotion);e.dataset.contrast=p.highContrast?"high":"normal";e.dataset.tap=p.largeTapTargets?"large":"normal";}catch(_){}})();`;
   return <script dangerouslySetInnerHTML={{ __html: js }} suppressHydrationWarning />;
 }
