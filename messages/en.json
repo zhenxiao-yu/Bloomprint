@@ -1660,6 +1660,30 @@
         "Toxicity and invasive flags are conservative; confirm for your area.",
         "Check the plant tag at the nursery before buying."
       ]
+    },
+    "hardiness": {
+      "title": "Hardiness Zone Finder",
+      "intro": "Look up your USDA plant hardiness zone by ZIP — the number every plant tag (and our Plant Finder) uses.",
+      "zipLabel": "US ZIP code",
+      "zipPlaceholder": "e.g. 20001",
+      "find": "Find my zone",
+      "loading": "Looking up…",
+      "zoneLabel": "Your hardiness zone",
+      "tempRange": "Average coldest winter lows: {low}°F to {high}°F",
+      "errInvalid": "Enter a 5-digit US ZIP code.",
+      "errNotFound": "No zone found for that ZIP — check the digits, or use the USDA map.",
+      "errUnreachable": "Couldn't reach the zone service. Try again, or enter your zone manually.",
+      "verify": "Live from the USDA map — confirm before relying on it for borderline plants.",
+      "usePlantFinder": "Use this zone in the Plant Finder to see what thrives.",
+      "formula": "ZIP → USDA 2023 hardiness zone (coldest-winter-low band)",
+      "how": "We look up your ZIP against the USDA 2023 Plant Hardiness Zone Map (via phzmapi.org). Your zone is the band of average coldest winter temperatures; plants are rated for the coldest zone they survive.",
+      "evidence": [
+        "Source: USDA 2023 Plant Hardiness Zone Map, via phzmapi.org (keyless).",
+        "Zones are 10°F bands; the 'a'/'b' suffix splits each in half.",
+        "Microclimates vary — a sheltered city yard can run a half-zone warmer."
+      ],
+      "emptyTitle": "Enter your ZIP",
+      "emptyBody": "We'll look up your USDA hardiness zone."
     }
   }
 }

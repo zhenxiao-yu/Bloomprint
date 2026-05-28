@@ -3,6 +3,7 @@ import {
   Droplets,
   Layers,
   Leaf,
+  MapPin,
   Mountain,
   Ruler,
   Scissors,
@@ -40,6 +41,10 @@ const COMPONENTS: Record<string, () => Promise<{ default: ComponentType }>> = {
     import("@/components/toolbox/tools/PlantFinderCalculator").then((m) => ({
       default: m.PlantFinderCalculator,
     })),
+  hardiness: () =>
+    import("@/components/toolbox/tools/HardinessCalculator").then((m) => ({
+      default: m.HardinessCalculator,
+    })),
 };
 
 const ICONS: Record<string, LucideIcon> = {
@@ -50,6 +55,7 @@ const ICONS: Record<string, LucideIcon> = {
   spacing: Sprout,
   watering: Droplets,
   plantFinder: Leaf,
+  hardiness: MapPin,
 };
 
 export const TOOL_REGISTRY: ToolEntry[] = TOOL_CATALOG.map((meta) => ({
