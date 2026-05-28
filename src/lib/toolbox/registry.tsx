@@ -10,6 +10,7 @@ import {
   Mountain,
   Ruler,
   Scissors,
+  Sparkles,
   Sprout,
   type LucideIcon,
 } from "lucide-react";
@@ -53,6 +54,8 @@ const COMPONENTS: Record<string, () => Promise<{ default: ComponentType }>> = {
     import("@/components/toolbox/tools/FertilizerCalculator").then((m) => ({ default: m.FertilizerCalculator })),
   raisedBed: () =>
     import("@/components/toolbox/tools/RaisedBedCalculator").then((m) => ({ default: m.RaisedBedCalculator })),
+  gardenAi: () =>
+    import("@/components/toolbox/tools/GardenAiCalculator").then((m) => ({ default: m.GardenAiCalculator })),
 };
 
 const ICONS: Record<string, LucideIcon> = {
@@ -67,6 +70,7 @@ const ICONS: Record<string, LucideIcon> = {
   soilPh: FlaskConical,
   fertilizer: Beaker,
   raisedBed: Box,
+  gardenAi: Sparkles,
 };
 
 export const TOOL_REGISTRY: ToolEntry[] = TOOL_CATALOG.map((meta) => ({

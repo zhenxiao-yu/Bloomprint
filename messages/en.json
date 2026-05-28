@@ -1357,7 +1357,8 @@
       "planting": "Planting",
       "lookup": "Plant lookup",
       "climate": "Climate & timing",
-      "budget": "Budget & pro"
+      "budget": "Budget & pro",
+      "ai": "Garden AI"
     },
     "common": {
       "units": "Units",
@@ -1758,6 +1759,40 @@
       ],
       "emptyTitle": "Enter your bed size",
       "emptyBody": "Add length, width, and fill depth."
+    },
+    "gardenAi": {
+      "title": "Garden AI Helper",
+      "intro": "Ask a gardening question and get concise, honest guidance — powered by DeepSeek, with a built-in offline fallback.",
+      "topic": "Topic",
+      "topic_general": "General",
+      "topic_planting": "Planting",
+      "topic_watering": "Watering",
+      "topic_pruning": "Pruning",
+      "topic_pests": "Pests",
+      "topic_soil": "Soil",
+      "topic_lawn": "Lawn",
+      "placeholder": "e.g. When should I prune hydrangeas?",
+      "ask": "Ask",
+      "loading": "Thinking…",
+      "error": "Couldn't answer right now — try again.",
+      "aiBadge": "DeepSeek",
+      "offlineBadge": "Offline guidance",
+      "tipsTitle": "Tips",
+      "tryAsking": "Try asking",
+      "prompts": [
+        "When should I prune hydrangeas?",
+        "Why are my tomato leaves turning yellow?",
+        "How often should I water newly planted shrubs?"
+      ],
+      "formula": "your question → DeepSeek (or offline guidance) → answer + tips",
+      "how": "A single gardening question, answered concisely. When a DeepSeek key is configured it writes the reply; otherwise you get built-in guidance. Either way it sticks to general horticulture and won't invent prices, quantities, or plant-safety claims.",
+      "evidence": [
+        "Powered by DeepSeek when configured; deterministic offline guidance otherwise.",
+        "General guidance only — confirm specifics on the plant tag or with a local extension office.",
+        "No prices, exact quantities, brand names, or safety claims are invented."
+      ],
+      "emptyTitle": "Ask a gardening question",
+      "emptyBody": "Pick a topic and type your question."
     }
   }
 }

@@ -23,6 +23,7 @@ export const TOOL_CATEGORIES = [
   "lookup",
   "climate",
   "budget",
+  "ai",
 ] as const;
 export type ToolCategory = (typeof TOOL_CATEGORIES)[number];
 
@@ -61,6 +62,13 @@ export const TOOL_CATALOG: readonly ToolMeta[] = [
   { slug: "soilPh", category: "lawn", personas: ["homeowner", "pro", "yard-enthusiast"], effort: "quick" },
   { slug: "fertilizer", category: "lawn", personas: ["homeowner", "pro", "store-staff"], effort: "quick" },
   { slug: "raisedBed", category: "planting", personas: ["homeowner", "yard-enthusiast"], effort: "quick" },
+  {
+    slug: "gardenAi",
+    category: "ai",
+    personas: ["homeowner", "pro", "store-staff", "yard-enthusiast", "plant-enthusiast"],
+    effort: "involved",
+    usesLiveData: true,
+  },
 ];
 
 export const TOOL_SLUGS: readonly string[] = TOOL_CATALOG.map((t) => t.slug);

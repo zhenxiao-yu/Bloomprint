@@ -1357,7 +1357,8 @@
       "planting": "种植",
       "lookup": "植物查询",
       "climate": "气候与时机",
-      "budget": "预算与专业"
+      "budget": "预算与专业",
+      "ai": "园艺 AI"
     },
     "common": {
       "units": "单位",
@@ -1758,6 +1759,40 @@
       ],
       "emptyTitle": "输入花床尺寸",
       "emptyBody": "填入长、宽和填充深度。"
+    },
+    "gardenAi": {
+      "title": "园艺 AI 助手",
+      "intro": "提一个园艺问题，获得简明、靠谱的建议——由 DeepSeek 驱动，并内置离线兜底。",
+      "topic": "话题",
+      "topic_general": "综合",
+      "topic_planting": "种植",
+      "topic_watering": "浇水",
+      "topic_pruning": "修剪",
+      "topic_pests": "病虫害",
+      "topic_soil": "土壤",
+      "topic_lawn": "草坪",
+      "placeholder": "例如：绣球什么时候修剪？",
+      "ask": "提问",
+      "loading": "思考中……",
+      "error": "暂时无法回答——请重试。",
+      "aiBadge": "DeepSeek",
+      "offlineBadge": "离线建议",
+      "tipsTitle": "小贴士",
+      "tryAsking": "试试这样问",
+      "prompts": [
+        "绣球什么时候修剪？",
+        "番茄叶子为什么发黄？",
+        "新栽灌木要多久浇一次水？"
+      ],
+      "formula": "你的问题 → DeepSeek（或离线建议）→ 回答 + 小贴士",
+      "how": "单轮园艺问答，简明作答。配置了 DeepSeek 密钥时由它撰写回答；否则使用内置建议。无论哪种方式都只给通用园艺知识，不编造价格、数量或植物安全性结论。",
+      "evidence": [
+        "配置后由 DeepSeek 驱动；否则为确定性的离线建议。",
+        "仅为通用建议——具体信息请以植物标签或本地推广机构为准。",
+        "不编造价格、精确数量、品牌名或安全性结论。"
+      ],
+      "emptyTitle": "提一个园艺问题",
+      "emptyBody": "选一个话题并输入你的问题。"
     }
   }
 }
