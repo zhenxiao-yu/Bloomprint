@@ -1,5 +1,7 @@
 # Bloomprint
 
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 **Bloomprint turns yard inspiration into a buildable plan** — what to buy, how much, what tools,
 how many people, in what order, and what can go wrong.
 
@@ -91,3 +93,7 @@ Real providers (SerpApi / Perenual / Open-Meteo / GBIF) drop in behind the same 
 - [docs/LIVE_DATA_LAYER.md](docs/LIVE_DATA_LAYER.md) — optional live enrichment (prices, weather, plant facts, invasive)
 - [docs/FREE_DATA_MODE.md](docs/FREE_DATA_MODE.md) — how Bloomprint works without paid APIs (default)
 - [docs/MEASUREMENT_STRATEGY.md](docs/MEASUREMENT_STRATEGY.md) — manual dimensions, unknowns, confidence
+
+## License
+
+Released under the [MIT License](LICENSE).
