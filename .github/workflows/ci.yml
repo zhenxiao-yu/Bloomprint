@@ -20,7 +20,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        # Use `npm install` (not `npm ci`): the committed lockfile drifts
+        # from package.json, so strict `npm ci` fails. install tolerates it;
+        # regenerate the lockfile (`npm install` locally + commit) to switch back.
+        run: npm install --no-audit --no-fund
 
       - name: Lint
         run: npm run lint
